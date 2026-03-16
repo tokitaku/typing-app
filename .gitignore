@@ -3,3 +3,13 @@ node_modules
 coverage
 dist
 npm-debug.log*
+.serena
+
+# Environment
+.env*.local
+
+# macOS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
