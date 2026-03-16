@@ -1,0 +1,1 @@
+タスク完了時は最低限 npm test, npm run lint, npm run build を順に実行して通過を確認する。MVP ではミス問題保存と結果表示が localStorage 依存のため、ブラウザ上でも一連の導線を確認するとよい。
