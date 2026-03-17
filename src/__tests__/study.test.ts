@@ -29,6 +29,30 @@ describe("study utilities", () => {
     ).toBe(true);
   });
 
+  it("filters learn problems by specified levels", () => {
+    const level1Only = buildProblemSet("learn", [], [1]);
+
+    expect(level1Only.length).toBeGreaterThan(0);
+    expect(level1Only.every((problem) => problem.level === 1)).toBe(true);
+  });
+
+  it("filters learn problems by level 3", () => {
+    const level3Only = buildProblemSet("learn", [], [3]);
+
+    expect(level3Only.length).toBeGreaterThan(0);
+    expect(level3Only.every((problem) => problem.level === 3)).toBe(true);
+  });
+
+  it("does not apply level filter in review mode", () => {
+    const level1Id = problems.find((p) => p.level === 1)!.id;
+    const level3Id = problems.find((p) => p.level === 3)!.id;
+    const reviewProblems = buildProblemSet("review", [level1Id, level3Id], [1]);
+
+    expect(reviewProblems).toHaveLength(2);
+    const ids = reviewProblems.map((p) => p.id).sort((a, b) => a - b);
+    expect(ids).toEqual([level1Id, level3Id].sort((a, b) => a - b));
+  });
+
   it("marks typed characters with real-time states", () => {
     const states = getCharacterStates("apple", "apx");
 
