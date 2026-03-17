@@ -5,8 +5,47 @@ const MISTAKE_LOG_KEY = "typing-app::mistake_log";
 const STUDY_RESULT_KEY = "typing-app::study_result";
 const LATEST_RESULT_KEY = "typing-app::latest-result";
 const SETTINGS_KEY = "typing-app::settings";
+const AVAILABLE_LEVELS = [1, 2, 3] as const;
 
 const DEFAULT_SETTINGS: Settings = { levels: [1] };
+
+function normalizeLevel(level: unknown): number | null {
+  const numericLevel =
+    typeof level === "number"
+      ? level
+      : typeof level === "string" && level.trim() !== ""
+        ? Number(level)
+        : Number.NaN;
+
+  return AVAILABLE_LEVELS.includes(numericLevel as (typeof AVAILABLE_LEVELS)[number])
+    ? numericLevel
+    : null;
+}
+
+function normalizeSettings(input: unknown): Settings {
+  const mergedSettings =
+    typeof input === "object" && input !== null
+      ? { ...DEFAULT_SETTINGS, ...(input as Partial<Settings>) }
+      : DEFAULT_SETTINGS;
+  const sourceLevels = Array.isArray(mergedSettings.levels)
+    ? mergedSettings.levels
+    : DEFAULT_SETTINGS.levels;
+  const normalizedLevels = Array.from(
+    new Set(
+      sourceLevels
+        .map((level) => normalizeLevel(level))
+        .filter((level): level is number => level !== null)
+    )
+  ).sort((left, right) => left - right);
+
+  return {
+    ...DEFAULT_SETTINGS,
+    levels:
+      normalizedLevels.length > 0
+        ? normalizedLevels
+        : [...DEFAULT_SETTINGS.levels]
+  };
+}
 
 function safeRead<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") {
@@ -67,11 +106,12 @@ export function appendStudyResult(result: StudyResult) {
 }
 
 export function getSettings(): Settings {
-  return safeRead<Settings>(SETTINGS_KEY, DEFAULT_SETTINGS);
+  const settings = safeRead<unknown>(SETTINGS_KEY, DEFAULT_SETTINGS);
+  return normalizeSettings(settings);
 }
 
 export function saveSettings(settings: Settings): void {
-  safeWrite(SETTINGS_KEY, settings);
+  safeWrite(SETTINGS_KEY, normalizeSettings(settings));
 }
 
 export function getTodaySummary(): DailySummary {
