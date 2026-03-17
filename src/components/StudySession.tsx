@@ -14,6 +14,7 @@ import {
   appendReviewQueue,
   appendStudyResult,
   getReviewQueue,
+  getSettings,
   removeRecoveredProblemIds,
   saveLatestResult
 } from "@/lib/storage";
@@ -42,7 +43,8 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
   useEffect(() => {
     const reviewQueue = getReviewQueue();
-    setProblemSet(buildProblemSet(mode, reviewQueue));
+    const { levels } = getSettings();
+    setProblemSet(buildProblemSet(mode, reviewQueue, levels));
     setCurrentIndex(0);
     setInputValue("");
     setElapsedMs(0);

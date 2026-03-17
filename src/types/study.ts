@@ -38,3 +38,7 @@ export type DailySummary = {
   solvedProblems: number;
   reviewBacklog: number;
 };
+
+export type Settings = {
+  levels: number[];
+};

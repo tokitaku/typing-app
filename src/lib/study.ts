@@ -23,6 +23,7 @@ function shuffleProblems(items: Problem[]): Problem[] {
 export function buildProblemSet(
   mode: StudyMode,
   missedIds: number[],
+  levels: number[] = [1, 2, 3],
   sessionQuestionCount = SESSION_QUESTION_COUNT
 ): Problem[] {
   if (mode === "review") {
@@ -31,7 +32,10 @@ export function buildProblemSet(
     return shuffleProblems(reviewSet).slice(0, sessionQuestionCount);
   }
 
-  return shuffleProblems(problems).slice(0, Math.min(sessionQuestionCount, problems.length));
+  const filtered = levels.length > 0
+    ? problems.filter((problem) => levels.includes(problem.level))
+    : problems;
+  return shuffleProblems(filtered).slice(0, Math.min(sessionQuestionCount, filtered.length));
 }
 
 export function getCharacterStates(target: string, input: string): CharacterState[] {

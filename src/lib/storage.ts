@@ -1,9 +1,12 @@
-import type { DailySummary, MistakeLog, StudyResult } from "@/types/study";
+import type { DailySummary, MistakeLog, Settings, StudyResult } from "@/types/study";
 
 const REVIEW_QUEUE_KEY = "typing-app::review-queue";
 const MISTAKE_LOG_KEY = "typing-app::mistake_log";
 const STUDY_RESULT_KEY = "typing-app::study_result";
 const LATEST_RESULT_KEY = "typing-app::latest-result";
+const SETTINGS_KEY = "typing-app::settings";
+
+const DEFAULT_SETTINGS: Settings = { levels: [1, 2, 3] };
 
 function safeRead<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") {
@@ -61,6 +64,14 @@ export function getLatestResult(): StudyResult | null {
 export function appendStudyResult(result: StudyResult) {
   const history = safeRead<StudyResult[]>(STUDY_RESULT_KEY, []);
   safeWrite(STUDY_RESULT_KEY, [result, ...history].slice(0, 20));
+}
+
+export function getSettings(): Settings {
+  return safeRead<Settings>(SETTINGS_KEY, DEFAULT_SETTINGS);
+}
+
+export function saveSettings(settings: Settings): void {
+  safeWrite(SETTINGS_KEY, settings);
 }
 
 export function getTodaySummary(): DailySummary {
