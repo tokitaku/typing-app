@@ -16,24 +16,15 @@ const defaultSummary: DailySummary = {
 
 export function HomeDashboard() {
   const [summary, setSummary] = useState<DailySummary>(defaultSummary);
-  const [settings, setSettings] = useState<Settings>({ levels: [1, 2, 3] });
+  const [settings, setSettings] = useState<Settings>({ levels: [1] });
 
   useEffect(() => {
     setSummary(getTodaySummary());
     setSettings(getSettings());
   }, []);
 
-  const toggleLevel = (level: number) => {
-    const current = settings.levels;
-    const next = current.includes(level)
-      ? current.filter((l) => l !== level)
-      : [...current, level].sort();
-
-    if (next.length === 0) {
-      return;
-    }
-
-    const nextSettings = { ...settings, levels: next };
+  const selectLevel = (level: number) => {
+    const nextSettings = { ...settings, levels: [level] };
     setSettings(nextSettings);
     saveSettings(nextSettings);
   };
@@ -75,19 +66,21 @@ export function HomeDashboard() {
       </section>
 
       <section className="settings-section">
-        <p className="settings-label">出題レベル（通常学習）</p>
-        <div className="level-toggle-group">
+        <label className="settings-label" htmlFor="level-select">
+          出題レベル（通常学習）
+        </label>
+        <select
+          className="level-select"
+          id="level-select"
+          onChange={(event) => selectLevel(Number(event.target.value))}
+          value={settings.levels[0]}
+        >
           {ALL_LEVELS.map((level) => (
-            <button
-              className={`level-toggle ${settings.levels.includes(level) ? "is-active" : ""}`}
-              key={level}
-              onClick={() => toggleLevel(level)}
-              type="button"
-            >
+            <option key={level} value={level}>
               Level {level}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </section>
     </main>
   );

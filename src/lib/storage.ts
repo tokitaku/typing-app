@@ -6,7 +6,7 @@ const STUDY_RESULT_KEY = "typing-app::study_result";
 const LATEST_RESULT_KEY = "typing-app::latest-result";
 const SETTINGS_KEY = "typing-app::settings";
 
-const DEFAULT_SETTINGS: Settings = { levels: [1, 2, 3] };
+const DEFAULT_SETTINGS: Settings = { levels: [1] };
 
 function safeRead<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") {

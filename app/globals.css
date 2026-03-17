@@ -297,36 +297,24 @@ a {
   letter-spacing: 0.04em;
 }
 
-.level-toggle-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.level-toggle {
-  padding: 8px 20px;
+.level-select {
+  appearance: none;
+  padding: 10px 40px 10px 16px;
   border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface-strong);
-  color: var(--text-soft);
-  font-size: 0.9rem;
+  border-radius: 14px;
+  background:
+    var(--surface-strong)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b655e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  color: var(--text-main);
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
 }
 
-.level-toggle.is-active {
-  background: var(--primary);
+.level-select:focus {
+  outline: 2px solid rgba(24, 78, 59, 0.18);
   border-color: var(--primary);
-  color: white;
-}
-
-.level-toggle:hover:not(.is-active) {
-  border-color: var(--primary);
-  color: var(--primary);
 }
 
 @media (max-width: 720px) {
