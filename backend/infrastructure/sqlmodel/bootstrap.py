@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from typing import TypedDict
 
 from sqlalchemy import inspect, text
 from sqlmodel import select
@@ -14,7 +15,29 @@ from backend.infrastructure.sqlmodel.repositories import SqlModelQuestionReposit
 from backend.database import get_session
 
 
-EIKEN_LEVELS = [
+class EikenLevelSeed(TypedDict):
+    code: str
+    name: str
+    sort_order: int
+
+
+class QuestionTypeSeed(TypedDict):
+    code: QuestionTypeRecordCode
+    name: str
+
+
+class TypingQuestionSeedRequired(TypedDict):
+    eiken_level_code: str
+    question_type: str
+    english: str
+    japanese: str
+
+
+class TypingQuestionSeed(TypingQuestionSeedRequired, total=False):
+    is_active: bool
+
+
+EIKEN_LEVELS: list[EikenLevelSeed] = [
     {"code": "5", "name": "英検5級", "sort_order": 1},
     {"code": "4", "name": "英検4級", "sort_order": 2},
     {"code": "3", "name": "英検3級", "sort_order": 3},
@@ -24,12 +47,12 @@ EIKEN_LEVELS = [
     {"code": "1", "name": "英検1級", "sort_order": 7},
 ]
 
-QUESTION_TYPES = [
+QUESTION_TYPES: list[QuestionTypeSeed] = [
     {"code": QuestionTypeRecordCode.WORD, "name": "英単語"},
     {"code": QuestionTypeRecordCode.SENTENCE, "name": "英文章"},
 ]
 
-INITIAL_QUESTIONS = [
+INITIAL_QUESTIONS: list[TypingQuestionSeed] = [
     {"eiken_level_code": "5", "question_type": "word", "english": "apple", "japanese": "りんご"},
     {"eiken_level_code": "5", "question_type": "word", "english": "library", "japanese": "図書館"},
     {"eiken_level_code": "4", "question_type": "word", "english": "beautiful", "japanese": "美しい"},
@@ -44,7 +67,7 @@ INITIAL_QUESTIONS = [
 ]
 
 
-def seed_eiken_levels(database_url: str, levels: Iterable[dict[str, object]]) -> None:
+def seed_eiken_levels(database_url: str, levels: Iterable[EikenLevelSeed]) -> None:
     with get_session(database_url) as session:
         existing = session.exec(select(EikenLevelRecord.id)).first()
 
@@ -55,7 +78,7 @@ def seed_eiken_levels(database_url: str, levels: Iterable[dict[str, object]]) ->
         session.commit()
 
 
-def seed_question_types(database_url: str, question_types: Iterable[dict[str, object]]) -> None:
+def seed_question_types(database_url: str, question_types: Iterable[QuestionTypeSeed]) -> None:
     with get_session(database_url) as session:
         existing = session.exec(select(QuestionTypeRecord.id)).first()
 
@@ -66,7 +89,7 @@ def seed_question_types(database_url: str, question_types: Iterable[dict[str, ob
         session.commit()
 
 
-def seed_typing_questions(database_url: str, questions: Iterable[dict[str, object]]) -> None:
+def seed_typing_questions(database_url: str, questions: Iterable[TypingQuestionSeed]) -> None:
     repository = SqlModelQuestionRepository(database_url)
 
     for question in questions:
@@ -104,7 +127,7 @@ def migrate_legacy_words(database_url: str) -> None:
         if not inspector.has_table("words"):
             return  # 旧 words テーブルがなければ移行不要
 
-        rows = session.exec(
+        rows = session.execute(
             text(
                 """
                 SELECT english, japanese, level, is_active
