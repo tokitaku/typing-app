@@ -1,7 +1,15 @@
 # Type & Learn
 
 英単語と英語短文をタイピングしながら学ぶ MVP です。  
-`FastAPI` から問題データを取得し、ミスした問題を `localStorage` に保存して復習モードで再出題します。
+`FastAPI` から問題データを取得し、SQLite に保存した学習結果と `localStorage` の復習キューを組み合わせて再出題します。
+
+## 技術構成
+
+- フロントエンド: `Next.js 14`
+- バックエンド: `FastAPI`
+- DBアクセス: `SQLModel`
+- 永続化DB: `SQLite`
+- 開発環境: `docker compose`
 
 ## 機能
 
@@ -25,6 +33,8 @@
 ## 問題データ API
 
 - `FastAPI` は `GET /problems` で問題一覧を返します
+- `FastAPI` は `POST /study-results` で学習結果を保存します
+- `FastAPI` は `GET /study-results/latest` と `GET /study-results/summary/today` で結果表示と日次集計を返します
 - 初期データは `word` 30件、`sentence` 12件です
 - フロントは取得した一覧からランダムで10問出題します
 
@@ -36,12 +46,43 @@ docker compose up --build
 
 ブラウザで `http://localhost:3000` を開いてください。  
 `FastAPI` は `http://localhost:8000` で起動します。  
+SQLite のデータは `docker compose` の named volume `sqlite_data` に保存されるため、`docker compose down` では消えません。  
 
 停止する場合は別ターミナルで以下を実行してください。
 
 ```bash
 docker compose down
 ```
+
+DBデータも削除したい場合は以下を実行してください。
+
+```bash
+docker compose down -v
+```
+
+## 永続化の考え方
+
+- サーバー側の永続データ
+  - 問題データ: 起動時に SQLite へシード
+  - 学習結果: `POST /study-results` で SQLite に保存
+- ブラウザ側のローカルデータ
+  - 復習キュー
+  - ミス履歴
+  - 最新結果キャッシュ
+  - レベル設定
+- 役割分担
+  - SQLite: セッションをまたいで保持したいサーバー側データ
+  - `localStorage`: UI都合の即時参照やブラウザ依存の状態
+
+## 環境変数
+
+- `NEXT_PUBLIC_API_BASE_URL`
+  - フロントエンドが参照するAPIベースURL
+  - `docker compose` では `http://localhost:8000`
+- `DATABASE_URL`
+  - バックエンドが参照するDB接続文字列
+  - `docker compose` では `sqlite:////data/app.db`
+  - ホスト実行時のデフォルトは `sqlite:///./backend/app.db`
 
 ## テストと確認
 
@@ -77,10 +118,27 @@ npm run build
 ## 実装方針
 
 - リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
-- 問題データは `backend/main.py` の固定配列から API 配信
-- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、保存処理は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
-- `localStorage` には `mistake_log`、`study_result`、復習用キューを保存
-- PostgreSQL は今回の MVP スコープでは未導入
+- 問題データは起動時に SQLite へシードし、`SQLModel` 経由で API から配信
+- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、API 呼び出しは [`frontend/src/lib/api.ts`](./frontend/src/lib/api.ts)、ローカル保存は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
+- `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
+- SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用
+
+## DBスキーマ概要
+
+- `problems`
+  - `id`
+  - `type`
+  - `english`
+  - `japanese`
+  - `level`
+- `study_results`
+  - `id`
+  - `mode`
+  - `total_questions`
+  - `correct_rate`
+  - `mistakes`
+  - `average_time`
+  - `created_at`
 
 ## ローカル保存データ
 
@@ -89,8 +147,6 @@ npm run build
   - `mistake_count`
   - `created_at`
 - `typing-app::study_result`
-  - `total_questions`
-  - `correct_rate`
-  - `mistakes`
-  - `average_time`
-  - `created_at`
+  - API 保存失敗時のフォールバック用セッション履歴
+- `typing-app::latest-result`
+  - 結果画面の即時表示用キャッシュ

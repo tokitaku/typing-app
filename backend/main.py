@@ -1,8 +1,19 @@
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
+
+from backend.database import get_database_url, init_database
+from backend.repository import (
+    get_latest_study_result,
+    get_today_study_summary,
+    insert_study_result,
+    list_problems,
+    seed_problems,
+)
 
 
 class Problem(BaseModel):
@@ -15,6 +26,27 @@ class Problem(BaseModel):
 
 class ProblemListResponse(BaseModel):
     problems: list[Problem]
+
+
+class StudyResult(BaseModel):
+    mode: Literal["learn", "review"]
+    total_questions: int = Field(ge=1)
+    correct_rate: int = Field(ge=0, le=100)
+    mistakes: int = Field(ge=0)
+    average_time: int = Field(ge=0)
+    created_at: str
+
+    @field_validator("created_at")
+    @classmethod
+    def validate_created_at(cls, value: str) -> str:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+
+
+class DailyStudySummary(BaseModel):
+    date: str
+    sessions: int
+    solvedProblems: int
 
 
 PROBLEMS = [
@@ -135,22 +167,65 @@ PROBLEMS = [
 ]
 
 
-app = FastAPI(title="Typing App API")
+def create_app(database_url: str | None = None) -> FastAPI:
+    resolved_database_url = get_database_url(database_url)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        init_database(resolved_database_url)
+        seed_problems(
+            resolved_database_url,
+            [problem.model_dump() for problem in PROBLEMS],
+        )
+        yield
+
+    app = FastAPI(title="Typing App API", lifespan=lifespan)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    @app.get("/problems", response_model=ProblemListResponse)
+    def get_problems() -> ProblemListResponse:
+        return ProblemListResponse(
+            problems=[Problem(**problem) for problem in list_problems(resolved_database_url)]
+        )
+
+    @app.post(
+        "/study-results",
+        response_model=StudyResult,
+        status_code=status.HTTP_201_CREATED,
+    )
+    def create_study_result(study_result: StudyResult) -> StudyResult:
+        saved_result = insert_study_result(
+            resolved_database_url,
+            study_result.model_dump(),
+        )
+        return StudyResult(**saved_result)
+
+    @app.get("/study-results/latest", response_model=StudyResult)
+    def fetch_latest_study_result() -> StudyResult:
+        latest_result = get_latest_study_result(resolved_database_url)
+
+        if latest_result is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        return StudyResult(**latest_result)
+
+    @app.get("/study-results/summary/today", response_model=DailyStudySummary)
+    def fetch_today_study_summary() -> DailyStudySummary:
+        today = datetime.now(timezone.utc).date().isoformat()
+        return DailyStudySummary(**get_today_study_summary(resolved_database_url, today))
+
+    return app
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.get("/problems", response_model=ProblemListResponse)
-def get_problems() -> ProblemListResponse:
-    return ProblemListResponse(problems=PROBLEMS)
+app = create_app()

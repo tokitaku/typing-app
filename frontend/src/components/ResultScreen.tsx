@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getLatestResult, getTodaySummary } from "@/lib/storage";
+import { fetchLatestStudyResult, fetchTodayStudySummary } from "@/lib/api";
+import { getLatestResult, getReviewQueue, getTodaySummary } from "@/lib/storage";
 import type { DailySummary, StudyResult } from "@/types/study";
 
 function formatAverageTime(ms: number) {
@@ -21,8 +22,42 @@ export function ResultScreen() {
   const [todaySummary, setTodaySummary] = useState<DailySummary>(fallbackSummary);
 
   useEffect(() => {
-    setResult(getLatestResult());
-    setTodaySummary(getTodaySummary());
+    let isDisposed = false;
+
+    const loadResultScreen = async () => {
+      const localResult = getLatestResult();
+      const reviewBacklog = getReviewQueue().length;
+
+      if (!isDisposed) {
+        setResult(localResult);
+      }
+
+      try {
+        const [remoteResult, remoteSummary] = await Promise.all([
+          fetchLatestStudyResult(),
+          fetchTodayStudySummary()
+        ]);
+
+        if (isDisposed) {
+          return;
+        }
+
+        setResult(remoteResult ?? localResult);
+        setTodaySummary({ ...remoteSummary, reviewBacklog });
+      } catch {
+        if (isDisposed) {
+          return;
+        }
+
+        setTodaySummary(getTodaySummary());
+      }
+    };
+
+    void loadResultScreen();
+
+    return () => {
+      isDisposed = true;
+    };
   }, []);
 
   if (!result) {
