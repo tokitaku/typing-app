@@ -7,7 +7,7 @@ import {
   fetchLatestStudyResult,
   fetchTodayStudySummary
 } from "@/features/result-screen/api/resultScreenApi";
-import type { Quiz, StudyResult } from "@/domain/models/study";
+import type { Quiz, StudyResult } from "@/shared/types/study";
 
 const sampleResult: StudyResult = {
   mode: "learn",

@@ -3,7 +3,7 @@ import {
   getSettings,
   saveSettings
 } from "@/features/home-dashboard/storage/homeDashboardStorage";
-import type { Settings } from "@/domain/models/study";
+import type { Settings } from "@/shared/types/study";
 
 const SETTINGS_KEY = "typing-app::settings";
 

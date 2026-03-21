@@ -1,4 +1,4 @@
-import type { DailySummary, Quiz } from "@/domain/models/study";
+import type { DailySummary, Quiz } from "@/shared/types/study";
 
 export type QuizListResponseDto = {
   quizzes: Quiz[];

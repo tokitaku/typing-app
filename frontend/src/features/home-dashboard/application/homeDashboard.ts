@@ -3,7 +3,7 @@ import type {
   EikenLevel,
   QuizType,
   Settings
-} from "@/domain/models/study";
+} from "@/shared/types/study";
 import type { StudySummaryResponseDto } from "@/shared/api/studyApiTypes";
 
 export type HomeDashboardDto = {

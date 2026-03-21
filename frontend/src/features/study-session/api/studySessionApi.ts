@@ -1,8 +1,8 @@
-import type { EikenLevel, Quiz, QuizType, StudyResult } from "@/domain/models/study";
 import {
   fetchQuizList,
   postStudyResult
 } from "@/shared/api/studyApiClient";
+import type { EikenLevel, Quiz, QuizType, StudyResult } from "@/shared/types/study";
 
 export type FetchQuizzesOptions = {
   eikenLevels?: EikenLevel[];

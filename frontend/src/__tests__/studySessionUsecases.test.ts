@@ -3,7 +3,7 @@ import {
   completeStudySession,
   startStudySession
 } from "@/features/study-session/application/studySession";
-import type { Quiz, QuizProgress, Settings } from "@/domain/models/study";
+import type { Quiz, QuizProgress, Settings } from "@/shared/types/study";
 
 const settings: Settings = {
   eikenLevels: ["5", "4"],

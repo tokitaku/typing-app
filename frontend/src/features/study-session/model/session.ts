@@ -5,7 +5,7 @@ import type {
   QuizType,
   StudyMode,
   StudyResult
-} from "@/domain/models/study";
+} from "@/shared/types/study";
 
 export const SESSION_QUESTION_COUNT = 10;
 

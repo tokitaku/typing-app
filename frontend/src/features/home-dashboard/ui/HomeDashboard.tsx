@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
-import type { EikenLevel, QuizType } from "@/domain/models/study";
+import type { EikenLevel, QuizType } from "@/shared/types/study";
 
 const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [
   { value: "5", label: "英検5級" },

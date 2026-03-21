@@ -1,4 +1,4 @@
-import type { DailySummary, StudyResult } from "@/domain/models/study";
+import type { DailySummary, StudyResult } from "@/shared/types/study";
 import type { StudySummaryResponseDto } from "@/shared/api/studyApiTypes";
 
 export type ResultScreenDto = {

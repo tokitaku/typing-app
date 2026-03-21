@@ -24,7 +24,7 @@ import {
   removeRecoveredQuizIds,
   saveLatestResult
 } from "@/features/study-session/storage/studySessionStorage";
-import type { Quiz, QuizProgress, StudyMode } from "@/domain/models/study";
+import type { Quiz, QuizProgress, StudyMode } from "@/shared/types/study";
 
 type UseStudySessionResult = {
   quizSet: Quiz[];

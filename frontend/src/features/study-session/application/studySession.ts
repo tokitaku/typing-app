@@ -9,7 +9,7 @@ import type {
   Settings,
   StudyMode,
   StudyResult
-} from "@/domain/models/study";
+} from "@/shared/types/study";
 
 export type CompletedStudySessionDto = {
   summary: StudyResult;

@@ -14,7 +14,7 @@ import {
   getTodaySummary,
   saveSettings
 } from "@/features/home-dashboard/storage/homeDashboardStorage";
-import type { EikenLevel, QuizType } from "@/domain/models/study";
+import type { EikenLevel, QuizType } from "@/shared/types/study";
 
 function createFallbackDashboard(): HomeDashboardDto {
   return {
