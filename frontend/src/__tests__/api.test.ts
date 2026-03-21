@@ -20,9 +20,9 @@ const sampleQuizzes: Quiz[] = [
   {
     id: 1,
     type: "word",
+    eikenLevel: "5",
     english: "apple",
-    japanese: "りんご",
-    level: 1
+    japanese: "りんご"
   }
 ];
 
@@ -42,6 +42,26 @@ describe("study result api", () => {
     await expect(fetchQuizzes()).resolves.toEqual(sampleQuizzes);
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:8000/quizzes",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
+  it("fetches quizzes with filters when requested", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ quizzes: sampleQuizzes })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      fetchQuizzes({
+        eikenLevels: ["3", "pre2"],
+        questionTypes: ["word"]
+      })
+    ).resolves.toEqual(sampleQuizzes);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/quizzes?eiken_levels=3%2Cpre2&question_types=word",
       expect.objectContaining({ cache: "no-store" })
     );
   });

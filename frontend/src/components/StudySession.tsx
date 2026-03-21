@@ -61,10 +61,24 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
     const loadQuizSet = async () => {
       try {
-        const quizzes = await fetchQuizzes(abortController.signal);
+        const settings = getSettings();
+        const quizzes = await fetchQuizzes(
+          mode === "learn"
+            ? {
+                eikenLevels: settings.eikenLevels,
+                questionTypes: settings.questionTypes
+              }
+            : {},
+          abortController.signal
+        );
         const reviewQueue = getReviewQueue();
-        const { levels } = getSettings();
-        const nextQuizSet = buildQuizSet(quizzes, mode, reviewQueue, levels);
+        const nextQuizSet = buildQuizSet(
+          quizzes,
+          mode,
+          reviewQueue,
+          settings.eikenLevels,
+          settings.questionTypes
+        );
 
         setQuizSet(nextQuizSet);
         setIsEmptyQuizSet(mode === "learn" && nextQuizSet.length === 0);
@@ -157,7 +171,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
         <section className="empty-card">
           <p className="eyebrow">LEARN READY</p>
           <h1>出題できるクイズがありません。</h1>
-          <p>レベル設定を見直して、もう一度学習を開始してください。</p>
+          <p>英検級または出題タイプ設定を見直して、もう一度学習を開始してください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
           </Link>
@@ -274,7 +288,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <section className="problem-card">
         <div className="problem-meta">
           <span>{currentQuiz.type === "word" ? "単語" : "短文"}</span>
-          <span>Level {currentQuiz.level}</span>
+          <span>英検 {currentQuiz.eikenLevel}</span>
         </div>
         <p className="japanese-text">{currentQuiz.japanese}</p>
         <p className="english-target" aria-label="英語の正解文">

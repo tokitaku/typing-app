@@ -1,6 +1,8 @@
 import type {
+  EikenLevel,
   Quiz,
   QuizListResponse,
+  QuizType,
   StudyResult,
   StudySummaryResponse
 } from "@/types/study";
@@ -11,6 +13,11 @@ function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 }
 
+export type FetchQuizzesOptions = {
+  eikenLevels?: EikenLevel[];
+  questionTypes?: QuizType[];
+};
+
 async function readJsonResponse<T>(response: Response, errorMessage: string): Promise<T> {
   if (!response.ok) {
     throw new Error(`${errorMessage}: ${response.status}`);
@@ -19,8 +26,23 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
   return await response.json() as T;
 }
 
-export async function fetchQuizzes(signal?: AbortSignal): Promise<Quiz[]> {
-  const response = await fetch(`${getApiBaseUrl()}/quizzes`, {
+export async function fetchQuizzes(
+  options: FetchQuizzesOptions = {},
+  signal?: AbortSignal
+): Promise<Quiz[]> {
+  const searchParams = new URLSearchParams();
+
+  if (options.eikenLevels && options.eikenLevels.length > 0) {
+    searchParams.set("eiken_levels", options.eikenLevels.join(",")); // 英検級フィルタを付与する
+  }
+
+  if (options.questionTypes && options.questionTypes.length > 0) {
+    searchParams.set("question_types", options.questionTypes.join(",")); // 種別フィルタを付与する
+  }
+
+  const queryString = searchParams.toString();
+  const url = `${getApiBaseUrl()}/quizzes${queryString ? `?${queryString}` : ""}`;
+  const response = await fetch(url, {
     cache: "no-store",
     signal
   });

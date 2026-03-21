@@ -297,6 +297,10 @@ a {
   letter-spacing: 0.04em;
 }
 
+.settings-subtitle {
+  margin-top: 20px;
+}
+
 .level-select {
   appearance: none;
   padding: 10px 40px 10px 16px;
@@ -315,6 +319,31 @@ a {
 .level-select:focus {
   outline: 2px solid rgba(24, 78, 59, 0.18);
   border-color: var(--primary);
+}
+
+.settings-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.settings-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-chip input {
+  margin: 0;
+  accent-color: var(--primary);
 }
 
 @media (max-width: 720px) {
