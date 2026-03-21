@@ -31,23 +31,24 @@
 ## セットアップ
 
 ```bash
-npm install
-export NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-uv venv .venv
-source .venv/bin/activate
-uv pip install -r backend/requirements.txt
-uv run uvicorn main:app --reload --app-dir backend
-npm run dev
+npm run setup
+```
+
+## 開発サーバー起動
+
+```bash
+npm run dev:all
 ```
 
 ブラウザで `http://localhost:3000` を開いてください。  
-`FastAPI` は `http://localhost:8000` で起動します。
+`FastAPI` は `http://localhost:8000` で起動します。  
+個別に起動したい場合は `npm run dev:frontend` と `npm run dev:backend` を使います。
 
 ## テストと確認
 
 ```bash
 npm test
-uv run pytest backend/tests
+uv run --python .venv/bin/python pytest backend/tests
 npm run build
 ```
 
