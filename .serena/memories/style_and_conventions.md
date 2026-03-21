@@ -1,1 +1,0 @@
-TypeScript strict を前提に App Router 構成で実装。src 以下に data/lib/components/types を分離し、絶対パスエイリアス @/* を利用。UI はグローバル CSS で一貫したトークンを定義。ブラウザ保存は localStorage を safeRead/safeWrite でラップして例外吸収する。

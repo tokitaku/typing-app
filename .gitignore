@@ -2,10 +2,11 @@
 frontend/.next
 node_modules
 frontend/node_modules
+.pytest_cache/
 coverage
 dist
 npm-debug.log*
-.serena
+.serena/
 
 # Environment
 .env*.local

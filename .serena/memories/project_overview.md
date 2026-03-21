@@ -1,1 +1,0 @@
-空ワークスペースから構築した英語タイピング学習アプリのMVP。技術スタックは Next.js 14 App Router + React 18 + TypeScript + Vitest。機能はホーム、通常学習、復習モード、結果表示、固定問題データ、localStorage によるミス問題保存と当日サマリ表示。問題データは src/data/problems.ts、学習ロジックは src/lib/study.ts、永続化は src/lib/storage.ts、UI は app/ と src/components/ に配置。
