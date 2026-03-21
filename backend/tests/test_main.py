@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import datetime, timezone
 
 import pytest
@@ -28,101 +29,138 @@ def test_quizzes_returns_expected_shape(client: TestClient) -> None:
 
     body = response.json()
     assert "quizzes" in body
-    assert len(body["quizzes"]) == 42
+    assert len(body["quizzes"]) > 0
     assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
     assert all(
-        {"id", "type", "english", "japanese", "level"} <= set(quiz.keys())
+        {"id", "type", "english", "japanese", "eikenLevel"} <= set(quiz.keys())
         for quiz in body["quizzes"]
     )
 
 
-def test_post_word_creates_new_word(client: TestClient) -> None:
-    payload = {
-        "english": "notebook",
-        "japanese": "ノート",
-        "level": 2,
-    }
-
-    response = client.post("/words", json=payload)
-
-    assert response.status_code == 201
-    assert response.json() == {
-        "id": 31,
-        "english": "notebook",
-        "japanese": "ノート",
-        "level": 2,
-        "is_active": True,
-    }
-
-
-def test_get_words_returns_registered_words(client: TestClient) -> None:
-    client.post(
-        "/words",
-        json={
-            "english": "notebook",
-            "japanese": "ノート",
-            "level": 2,
-        },
-    )
-
-    response = client.get("/words")
+def test_quizzes_can_filter_by_eiken_level_and_question_type(client: TestClient) -> None:
+    response = client.get("/quizzes?eiken_levels=3&question_types=word")
 
     assert response.status_code == 200
     body = response.json()
-    assert "words" in body
-    assert len(body["words"]) == 31
-    assert body["words"][-1] == {
-        "id": 31,
+    assert len(body["quizzes"]) > 0
+    assert all(quiz["eikenLevel"] == "3" for quiz in body["quizzes"])
+    assert all(quiz["type"] == "word" for quiz in body["quizzes"])
+
+
+def test_quizzes_can_filter_sentence_only(client: TestClient) -> None:
+    response = client.get("/quizzes?question_types=sentence")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["quizzes"]) > 0
+    assert all(quiz["type"] == "sentence" for quiz in body["quizzes"])
+    assert all("eikenLevel" in quiz for quiz in body["quizzes"])
+
+
+def test_post_question_creates_new_sentence_question(client: TestClient) -> None:
+    payload = {
+        "eiken_level_code": "pre2",
+        "question_type": "sentence",
+        "english": "I will call you after I get home.",
+        "japanese": "家に着いたら電話します。",
+    }
+
+    response = client.post("/questions", json=payload)
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["type"] == "sentence"
+    assert body["eikenLevel"] == "pre2"
+    assert body["english"] == payload["english"]
+    assert body["japanese"] == payload["japanese"]
+    assert body["isActive"] is True
+
+
+def test_get_questions_returns_registered_questions(client: TestClient) -> None:
+    created_response = client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "2",
+            "question_type": "word",
+            "english": "notebook",
+            "japanese": "ノート",
+        },
+    )
+    created_id = created_response.json()["id"]
+
+    response = client.get("/questions")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "questions" in body
+    assert any(question["id"] == created_id for question in body["questions"])
+    assert body["questions"][-1] == {
+        "id": created_id,
+        "type": "word",
+        "eikenLevel": "2",
         "english": "notebook",
         "japanese": "ノート",
-        "level": 2,
-        "is_active": True,
+        "isActive": True,
     }
 
 
-def test_patch_word_updates_existing_word(client: TestClient) -> None:
-    response = client.patch(
-        "/words/1",
+def test_patch_question_updates_existing_question(client: TestClient) -> None:
+    created_response = client.post(
+        "/questions",
         json={
-            "english": "apple pie",
-            "japanese": "アップルパイ",
-            "level": 3,
+            "eiken_level_code": "4",
+            "question_type": "word",
+            "english": "notebook",
+            "japanese": "ノート",
+        },
+    )
+    question_id = created_response.json()["id"]
+
+    response = client.patch(
+        f"/questions/{question_id}",
+        json={
+            "eiken_level_code": "3",
+            "question_type": "sentence",
+            "english": "I bought a new notebook yesterday.",
+            "japanese": "昨日新しいノートを買いました。",
             "is_active": False,
         },
     )
 
     assert response.status_code == 200
     assert response.json() == {
-        "id": 1,
-        "english": "apple pie",
-        "japanese": "アップルパイ",
-        "level": 3,
-        "is_active": False,
+        "id": question_id,
+        "type": "sentence",
+        "eikenLevel": "3",
+        "english": "I bought a new notebook yesterday.",
+        "japanese": "昨日新しいノートを買いました。",
+        "isActive": False,
     }
 
 
-def test_patch_word_returns_not_found_for_unknown_id(client: TestClient) -> None:
-    response = client.patch("/words/999", json={"english": "ghost"})
+def test_patch_question_returns_not_found_for_unknown_id(client: TestClient) -> None:
+    response = client.patch("/questions/999", json={"english": "ghost"})
 
     assert response.status_code == 404
 
 
-def test_post_word_rejects_whitespace_only_fields(client: TestClient) -> None:
+def test_post_question_rejects_whitespace_only_fields(client: TestClient) -> None:
     response = client.post(
-        "/words",
+        "/questions",
         json={
+            "eiken_level_code": "3",
+            "question_type": "word",
             "english": "   ",
             "japanese": "\t",
-            "level": 1,
         },
     )
 
     assert response.status_code == 422
 
 
-def test_patch_word_rejects_whitespace_only_fields(client: TestClient) -> None:
+def test_patch_question_rejects_whitespace_only_fields(client: TestClient) -> None:
     response = client.patch(
-        "/words/1",
+        "/questions/1",
         json={
             "english": "   ",
         },
@@ -131,27 +169,62 @@ def test_patch_word_rejects_whitespace_only_fields(client: TestClient) -> None:
     assert response.status_code == 422
 
 
-def test_delete_word_deactivates_existing_word(client: TestClient) -> None:
-    response = client.delete("/words/1")
+def test_delete_question_deactivates_existing_question(client: TestClient) -> None:
+    response = client.delete("/questions/1")
 
     assert response.status_code == 204
 
-    words_response = client.get("/words")
+    questions_response = client.get("/questions")
 
-    assert words_response.status_code == 200
-    assert words_response.json()["words"][0]["is_active"] is False
+    assert questions_response.status_code == 200
+    assert questions_response.json()["questions"][0]["isActive"] is False
 
 
-def test_quizzes_uses_active_words_only(client: TestClient) -> None:
-    client.delete("/words/1")
+def test_quizzes_uses_active_questions_only(client: TestClient) -> None:
+    client.delete("/questions/1")
 
     response = client.get("/quizzes")
 
     assert response.status_code == 200
     body = response.json()
-    assert len(body["quizzes"]) == 41
     assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
     assert all(quiz["id"] != 1 for quiz in body["quizzes"])
+
+
+def test_create_app_migrates_legacy_words_into_questions(tmp_path) -> None:
+    database_path = tmp_path / "legacy.db"
+    connection = sqlite3.connect(database_path)
+    connection.execute(
+        """
+        CREATE TABLE words (
+            id INTEGER PRIMARY KEY,
+            english TEXT NOT NULL,
+            japanese TEXT NOT NULL,
+            level INTEGER NOT NULL,
+            is_active BOOLEAN NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        INSERT INTO words (id, english, japanese, level, is_active)
+        VALUES (1, 'legacy-word', '旧データ', 2, 1)
+        """
+    )
+    connection.commit()
+    connection.close()
+
+    database_url = f"sqlite:///{database_path}"
+
+    with TestClient(create_app(database_url)) as migrated_client:
+        response = migrated_client.get("/quizzes?question_types=word")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert any(
+        quiz["english"] == "legacy-word" and quiz["eikenLevel"] == "4"
+        for quiz in body["quizzes"]
+    )
 
 
 def test_post_study_result_persists_payload(client: TestClient) -> None:

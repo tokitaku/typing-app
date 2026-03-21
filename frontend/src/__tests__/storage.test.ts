@@ -29,17 +29,32 @@ describe("storage settings", () => {
   it("normalizes malformed saved settings before returning them", () => {
     const { storage } = setupWindow();
 
-    storage.set(SETTINGS_KEY, JSON.stringify({ levels: ["2", 4, null, ""] }));
+    storage.set(
+      SETTINGS_KEY,
+      JSON.stringify({
+        eikenLevels: ["3", "pre2", "0", null],
+        questionTypes: ["sentence", "word", "other", "word"]
+      })
+    );
 
-    expect(getSettings()).toEqual({ levels: [2] });
+    expect(getSettings()).toEqual({
+      eikenLevels: ["3", "pre2"],
+      questionTypes: ["sentence", "word"]
+    });
   });
 
   it("normalizes settings before persisting them", () => {
     const { localStorageMock, storage } = setupWindow();
 
-    saveSettings({ levels: [3, 3, 9, Number.NaN] } as Settings);
+    saveSettings({
+      eikenLevels: ["pre2", "pre2", "2", "invalid"],
+      questionTypes: ["word", "word", "sentence", "invalid"]
+    } as Settings);
 
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(storage.get(SETTINGS_KEY) ?? "null")).toEqual({ levels: [3] });
+    expect(JSON.parse(storage.get(SETTINGS_KEY) ?? "null")).toEqual({
+      eikenLevels: ["pre2", "2"],
+      questionTypes: ["word", "sentence"]
+    });
   });
 });

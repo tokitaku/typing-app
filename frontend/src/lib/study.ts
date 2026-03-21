@@ -1,6 +1,8 @@
 import type {
+  EikenLevel,
   Quiz,
   QuizProgress,
+  QuizType,
   StudyResult,
   StudyMode
 } from "@/types/study";
@@ -23,7 +25,8 @@ export function buildQuizSet(
   quizzes: Quiz[],
   mode: StudyMode,
   missedIds: number[],
-  levels: number[] = [1, 2, 3],
+  eikenLevels: EikenLevel[] = ["5", "4", "3", "pre2", "2", "pre1", "1"],
+  questionTypes: QuizType[] = ["word", "sentence"],
   sessionQuestionCount = SESSION_QUESTION_COUNT
 ): Quiz[] {
   if (mode === "review") {
@@ -32,9 +35,11 @@ export function buildQuizSet(
     return shuffleQuizzes(reviewSet).slice(0, sessionQuestionCount);
   }
 
-  const filtered = levels.length > 0
-    ? quizzes.filter((quiz) => levels.includes(quiz.level))
-    : quizzes;
+  const filtered = quizzes.filter(
+    (quiz) =>
+      (eikenLevels.length === 0 || eikenLevels.includes(quiz.eikenLevel)) &&
+      (questionTypes.length === 0 || questionTypes.includes(quiz.type))
+  );
   return shuffleQuizzes(filtered).slice(0, Math.min(sessionQuestionCount, filtered.length));
 }
 

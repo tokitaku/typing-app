@@ -27,43 +27,51 @@
         }
       }
     },
-    "/words": {
+    "/quizzes": {
       "get": {
-        "summary": "Get Words",
-        "operationId": "get_words_words_get",
+        "summary": "Get Quizzes",
+        "operationId": "get_quizzes_quizzes_get",
+        "parameters": [
+          {
+            "name": "eiken_levels",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Eiken Levels"
+            }
+          },
+          {
+            "name": "question_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Question Types"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WordListResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Post Word",
-        "operationId": "post_word_words_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WordCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WordResponse"
+                  "$ref": "#/components/schemas/QuizListResponse"
                 }
               }
             }
@@ -81,18 +89,126 @@
         }
       }
     },
-    "/words/{word_id}": {
-      "patch": {
-        "summary": "Patch Word",
-        "operationId": "patch_word_words__word_id__patch",
+    "/questions": {
+      "get": {
+        "summary": "Get Questions",
+        "operationId": "get_questions_questions_get",
         "parameters": [
           {
-            "name": "word_id",
+            "name": "eiken_levels",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Eiken Levels"
+            }
+          },
+          {
+            "name": "question_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Question Types"
+            }
+          },
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Post Question",
+        "operationId": "post_question_questions_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/{question_id}": {
+      "patch": {
+        "summary": "Patch Question",
+        "operationId": "patch_question_questions__question_id__patch",
+        "parameters": [
+          {
+            "name": "question_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "integer",
-              "title": "Word Id"
+              "title": "Question Id"
             }
           }
         ],
@@ -101,7 +217,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WordUpdate"
+                "$ref": "#/components/schemas/QuestionUpdate"
               }
             }
           }
@@ -112,7 +228,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WordResponse"
+                  "$ref": "#/components/schemas/QuestionResponse"
                 }
               }
             }
@@ -130,16 +246,16 @@
         }
       },
       "delete": {
-        "summary": "Delete Word",
-        "operationId": "delete_word_words__word_id__delete",
+        "summary": "Delete Question",
+        "operationId": "delete_question_questions__question_id__delete",
         "parameters": [
           {
-            "name": "word_id",
+            "name": "question_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "integer",
-              "title": "Word Id"
+              "title": "Question Id"
             }
           }
         ],
@@ -160,28 +276,10 @@
         }
       }
     },
-    "/quizzes": {
-      "get": {
-        "summary": "Get Quizzes",
-        "operationId": "get_quizzes_quizzes_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/QuizListResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/study-results": {
       "post": {
-        "summary": "Create Study Result",
-        "operationId": "create_study_result_study_results_post",
+        "summary": "Post Study Result",
+        "operationId": "post_study_result_study_results_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -218,8 +316,8 @@
     },
     "/study-results/latest": {
       "get": {
-        "summary": "Fetch Latest Study Result",
-        "operationId": "fetch_latest_study_result_study_results_latest_get",
+        "summary": "Get Latest Result",
+        "operationId": "get_latest_result_study_results_latest_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -236,8 +334,8 @@
     },
     "/study-results/summary/today": {
       "get": {
-        "summary": "Fetch Today Study Summary",
-        "operationId": "fetch_today_study_summary_study_results_summary_today_get",
+        "summary": "Get Today Summary",
+        "operationId": "get_today_summary_study_results_summary_today_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -291,7 +389,58 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "Quiz": {
+      "QuestionCreate": {
+        "properties": {
+          "eiken_level_code": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Eiken Level Code"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "word",
+              "sentence"
+            ],
+            "title": "Question Type"
+          },
+          "english": {
+            "type": "string",
+            "minLength": 1,
+            "title": "English"
+          },
+          "japanese": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Japanese"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eiken_level_code",
+          "question_type",
+          "english",
+          "japanese"
+        ],
+        "title": "QuestionCreate"
+      },
+      "QuestionListResponse": {
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionResponse"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions"
+        ],
+        "title": "QuestionListResponse"
+      },
+      "QuestionResponse": {
         "properties": {
           "id": {
             "type": "integer",
@@ -305,6 +454,10 @@
             ],
             "title": "Type"
           },
+          "eikenLevel": {
+            "type": "string",
+            "title": "Eikenlevel"
+          },
           "english": {
             "type": "string",
             "title": "English"
@@ -313,28 +466,95 @@
             "type": "string",
             "title": "Japanese"
           },
-          "level": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 1.0,
-            "title": "Level"
+          "isActive": {
+            "type": "boolean",
+            "title": "Isactive"
           }
         },
         "type": "object",
         "required": [
           "id",
           "type",
+          "eikenLevel",
           "english",
           "japanese",
-          "level"
+          "isActive"
         ],
-        "title": "Quiz"
+        "title": "QuestionResponse"
+      },
+      "QuestionUpdate": {
+        "properties": {
+          "eiken_level_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eiken Level Code"
+          },
+          "question_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "word",
+                  "sentence"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Type"
+          },
+          "english": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "English"
+          },
+          "japanese": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Japanese"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "QuestionUpdate"
       },
       "QuizListResponse": {
         "properties": {
           "quizzes": {
             "items": {
-              "$ref": "#/components/schemas/Quiz"
+              "$ref": "#/components/schemas/QuizResponse"
             },
             "type": "array",
             "title": "Quizzes"
@@ -345,6 +565,43 @@
           "quizzes"
         ],
         "title": "QuizListResponse"
+      },
+      "QuizResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "word",
+              "sentence"
+            ],
+            "title": "Type"
+          },
+          "eikenLevel": {
+            "type": "string",
+            "title": "Eikenlevel"
+          },
+          "english": {
+            "type": "string",
+            "title": "English"
+          },
+          "japanese": {
+            "type": "string",
+            "title": "Japanese"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "eikenLevel",
+          "english",
+          "japanese"
+        ],
+        "title": "QuizResponse"
       },
       "StudyResult": {
         "properties": {
@@ -425,140 +682,6 @@
           "type"
         ],
         "title": "ValidationError"
-      },
-      "WordCreate": {
-        "properties": {
-          "english": {
-            "type": "string",
-            "minLength": 1,
-            "title": "English"
-          },
-          "japanese": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Japanese"
-          },
-          "level": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 1.0,
-            "title": "Level"
-          }
-        },
-        "type": "object",
-        "required": [
-          "english",
-          "japanese",
-          "level"
-        ],
-        "title": "WordCreate"
-      },
-      "WordListResponse": {
-        "properties": {
-          "words": {
-            "items": {
-              "$ref": "#/components/schemas/WordResponse"
-            },
-            "type": "array",
-            "title": "Words"
-          }
-        },
-        "type": "object",
-        "required": [
-          "words"
-        ],
-        "title": "WordListResponse"
-      },
-      "WordResponse": {
-        "properties": {
-          "english": {
-            "type": "string",
-            "minLength": 1,
-            "title": "English"
-          },
-          "japanese": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Japanese"
-          },
-          "level": {
-            "type": "integer",
-            "maximum": 3.0,
-            "minimum": 1.0,
-            "title": "Level"
-          },
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "is_active": {
-            "type": "boolean",
-            "title": "Is Active"
-          }
-        },
-        "type": "object",
-        "required": [
-          "english",
-          "japanese",
-          "level",
-          "id",
-          "is_active"
-        ],
-        "title": "WordResponse"
-      },
-      "WordUpdate": {
-        "properties": {
-          "english": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "English"
-          },
-          "japanese": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Japanese"
-          },
-          "level": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 3.0,
-                "minimum": 1.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Level"
-          },
-          "is_active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Active"
-          }
-        },
-        "type": "object",
-        "title": "WordUpdate"
       }
     }
   }
