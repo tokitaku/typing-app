@@ -28,6 +28,7 @@
 - フロントエンドの `shared` には複数 feature で再利用が明確なものだけを置き、共通型は `shared/types`、共有 API DTO は `shared/api` に置く。
 - フロントエンドでは `components` や `ui` から直接 API / storage / 業務ロジックを抱え込ませず、必要に応じて feature 内の `application`、`hooks`、`model` に分離する。
 - 命名は業務用語を優先し、`manager` や `util` のような曖昧な名前へ逃がさず、`QuestionRepository`、`RecordStudyResultUseCase` のように役割が分かる名前にする。
+- オブジェクト指向を基本とし、データと振る舞いを不必要に分離せず、責務ごとに関心を閉じ込め、カプセル化と明確な公開 `interface` を通じて変更容易性を保つ。継承よりも合成を優先し、状態を書き換える手続きの集積ではなく、役割を持つオブジェクト同士の協調で業務を表現する。
 
 ## ブランチ運用
 
