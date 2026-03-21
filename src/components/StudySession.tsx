@@ -14,6 +14,7 @@ import {
   appendReviewQueue,
   appendStudyResult,
   getReviewQueue,
+  getSettings,
   removeRecoveredProblemIds,
   saveLatestResult
 } from "@/lib/storage";
@@ -31,6 +32,7 @@ function formatMs(ms: number) {
 export function StudySession({ mode }: { mode: StudyMode }) {
   const router = useRouter();
   const [problemSet, setProblemSet] = useState<Problem[]>([]);
+  const [isEmptyProblemSet, setIsEmptyProblemSet] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
@@ -42,7 +44,10 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
   useEffect(() => {
     const reviewQueue = getReviewQueue();
-    setProblemSet(buildProblemSet(mode, reviewQueue));
+    const { levels } = getSettings();
+    const nextProblemSet = buildProblemSet(mode, reviewQueue, levels);
+    setProblemSet(nextProblemSet);
+    setIsEmptyProblemSet(mode === "learn" && nextProblemSet.length === 0);
     setCurrentIndex(0);
     setInputValue("");
     setElapsedMs(0);
@@ -93,6 +98,21 @@ export function StudySession({ mode }: { mode: StudyMode }) {
           <p className="eyebrow">REVIEW READY</p>
           <h1>復習対象はありません。</h1>
           <p>まずは通常学習で問題を解いて、ミスした内容を復習キューに貯めてください。</p>
+          <Link className="primary-button" href="/">
+            ホームへ戻る
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  if (mode === "learn" && isEmptyProblemSet) {
+    return (
+      <main className="page-shell">
+        <section className="empty-card">
+          <p className="eyebrow">LEARN READY</p>
+          <h1>出題できる問題がありません。</h1>
+          <p>レベル設定を見直して、もう一度学習を開始してください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
           </Link>

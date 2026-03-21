@@ -281,6 +281,42 @@ a {
   }
 }
 
+.settings-section {
+  margin-top: 24px;
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+}
+
+.settings-label {
+  margin: 0 0 14px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.level-select {
+  appearance: none;
+  padding: 10px 40px 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    var(--surface-strong)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b655e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.level-select:focus {
+  outline: 2px solid rgba(24, 78, 59, 0.18);
+  border-color: var(--primary);
+}
+
 @media (max-width: 720px) {
   .page-shell {
     width: min(100% - 20px, 960px);

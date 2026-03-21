@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getTodaySummary } from "@/lib/storage";
-import type { DailySummary } from "@/types/study";
+import { getSettings, getTodaySummary, saveSettings } from "@/lib/storage";
+import type { DailySummary, Settings } from "@/types/study";
+
+const ALL_LEVELS = [1, 2, 3] as const;
 
 const defaultSummary: DailySummary = {
   date: new Date().toISOString().slice(0, 10),
@@ -14,10 +16,18 @@ const defaultSummary: DailySummary = {
 
 export function HomeDashboard() {
   const [summary, setSummary] = useState<DailySummary>(defaultSummary);
+  const [settings, setSettings] = useState<Settings>({ levels: [1] });
 
   useEffect(() => {
     setSummary(getTodaySummary());
+    setSettings(getSettings());
   }, []);
+
+  const selectLevel = (level: number) => {
+    const nextSettings = { ...settings, levels: [level] };
+    setSettings(nextSettings);
+    saveSettings(nextSettings);
+  };
 
   return (
     <main className="page-shell">
@@ -53,6 +63,24 @@ export function HomeDashboard() {
           <strong>{summary.reviewBacklog}</strong>
           <small>問題</small>
         </article>
+      </section>
+
+      <section className="settings-section">
+        <label className="settings-label" htmlFor="level-select">
+          出題レベル（通常学習）
+        </label>
+        <select
+          className="level-select"
+          id="level-select"
+          onChange={(event) => selectLevel(Number(event.target.value))}
+          value={settings.levels[0]}
+        >
+          {ALL_LEVELS.map((level) => (
+            <option key={level} value={level}>
+              Level {level}
+            </option>
+          ))}
+        </select>
       </section>
     </main>
   );

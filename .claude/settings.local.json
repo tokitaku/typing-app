@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout -b feature/level-settings)",
+      "Bash(git add app/globals.css src/components/HomeDashboard.tsx src/components/StudySession.tsx src/lib/storage.ts src/lib/study.ts src/types/study.ts)",
+      "Bash(git commit:*)",
+      "Bash(git push -u origin feature/level-settings)",
+      "Bash(npm run test)"
+    ]
+  }
+}
