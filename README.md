@@ -1,7 +1,7 @@
 # Type & Learn
 
 英単語と英語短文をタイピングしながら学ぶ MVP です。  
-固定問題を使って学習し、ミスした問題を `localStorage` に保存して復習モードで再出題します。
+`FastAPI` から問題データを取得し、ミスした問題を `localStorage` に保存して復習モードで再出題します。
 
 ## 機能
 
@@ -22,36 +22,42 @@
   - ミスした問題のみ再出題
   - 対象がない場合は空状態を表示
 
-## ダミーデータ
+## 問題データ API
 
-- 問題データは [src/data/problems.ts](./src/data/problems.ts) にあります
+- `FastAPI` は `GET /problems` で問題一覧を返します
 - 初期データは `word` 30件、`sentence` 12件です
-- 通常モードはこの固定データからランダムで10問出題します
+- フロントは取得した一覧からランダムで10問出題します
 
 ## セットアップ
 
 ```bash
 npm install
+export NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+uv venv .venv
+source .venv/bin/activate
+uv pip install -r backend/requirements.txt
+uv run uvicorn main:app --reload --app-dir backend
 npm run dev
 ```
 
-ブラウザで `http://localhost:3000` を開いてください。
+ブラウザで `http://localhost:3000` を開いてください。  
+`FastAPI` は `http://localhost:8000` で起動します。
 
 ## テストと確認
 
 ```bash
 npm test
-npm run lint
+uv run pytest backend/tests
 npm run build
 ```
 
 ## 実装方針
 
-- リポジトリが空だったため、MVP は Next.js 単体で最小構成を作成
-- 問題データは [`src/data/problems.ts`](./src/data/problems.ts) の固定配列で管理
+- リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
+- 問題データは `backend/main.py` の固定配列から API 配信
 - 出題ロジックは [`src/lib/study.ts`](./src/lib/study.ts)、保存処理は [`src/lib/storage.ts`](./src/lib/storage.ts) に分離
 - `localStorage` には `mistake_log`、`study_result`、復習用キューを保存
-- FastAPI / PostgreSQL は今回の MVP スコープでは未導入
+- PostgreSQL は今回の MVP スコープでは未導入
 
 ## ローカル保存データ
 

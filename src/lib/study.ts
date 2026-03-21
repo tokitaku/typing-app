@@ -1,4 +1,3 @@
-import { problems } from "@/data/problems";
 import type {
   Problem,
   ProblemProgress,
@@ -21,6 +20,7 @@ function shuffleProblems(items: Problem[]): Problem[] {
 }
 
 export function buildProblemSet(
+  problems: Problem[],
   mode: StudyMode,
   missedIds: number[],
   levels: number[] = [1, 2, 3],
