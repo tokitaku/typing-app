@@ -37,6 +37,16 @@ class WordBase(BaseModel):
     japanese: str = Field(min_length=1)
     level: int = Field(ge=1, le=3)
 
+    @field_validator("english", "japanese")
+    @classmethod
+    def validate_non_empty_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if normalized_value == "":
+            raise ValueError("must not be blank")
+
+        return normalized_value
+
 
 class WordCreate(WordBase):
     pass
@@ -47,6 +57,19 @@ class WordUpdate(BaseModel):
     japanese: str | None = Field(default=None, min_length=1)
     level: int | None = Field(default=None, ge=1, le=3)
     is_active: bool | None = None
+
+    @field_validator("english", "japanese")
+    @classmethod
+    def validate_non_empty_text(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized_value = value.strip()
+
+        if normalized_value == "":
+            raise ValueError("must not be blank")
+
+        return normalized_value
 
 
 class WordResponse(WordBase):

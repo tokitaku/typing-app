@@ -107,6 +107,30 @@ def test_patch_word_returns_not_found_for_unknown_id(client: TestClient) -> None
     assert response.status_code == 404
 
 
+def test_post_word_rejects_whitespace_only_fields(client: TestClient) -> None:
+    response = client.post(
+        "/words",
+        json={
+            "english": "   ",
+            "japanese": "\t",
+            "level": 1,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_patch_word_rejects_whitespace_only_fields(client: TestClient) -> None:
+    response = client.patch(
+        "/words/1",
+        json={
+            "english": "   ",
+        },
+    )
+
+    assert response.status_code == 422
+
+
 def test_delete_word_deactivates_existing_word(client: TestClient) -> None:
     response = client.delete("/words/1")
 
