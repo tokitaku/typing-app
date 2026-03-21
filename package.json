@@ -3,28 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "setup": "npm ci && uv venv .venv --allow-existing && uv pip install --python .venv/bin/python -r backend/requirements.txt",
+    "setup": "cd frontend && npm ci && cd .. && uv venv .venv --allow-existing && uv pip install --python .venv/bin/python -r backend/requirements.txt",
     "dev": "docker compose up --build",
     "dev:down": "docker compose down",
-    "openapi:generate": "uv run --python .venv/bin/python python -m backend.openapi --output backend/openapi.json",
-    "dev:frontend:docker": "next dev ./frontend --hostname 0.0.0.0 --port 3000",
-    "build": "next build ./frontend",
-    "start": "next start ./frontend",
-    "lint": "next lint ./frontend",
-    "test": "vitest run --config frontend/vitest.config.ts"
-  },
-  "dependencies": {
-    "next": "^14.2.35",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  },
-  "devDependencies": {
-    "@types/node": "22.10.2",
-    "@types/react": "18.3.3",
-    "@types/react-dom": "18.3.0",
-    "eslint": "8.57.0",
-    "eslint-config-next": "^14.2.35",
-    "typescript": "5.5.4",
-    "vitest": "2.0.5"
+    "openapi:generate": "uv run --python .venv/bin/python python -m backend.openapi --output backend/openapi.json"
   }
 }

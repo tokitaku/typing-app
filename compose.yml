@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile.dev
-    command: npm run dev:frontend:docker
+    command: npm run dev
+    working_dir: /app/frontend
     depends_on:
       backend:
         condition: service_healthy
@@ -14,8 +15,7 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app/frontend
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
+      - /app/frontend/node_modules
 
   backend:
     build:
