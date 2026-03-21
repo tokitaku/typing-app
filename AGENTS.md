@@ -13,6 +13,19 @@
 - リファクタリング前は関連テストが成功していることを確認し、変更後は影響範囲に応じてテスト・lint・build を実行する。
 - 並列化できる作業は分担してよいが、担当ファイルを明確に分け、最終担当が矛盾を解消してから反映する。
 
+## 設計方針
+
+- 設計は DDD とクリーンアーキテクチャを基本方針とし、UI やフレームワーク都合ではなく業務ルールを中心に責務を分ける。
+- 依存方向は `domain -> application <- infrastructure/presentation` ではなく、実装上は `presentation -> application -> domain` とし、`infrastructure` は `domain` または `application` の境界を実装する外側の層として扱う。
+- `domain` にはエンティティ、値オブジェクト、ドメインサービス、repository interface だけを置き、`FastAPI`、`Next.js`、`SQLModel`、`localStorage` などの技術詳細を持ち込まない。
+- `application` にはユースケース、コマンド、クエリ、DTO を置き、1 ユースケース 1 責務を原則とする。
+- `presentation` にはルーター、ページ、コンポーネント、schema、view model だけを置き、業務判断や永続化判断を直接書かない。
+- `infrastructure` には DB 実装、API クライアント、ストレージ実装、外部サービス連携を置き、`domain` / `application` で定義した境界を実装する。
+- 既存規模では過剰設計を避け、Aggregate、Domain Event、Factory などは必要性が明確な場合のみ導入する。
+- 既存コードを移行する際は、まずユースケース単位で境界を切り出し、公開 API や画面挙動を維持したまま内部構造だけを段階的に置き換える。
+- フロントエンドでも同じ責務分割を適用し、`components` から直接 API / storage / 業務ロジックを抱え込ませず、必要に応じて `application` と `presentation/hooks` に分離する。
+- 命名は業務用語を優先し、`manager` や `util` のような曖昧な名前へ逃がさず、`QuestionRepository`、`RecordStudyResultUseCase` のように役割が分かる名前にする。
+
 ## ブランチ運用
 
 - 作業ブランチは `main` から作成し、1つの目的に対して1ブランチを原則とする。
