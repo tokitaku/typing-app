@@ -120,10 +120,10 @@ npm run openapi:generate
 ├── frontend/  # Next.js フロントエンド一式
 │   ├── src/
 │   │   ├── app/            # App Router のページと layout
-│   │   ├── features/       # feature 単位で切り出した画面実装
-│   │   ├── application/    # 画面・通信 DTO
-│   │   ├── domain/         # 業務ルールと業務型
-│   │   ├── infrastructure/ # API / localStorage 実装
+│   │   ├── features/       # 画面単位の UI / hooks / application / api / storage / model
+│   │   ├── application/    # 複数 feature で共有する DTO
+│   │   ├── domain/         # 共有する型定義
+│   │   ├── shared/         # 明確に再利用される API client / browser helper
 │   │   └── __tests__/      # フロントのユースケース / infrastructure テスト
 │   ├── public/
 │   ├── next.config.mjs
@@ -143,10 +143,10 @@ npm run openapi:generate
 - 英単語データは起動時に SQLite へシードし、`SQLModel` 経由で CRUD と問題配信を行う
 - 短文クイズは後方互換のためアプリ内データとして配信する
 - バックエンドは `domain -> application -> infrastructure -> presentation` の依存方向で責務分離する
-- フロントエンドも `presentation -> application -> domain` を基本にし、`infrastructure` が API と `localStorage` の詳細を担当する
-- `home-dashboard`、`result-screen`、`study-session` は `frontend/src/features` 配下へ移し、画面単位で責務を閉じ込める
-- タイピング中の入力判定は `frontend/src/features/study-session/typing` に寄せ、フロント固有ロジックとして扱う
-- `frontend/src/application` には DTO を置き、画面実装は `features` と `app` を中心に構成する
+- フロントエンドは `app` をルーティング入口に限定し、実装本体を `features` 配下へ集約する
+- `home-dashboard`、`result-screen`、`study-session` は `frontend/src/features` 配下で UI / hooks / application / api / storage を閉じ込める
+- タイピング中の入力判定は `frontend/src/features/study-session/typing`、出題セット生成と結果集計は `frontend/src/features/study-session/model` に寄せ、フロント固有ロジックとして扱う
+- `frontend/src/application` には DTO、`frontend/src/shared` には複数 feature で再利用する API client と browser helper だけを置く
 - 業務型は [`frontend/src/domain/models/study.ts`](./frontend/src/domain/models/study.ts)、画面・通信 DTO は [`frontend/src/application/dtos/study.ts`](./frontend/src/application/dtos/study.ts) に分離する
 - `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
 - SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用

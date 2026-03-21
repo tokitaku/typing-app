@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { createResultScreenModel } from "@/features/result-screen/application/resultScreen";
-import type { ResultScreenDto } from "@/application/dtos/study";
-import { fetchLatestStudyResult, fetchTodayStudySummary } from "@/infrastructure/api/studyApi";
+import {
+  fetchLatestStudyResult,
+  fetchTodayStudySummary
+} from "@/features/result-screen/api/resultScreenApi";
 import {
   getLatestResult,
   getReviewQueue,
   getTodaySummary
-} from "@/infrastructure/storage/studyStorage";
+} from "@/features/result-screen/storage/resultScreenStorage";
+import type { ResultScreenDto } from "@/application/dtos/study";
 
 function createFallbackResultScreen(): ResultScreenDto {
   return {

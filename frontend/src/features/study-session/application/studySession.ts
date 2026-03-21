@@ -1,8 +1,8 @@
+import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import {
   buildQuizSet,
   calculateStudyResult
-} from "@/domain/services/studyService";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
+} from "@/features/study-session/model/session";
 import type {
   Quiz,
   QuizProgress,

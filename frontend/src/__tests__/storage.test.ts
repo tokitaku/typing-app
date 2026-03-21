@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getSettings, saveSettings } from "@/infrastructure/storage/studyStorage";
+import {
+  getSettings,
+  saveSettings
+} from "@/features/home-dashboard/storage/homeDashboardStorage";
 import type { Settings } from "@/domain/models/study";
 
 const SETTINGS_KEY = "typing-app::settings";

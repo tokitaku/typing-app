@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   fetchQuizzes,
-  fetchLatestStudyResult,
-  fetchTodayStudySummary,
   saveStudyResult
-} from "@/infrastructure/api/studyApi";
+} from "@/features/study-session/api/studySessionApi";
+import {
+  fetchLatestStudyResult,
+  fetchTodayStudySummary
+} from "@/features/result-screen/api/resultScreenApi";
 import type { Quiz, StudyResult } from "@/domain/models/study";
 
 const sampleResult: StudyResult = {

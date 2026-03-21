@@ -6,15 +6,15 @@ import {
   selectEikenLevel,
   toggleQuestionType
 } from "@/features/home-dashboard/application/homeDashboard";
-import type { HomeDashboardDto } from "@/application/dtos/study";
-import type { EikenLevel, QuizType } from "@/domain/models/study";
-import { fetchTodayStudySummary } from "@/infrastructure/api/studyApi";
+import { fetchTodayStudySummary } from "@/features/home-dashboard/api/homeDashboardApi";
 import {
   getReviewQueue,
   getSettings,
   getTodaySummary,
   saveSettings
-} from "@/infrastructure/storage/studyStorage";
+} from "@/features/home-dashboard/storage/homeDashboardStorage";
+import type { HomeDashboardDto } from "@/application/dtos/study";
+import type { EikenLevel, QuizType } from "@/domain/models/study";
 
 function createFallbackDashboard(): HomeDashboardDto {
   return {

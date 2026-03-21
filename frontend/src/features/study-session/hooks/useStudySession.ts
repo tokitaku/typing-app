@@ -10,8 +10,10 @@ import {
   countIncrementalMistakes,
   getCharacterStates
 } from "@/features/study-session/typing/typing";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
-import { fetchQuizzes, saveStudyResult } from "@/infrastructure/api/studyApi";
+import {
+  fetchQuizzes,
+  saveStudyResult
+} from "@/features/study-session/api/studySessionApi";
 import {
   appendMistakeLog,
   appendReviewQueue,
@@ -20,7 +22,8 @@ import {
   getSettings,
   removeRecoveredQuizIds,
   saveLatestResult
-} from "@/infrastructure/storage/studyStorage";
+} from "@/features/study-session/storage/studySessionStorage";
+import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import type { Quiz, QuizProgress, StudyMode } from "@/domain/models/study";
 
 type UseStudySessionResult = {

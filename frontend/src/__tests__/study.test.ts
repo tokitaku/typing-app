@@ -3,7 +3,7 @@ import {
   SESSION_QUESTION_COUNT,
   buildQuizSet,
   calculateStudyResult
-} from "@/domain/services/studyService";
+} from "@/features/study-session/model/session";
 import {
   countIncrementalMistakes,
   getCharacterStates
