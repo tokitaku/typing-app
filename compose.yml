@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile.dev
-    command: npm run dev:frontend:docker
+    command: npm run dev
+    working_dir: /app/frontend
     depends_on:
       backend:
         condition: service_healthy
@@ -14,14 +15,13 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app/frontend
-      - ./package.json:/app/package.json
-      - ./package-lock.json:/app/package-lock.json
+      - /app/frontend/node_modules
 
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile.dev
-    command: uv run --no-project --python /opt/venv/bin/python uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir /app
+    command: uv run --project backend uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir /app
     environment:
       DATABASE_URL: sqlite:////data/app.db
       WATCHFILES_FORCE_POLLING: "true"

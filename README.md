@@ -98,11 +98,9 @@ npm run setup
 その後に以下を実行してください。
 
 ```bash
-npm test
-uv run --python .venv/bin/python pytest backend/tests
+cd frontend && npm test && npm run lint && npm run build && cd ..
+uv run --project backend pytest backend/tests
 npm run openapi:generate
-npm run lint
-npm run build
 ```
 
 OpenAPI spec をファイル出力したい場合は、以下でも生成できます。
