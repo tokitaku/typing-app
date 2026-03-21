@@ -5,7 +5,7 @@ import {
   createHomeDashboardModel,
   selectEikenLevel,
   toggleQuestionType
-} from "@/application/usecases/homeDashboard";
+} from "@/features/home-dashboard/application/homeDashboard";
 import type { HomeDashboardDto } from "@/application/dtos/study";
 import type { EikenLevel, QuizType } from "@/domain/models/study";
 import { fetchTodayStudySummary } from "@/infrastructure/api/studyApi";

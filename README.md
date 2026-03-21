@@ -118,12 +118,13 @@ npm run openapi:generate
 ```text
 .
 ├── frontend/  # Next.js フロントエンド一式
-│   ├── app/   # App Router のページ
 │   ├── src/
-│   │   ├── application/    # 画面用ユースケースと DTO
+│   │   ├── app/            # App Router のページと layout
+│   │   ├── features/       # feature 単位で切り出した画面実装
+│   │   ├── application/    # feature 化前の画面ユースケースと DTO
 │   │   ├── domain/         # 業務ルールと業務型
 │   │   ├── infrastructure/ # API / localStorage 実装
-│   │   ├── presentation/   # 画面コンポーネントと hooks
+│   │   ├── presentation/   # study-session など移行前の画面実装
 │   │   └── __tests__/      # フロントのユースケース / infrastructure テスト
 │   ├── public/
 │   ├── next.config.mjs
@@ -144,7 +145,8 @@ npm run openapi:generate
 - 短文クイズは後方互換のためアプリ内データとして配信する
 - バックエンドは `domain -> application -> infrastructure -> presentation` の依存方向で責務分離する
 - フロントエンドも `presentation -> application -> domain` を基本にし、`infrastructure` が API と `localStorage` の詳細を担当する
-- 画面は `frontend/src/presentation/components` と `frontend/src/presentation/hooks` に寄せ、永続化や集約ロジックは `frontend/src/application/usecases` に切り出す
+- `home-dashboard` と `result-screen` は `frontend/src/features` 配下へ移し、`study-session` は段階的に追随させる
+- 移行前の画面は `frontend/src/presentation` と `frontend/src/application/usecases` に残し、小さい単位で feature 化を進める
 - 業務型は [`frontend/src/domain/models/study.ts`](./frontend/src/domain/models/study.ts)、画面・通信 DTO は [`frontend/src/application/dtos/study.ts`](./frontend/src/application/dtos/study.ts) に分離する
 - `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
 - SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用

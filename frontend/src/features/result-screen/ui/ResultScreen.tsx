@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useResultScreen } from "@/presentation/hooks/useResultScreen";
+import { useResultScreen } from "@/features/result-screen/hooks/useResultScreen";
 
 function formatAverageTime(ms: number) {
   return `${(ms / 1000).toFixed(1)}秒`;

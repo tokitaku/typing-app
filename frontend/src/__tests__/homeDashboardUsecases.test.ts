@@ -3,7 +3,7 @@ import {
   createHomeDashboardModel,
   selectEikenLevel,
   toggleQuestionType
-} from "@/application/usecases/homeDashboard";
+} from "@/features/home-dashboard/application/homeDashboard";
 import type { DailySummary, Settings } from "@/domain/models/study";
 
 const settings: Settings = {

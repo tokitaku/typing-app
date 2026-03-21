@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useHomeDashboard } from "@/presentation/hooks/useHomeDashboard";
+import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
 import type { EikenLevel, QuizType } from "@/domain/models/study";
 
 const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [

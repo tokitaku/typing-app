@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createResultScreenModel } from "@/application/usecases/resultScreen";
+import { createResultScreenModel } from "@/features/result-screen/application/resultScreen";
 import type { ResultScreenDto } from "@/application/dtos/study";
 import { fetchLatestStudyResult, fetchTodayStudySummary } from "@/infrastructure/api/studyApi";
 import {
