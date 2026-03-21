@@ -118,6 +118,18 @@ make migrate-backend
 make revision-backend message="add new table"
 ```
 
+### Backend migration 運用ルール
+
+1. `backend/infrastructure/sqlmodel/models.py` の `SQLModel` 定義を先に更新する
+2. `make revision-backend message="..."` で revision を生成する
+3. 生成された `backend/alembic/versions/*.py` を確認し、意図しない enum 変更や default 変更が入っていないかをレビューする
+4. `make migrate-backend` で手元 DB に適用する
+5. `uv run --project backend pytest backend/tests` を実行して回帰を確認する
+
+- backend 起動時にも `Alembic upgrade head` が自動実行される
+- `create_all` だけで作成された既存 SQLite DB は起動時に `stamp head` して互換維持する
+- migration ファイルは手で整理してよいが、適用済み revision の書き換えではなく、新しい revision を追加して差分を表現する
+
 OpenAPI spec をファイル出力したい場合は、以下でも生成できます。
 
 ```bash
