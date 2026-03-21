@@ -2,12 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { completeStudySession, startStudySession } from "@/application/usecases/studySession";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
+import {
+  completeStudySession,
+  startStudySession
+} from "@/features/study-session/application/studySession";
 import {
   countIncrementalMistakes,
   getCharacterStates
-} from "@/domain/services/studyService";
+} from "@/features/study-session/typing/typing";
+import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import { fetchQuizzes, saveStudyResult } from "@/infrastructure/api/studyApi";
 import {
   appendMistakeLog,

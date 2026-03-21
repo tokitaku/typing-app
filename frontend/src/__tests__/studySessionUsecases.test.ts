@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   completeStudySession,
   startStudySession
-} from "@/application/usecases/studySession";
+} from "@/features/study-session/application/studySession";
 import type { Quiz, QuizProgress, Settings } from "@/domain/models/study";
 
 const settings: Settings = {

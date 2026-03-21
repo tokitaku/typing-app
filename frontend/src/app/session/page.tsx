@@ -1,4 +1,4 @@
-import { StudySession } from "@/presentation/components/StudySession";
+import { StudySession } from "@/features/study-session/ui/StudySession";
 import type { StudyMode } from "@/domain/models/study";
 
 export default function SessionPage({

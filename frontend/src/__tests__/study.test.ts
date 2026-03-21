@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   SESSION_QUESTION_COUNT,
   buildQuizSet,
-  calculateStudyResult,
+  calculateStudyResult
+} from "@/domain/services/studyService";
+import {
   countIncrementalMistakes,
   getCharacterStates
-} from "@/domain/services/studyService";
+} from "@/features/study-session/typing/typing";
 import type { Quiz } from "@/domain/models/study";
 
 const quizzes: Quiz[] = [

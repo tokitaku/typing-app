@@ -7,7 +7,6 @@ import type {
   StudyResult
 } from "@/domain/models/study";
 
-export type CharacterState = "correct" | "wrong" | "pending";
 export const SESSION_QUESTION_COUNT = 10;
 
 function shuffleQuizzes(items: Quiz[]): Quiz[] {
@@ -41,38 +40,6 @@ export function buildQuizSet(
       (questionTypes.length === 0 || questionTypes.includes(quiz.type))
   );
   return shuffleQuizzes(filtered).slice(0, Math.min(sessionQuestionCount, filtered.length));
-}
-
-export function getCharacterStates(target: string, input: string): CharacterState[] {
-  return Array.from(target).map((character, index) => {
-    const typed = input[index];
-
-    if (typed === undefined) {
-      return "pending";
-    }
-
-    return typed === character ? "correct" : "wrong";
-  });
-}
-
-export function countIncrementalMistakes(
-  previousInput: string,
-  nextInput: string,
-  target: string
-): number {
-  if (!nextInput.startsWith(previousInput) || nextInput.length <= previousInput.length) {
-    return 0;
-  }
-
-  let nextMistakes = 0;
-
-  for (let index = previousInput.length; index < nextInput.length; index += 1) {
-    if (nextInput[index] !== target[index]) {
-      nextMistakes += 1;
-    }
-  }
-
-  return nextMistakes;
 }
 
 export function calculateStudyResult(
