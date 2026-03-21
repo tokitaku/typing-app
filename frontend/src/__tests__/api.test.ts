@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  fetchQuizzes,
   fetchLatestStudyResult,
   fetchTodayStudySummary,
   saveStudyResult
 } from "@/lib/api";
-import type { StudyResult } from "@/types/study";
+import type { Quiz, StudyResult } from "@/types/study";
 
 const sampleResult: StudyResult = {
   mode: "learn",
@@ -15,11 +16,36 @@ const sampleResult: StudyResult = {
   created_at: "2026-03-21T01:23:45.000Z"
 };
 
+const sampleQuizzes: Quiz[] = [
+  {
+    id: 1,
+    type: "word",
+    english: "apple",
+    japanese: "りんご",
+    level: 1
+  }
+];
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe("study result api", () => {
+  it("fetches quizzes from the backend", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ quizzes: sampleQuizzes })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchQuizzes()).resolves.toEqual(sampleQuizzes);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/quizzes",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
   it("posts study results to the backend", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,

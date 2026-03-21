@@ -21,19 +21,113 @@ def test_health_returns_ok(client: TestClient) -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_problems_returns_expected_shape(client: TestClient) -> None:
-    response = client.get("/problems")
+def test_quizzes_returns_expected_shape(client: TestClient) -> None:
+    response = client.get("/quizzes")
 
     assert response.status_code == 200
 
     body = response.json()
-    assert "problems" in body
-    assert len(body["problems"]) == 42
-    assert {problem["type"] for problem in body["problems"]} == {"word", "sentence"}
+    assert "quizzes" in body
+    assert len(body["quizzes"]) == 30
+    assert {quiz["type"] for quiz in body["quizzes"]} == {"word"}
     assert all(
-        {"id", "type", "english", "japanese", "level"} <= set(problem.keys())
-        for problem in body["problems"]
+        {"id", "type", "english", "japanese", "level"} <= set(quiz.keys())
+        for quiz in body["quizzes"]
     )
+
+
+def test_post_word_creates_new_word(client: TestClient) -> None:
+    payload = {
+        "english": "notebook",
+        "japanese": "ノート",
+        "level": 2,
+    }
+
+    response = client.post("/words", json=payload)
+
+    assert response.status_code == 201
+    assert response.json() == {
+        "id": 31,
+        "english": "notebook",
+        "japanese": "ノート",
+        "level": 2,
+        "is_active": True,
+    }
+
+
+def test_get_words_returns_registered_words(client: TestClient) -> None:
+    client.post(
+        "/words",
+        json={
+            "english": "notebook",
+            "japanese": "ノート",
+            "level": 2,
+        },
+    )
+
+    response = client.get("/words")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "words" in body
+    assert len(body["words"]) == 31
+    assert body["words"][-1] == {
+        "id": 31,
+        "english": "notebook",
+        "japanese": "ノート",
+        "level": 2,
+        "is_active": True,
+    }
+
+
+def test_patch_word_updates_existing_word(client: TestClient) -> None:
+    response = client.patch(
+        "/words/1",
+        json={
+            "english": "apple pie",
+            "japanese": "アップルパイ",
+            "level": 3,
+            "is_active": False,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "english": "apple pie",
+        "japanese": "アップルパイ",
+        "level": 3,
+        "is_active": False,
+    }
+
+
+def test_patch_word_returns_not_found_for_unknown_id(client: TestClient) -> None:
+    response = client.patch("/words/999", json={"english": "ghost"})
+
+    assert response.status_code == 404
+
+
+def test_delete_word_deactivates_existing_word(client: TestClient) -> None:
+    response = client.delete("/words/1")
+
+    assert response.status_code == 204
+
+    words_response = client.get("/words")
+
+    assert words_response.status_code == 200
+    assert words_response.json()["words"][0]["is_active"] is False
+
+
+def test_quizzes_uses_active_words_only(client: TestClient) -> None:
+    client.delete("/words/1")
+
+    response = client.get("/quizzes")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["quizzes"]) == 29
+    assert all(quiz["type"] == "word" for quiz in body["quizzes"])
+    assert all(quiz["id"] != 1 for quiz in body["quizzes"])
 
 
 def test_post_study_result_persists_payload(client: TestClient) -> None:

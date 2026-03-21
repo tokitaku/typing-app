@@ -3,22 +3,17 @@ from enum import Enum
 from sqlmodel import Field, SQLModel
 
 
-class ProblemType(str, Enum):
-    WORD = "word"
-    SENTENCE = "sentence"
-
-
 class StudyMode(str, Enum):
     LEARN = "learn"
     REVIEW = "review"
 
 
-class ProblemRecord(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    type: ProblemType
+class WordRecord(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
     english: str
     japanese: str
     level: int
+    is_active: bool = True
 
 
 class StudyResultRecord(SQLModel, table=True):

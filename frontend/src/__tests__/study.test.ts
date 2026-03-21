@@ -1,69 +1,69 @@
 import { describe, expect, it } from "vitest";
 import {
   SESSION_QUESTION_COUNT,
-  buildProblemSet,
+  buildQuizSet,
   calculateStudyResult,
   countIncrementalMistakes,
   getCharacterStates
 } from "@/lib/study";
-import type { Problem } from "@/types/study";
+import type { Quiz } from "@/types/study";
 
-const problems: Problem[] = [
+const quizzes: Quiz[] = [
   { id: 1, type: "word", english: "apple", japanese: "りんご", level: 1 },
   { id: 2, type: "word", english: "library", japanese: "図書館", level: 1 },
   { id: 3, type: "word", english: "beautiful", japanese: "美しい", level: 2 },
   { id: 4, type: "word", english: "schedule", japanese: "予定", level: 2 },
   { id: 5, type: "word", english: "environment", japanese: "環境", level: 3 },
-  { id: 6, type: "sentence", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", level: 1 },
-  { id: 7, type: "sentence", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", level: 2 },
-  { id: 8, type: "sentence", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", level: 3 },
+  { id: 6, type: "word", english: "morning", japanese: "朝", level: 1 },
+  { id: 7, type: "word", english: "report", japanese: "報告書", level: 2 },
+  { id: 8, type: "word", english: "progress", japanese: "前進", level: 3 },
   { id: 9, type: "word", english: "practice", japanese: "練習", level: 1 },
   { id: 10, type: "word", english: "through", japanese: "通り抜けて", level: 2 },
   { id: 11, type: "word", english: "confidence", japanese: "自信", level: 3 }
 ];
 
 describe("study utilities", () => {
-  it("returns only review problems when review ids exist", () => {
-    const reviewProblems = buildProblemSet(problems, "review", [2, 8]);
+  it("returns only review quizzes when review ids exist", () => {
+    const reviewQuizzes = buildQuizSet(quizzes, "review", [2, 8]);
 
-    expect(reviewProblems).toHaveLength(2);
-    expect(reviewProblems.map((problem) => problem.id).sort((left, right) => left - right)).toEqual([
+    expect(reviewQuizzes).toHaveLength(2);
+    expect(reviewQuizzes.map((quiz) => quiz.id).sort((left, right) => left - right)).toEqual([
       2,
       8
     ]);
   });
 
   it("returns random ten questions in learn mode", () => {
-    const learnProblems = buildProblemSet(problems, "learn", []);
+    const learnQuizzes = buildQuizSet(quizzes, "learn", []);
 
-    expect(learnProblems).toHaveLength(SESSION_QUESTION_COUNT);
-    expect(new Set(learnProblems.map((problem) => problem.id)).size).toBe(SESSION_QUESTION_COUNT);
+    expect(learnQuizzes).toHaveLength(SESSION_QUESTION_COUNT);
+    expect(new Set(learnQuizzes.map((quiz) => quiz.id)).size).toBe(SESSION_QUESTION_COUNT);
     expect(
-      learnProblems.every((problem) => problems.some((candidate) => candidate.id === problem.id))
+      learnQuizzes.every((quiz) => quizzes.some((candidate) => candidate.id === quiz.id))
     ).toBe(true);
   });
 
-  it("filters learn problems by specified levels", () => {
-    const level1Only = buildProblemSet(problems, "learn", [], [1]);
+  it("filters learn quizzes by specified levels", () => {
+    const level1Only = buildQuizSet(quizzes, "learn", [], [1]);
 
     expect(level1Only.length).toBeGreaterThan(0);
-    expect(level1Only.every((problem) => problem.level === 1)).toBe(true);
+    expect(level1Only.every((quiz) => quiz.level === 1)).toBe(true);
   });
 
-  it("filters learn problems by level 3", () => {
-    const level3Only = buildProblemSet(problems, "learn", [], [3]);
+  it("filters learn quizzes by level 3", () => {
+    const level3Only = buildQuizSet(quizzes, "learn", [], [3]);
 
     expect(level3Only.length).toBeGreaterThan(0);
-    expect(level3Only.every((problem) => problem.level === 3)).toBe(true);
+    expect(level3Only.every((quiz) => quiz.level === 3)).toBe(true);
   });
 
   it("does not apply level filter in review mode", () => {
-    const level1Id = problems.find((p) => p.level === 1)!.id;
-    const level3Id = problems.find((p) => p.level === 3)!.id;
-    const reviewProblems = buildProblemSet(problems, "review", [level1Id, level3Id], [1]);
+    const level1Id = quizzes.find((quiz) => quiz.level === 1)!.id;
+    const level3Id = quizzes.find((quiz) => quiz.level === 3)!.id;
+    const reviewQuizzes = buildQuizSet(quizzes, "review", [level1Id, level3Id], [1]);
 
-    expect(reviewProblems).toHaveLength(2);
-    const ids = reviewProblems.map((p) => p.id).sort((a, b) => a - b);
+    expect(reviewQuizzes).toHaveLength(2);
+    const ids = reviewQuizzes.map((quiz) => quiz.id).sort((a, b) => a - b);
     expect(ids).toEqual([level1Id, level3Id].sort((a, b) => a - b));
   });
 
@@ -83,14 +83,14 @@ describe("study utilities", () => {
     const summary = calculateStudyResult(
       [
         {
-          problemId: 1,
+          quizId: 1,
           durationMs: 3000,
           mistakeCount: 0,
           wasMistaken: false,
           completedAt: "2026-03-16T00:00:00.000Z"
         },
         {
-          problemId: 2,
+          quizId: 2,
           durationMs: 5000,
           mistakeCount: 2,
           wasMistaken: true,

@@ -5,29 +5,76 @@ from sqlalchemy import func
 from sqlmodel import select
 
 from backend.database import get_session
-from backend.models import ProblemRecord, StudyResultRecord
+from backend.models import StudyResultRecord, WordRecord
 
 
-ProblemRow = dict[str, Any]
+QuizRow = dict[str, Any]
 StudyResultRow = dict[str, Any]
+WordRow = dict[str, Any]
 
 
-def seed_problems(database_url: str, problems: Iterable[ProblemRow]) -> None:
+def seed_words(database_url: str, words: Iterable[WordRow]) -> None:
     with get_session(database_url) as session:
-        existing_problem = session.exec(select(ProblemRecord.id)).first()
+        existing_word = session.exec(select(WordRecord.id)).first()
 
-        if existing_problem is not None:
+        if existing_word is not None:
             return
 
-        session.add_all([ProblemRecord.model_validate(problem) for problem in problems])
+        session.add_all([WordRecord.model_validate(word) for word in words])
         session.commit()
 
 
-def list_problems(database_url: str) -> list[ProblemRow]:
+def list_words(database_url: str) -> list[WordRow]:
     with get_session(database_url) as session:
-        problems = session.exec(select(ProblemRecord).order_by(ProblemRecord.id)).all()
+        words = session.exec(select(WordRecord).order_by(WordRecord.id)).all()
 
-    return [problem.model_dump(mode="json") for problem in problems]
+    return [word.model_dump(mode="json") for word in words]
+
+
+def create_word(database_url: str, word: WordRow) -> WordRow:
+    with get_session(database_url) as session:
+        record = WordRecord.model_validate(word)
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+
+    return record.model_dump(mode="json")
+
+
+def update_word(database_url: str, word_id: int, updates: WordRow) -> WordRow | None:
+    with get_session(database_url) as session:
+        record = session.get(WordRecord, word_id)
+
+        if record is None:
+            return None
+
+        for key, value in updates.items():
+            setattr(record, key, value)
+
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+
+    return record.model_dump(mode="json")
+
+
+def deactivate_word(database_url: str, word_id: int) -> bool:
+    updated = update_word(database_url, word_id, {"is_active": False})
+    return updated is not None
+
+
+def list_quizzes(database_url: str) -> list[QuizRow]:
+    return [
+        {
+            "id": word["id"],
+            "type": "word",
+            "english": word["english"],
+            "japanese": word["japanese"],
+            "level": word["level"],
+        }
+        for word in list_words(database_url)
+        if word["is_active"]
+    ]
 
 
 def insert_study_result(database_url: str, study_result: StudyResultRow) -> StudyResultRow:
