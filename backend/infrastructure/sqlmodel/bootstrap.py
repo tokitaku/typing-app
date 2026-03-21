@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from sqlalchemy import inspect, text
 from sqlmodel import select
 
-from backend.database import init_database
+from backend.database import migrate_database
 from backend.domain.entities import Question, QuestionType
 from backend.infrastructure.sqlmodel.models import (
     EikenLevelRecord,
@@ -146,7 +146,7 @@ def migrate_legacy_words(database_url: str) -> None:
 
 
 def bootstrap_database(database_url: str) -> None:
-    init_database(database_url)  # 先にテーブルを初期化する
+    migrate_database(database_url)  # 先に migration を適用してテーブルを最新化する
     seed_eiken_levels(database_url, EIKEN_LEVELS)  # 英検級マスタを投入する
     seed_question_types(database_url, QUESTION_TYPES)  # 問題種別マスタを投入する
     migrate_legacy_words(database_url)  # 旧 words テーブルがあれば移行する
