@@ -1,6 +1,6 @@
 import json
 
-from backend.openapi import build_openapi_schema, write_openapi_schema
+from backend.presentation.openapi import build_openapi_schema, write_openapi_schema
 
 
 def test_build_openapi_schema_includes_core_metadata() -> None:
