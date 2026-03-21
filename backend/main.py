@@ -274,3 +274,6 @@ def create_app(database_url: str | None = None) -> FastAPI:
         return DailyStudySummary(**summary)  # 集計結果を返す
 
     return app  # 構成済みアプリを返す
+
+
+app = create_app()  # Uvicorn の `backend.main:app` 参照用にアプリを公開する
