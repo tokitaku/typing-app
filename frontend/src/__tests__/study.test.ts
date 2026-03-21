@@ -14,9 +14,9 @@ const quizzes: Quiz[] = [
   { id: 3, type: "word", english: "beautiful", japanese: "美しい", level: 2 },
   { id: 4, type: "word", english: "schedule", japanese: "予定", level: 2 },
   { id: 5, type: "word", english: "environment", japanese: "環境", level: 3 },
-  { id: 6, type: "word", english: "morning", japanese: "朝", level: 1 },
-  { id: 7, type: "word", english: "report", japanese: "報告書", level: 2 },
-  { id: 8, type: "word", english: "progress", japanese: "前進", level: 3 },
+  { id: 6, type: "sentence", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", level: 1 },
+  { id: 7, type: "sentence", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", level: 2 },
+  { id: 8, type: "sentence", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", level: 3 },
   { id: 9, type: "word", english: "practice", japanese: "練習", level: 1 },
   { id: 10, type: "word", english: "through", japanese: "通り抜けて", level: 2 },
   { id: 11, type: "word", english: "confidence", japanese: "自信", level: 3 }

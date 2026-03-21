@@ -28,8 +28,8 @@ def test_quizzes_returns_expected_shape(client: TestClient) -> None:
 
     body = response.json()
     assert "quizzes" in body
-    assert len(body["quizzes"]) == 30
-    assert {quiz["type"] for quiz in body["quizzes"]} == {"word"}
+    assert len(body["quizzes"]) == 42
+    assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
     assert all(
         {"id", "type", "english", "japanese", "level"} <= set(quiz.keys())
         for quiz in body["quizzes"]
@@ -125,8 +125,8 @@ def test_quizzes_uses_active_words_only(client: TestClient) -> None:
 
     assert response.status_code == 200
     body = response.json()
-    assert len(body["quizzes"]) == 29
-    assert all(quiz["type"] == "word" for quiz in body["quizzes"])
+    assert len(body["quizzes"]) == 41
+    assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
     assert all(quiz["id"] != 1 for quiz in body["quizzes"])
 
 

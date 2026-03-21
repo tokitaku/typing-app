@@ -1,4 +1,4 @@
-export type QuizType = "word";
+export type QuizType = "word" | "sentence";
 export type StudyMode = "learn" | "review";
 
 export type Quiz = {

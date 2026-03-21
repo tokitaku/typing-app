@@ -273,7 +273,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
       <section className="problem-card">
         <div className="problem-meta">
-          <span>単語</span>
+          <span>{currentQuiz.type === "word" ? "単語" : "短文"}</span>
           <span>Level {currentQuiz.level}</span>
         </div>
         <p className="japanese-text">{currentQuiz.japanese}</p>

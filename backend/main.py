@@ -22,7 +22,7 @@ from backend.repository import (
 
 class Quiz(BaseModel):
     id: int
-    type: Literal["word"]
+    type: Literal["word", "sentence"]
     english: str
     japanese: str
     level: int = Field(ge=1, le=3)
@@ -112,6 +112,93 @@ WORDS = [
     WordResponse(id=30, english="responsible", japanese="責任がある", level=3, is_active=True),
 ]
 
+SENTENCE_QUIZZES = [
+    Quiz(
+        id=31,
+        type="sentence",
+        english="I drink coffee every morning.",
+        japanese="私は毎朝コーヒーを飲みます。",
+        level=1,
+    ),
+    Quiz(
+        id=32,
+        type="sentence",
+        english="She studies English after dinner.",
+        japanese="彼女は夕食後に英語を勉強します。",
+        level=1,
+    ),
+    Quiz(
+        id=33,
+        type="sentence",
+        english="We need to finish this report today.",
+        japanese="私たちは今日このレポートを終える必要があります。",
+        level=2,
+    ),
+    Quiz(
+        id=34,
+        type="sentence",
+        english="The train was delayed because of the rain.",
+        japanese="雨のため電車が遅れました。",
+        level=2,
+    ),
+    Quiz(
+        id=35,
+        type="sentence",
+        english="Please check the spelling before you submit it.",
+        japanese="提出する前にスペルを確認してください。",
+        level=3,
+    ),
+    Quiz(
+        id=36,
+        type="sentence",
+        english="Learning a language takes patience and repetition.",
+        japanese="言語学習には忍耐と反復が必要です。",
+        level=3,
+    ),
+    Quiz(
+        id=37,
+        type="sentence",
+        english="My brother plays the guitar on weekends.",
+        japanese="私の兄は週末にギターを弾きます。",
+        level=1,
+    ),
+    Quiz(
+        id=38,
+        type="sentence",
+        english="This museum opens at nine in the morning.",
+        japanese="この博物館は朝9時に開きます。",
+        level=1,
+    ),
+    Quiz(
+        id=39,
+        type="sentence",
+        english="Our team shared the meeting notes yesterday.",
+        japanese="私たちのチームは昨日会議メモを共有しました。",
+        level=2,
+    ),
+    Quiz(
+        id=40,
+        type="sentence",
+        english="He forgot his umbrella, so he got wet.",
+        japanese="彼は傘を忘れたのでぬれました。",
+        level=2,
+    ),
+    Quiz(
+        id=41,
+        type="sentence",
+        english="Typing slowly can improve your accuracy at first.",
+        japanese="最初はゆっくり打つと正確さが上がります。",
+        level=3,
+    ),
+    Quiz(
+        id=42,
+        type="sentence",
+        english="Small daily habits often create meaningful progress.",
+        japanese="小さな毎日の習慣が大きな前進を生みます。",
+        level=3,
+    ),
+]
+
 
 def create_app(database_url: str | None = None) -> FastAPI:
     resolved_database_url = get_database_url(database_url)
@@ -174,7 +261,10 @@ def create_app(database_url: str | None = None) -> FastAPI:
     @app.get("/quizzes", response_model=QuizListResponse)
     def get_quizzes() -> QuizListResponse:
         return QuizListResponse(
-            quizzes=[Quiz(**quiz) for quiz in list_quizzes(resolved_database_url)]
+            quizzes=[
+                *[Quiz(**quiz) for quiz in list_quizzes(resolved_database_url)],
+                *SENTENCE_QUIZZES,
+            ]
         )
 
     @app.post(

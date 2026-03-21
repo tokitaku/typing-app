@@ -299,7 +299,10 @@
           },
           "type": {
             "type": "string",
-            "const": "word",
+            "enum": [
+              "word",
+              "sentence"
+            ],
             "title": "Type"
           },
           "english": {
