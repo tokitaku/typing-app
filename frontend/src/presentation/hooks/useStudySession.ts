@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { completeStudySession, startStudySession } from "@/application/usecases/studySession";
+import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import {
   countIncrementalMistakes,
   getCharacterStates
@@ -17,7 +18,7 @@ import {
   removeRecoveredQuizIds,
   saveLatestResult
 } from "@/infrastructure/storage/studyStorage";
-import type { Quiz, QuizProgress, StudyMode } from "@/types/study";
+import type { Quiz, QuizProgress, StudyMode } from "@/domain/models/study";
 
 type UseStudySessionResult = {
   quizSet: Quiz[];
@@ -142,6 +143,28 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     return () => window.clearInterval(timerId);
   }, [currentQuiz]);
 
+  const persistCompletedSession = async (completedSession: CompletedStudySessionDto) => {
+    if (completedSession.reviewQueueToAppend.length > 0) {
+      appendReviewQueue(completedSession.reviewQueueToAppend);
+      appendMistakeLog(completedSession.mistakeLogs);
+    }
+
+    if (mode === "review" && completedSession.recoveredQuizIds.length > 0) {
+      removeRecoveredQuizIds(completedSession.recoveredQuizIds);
+    }
+
+    saveLatestResult(completedSession.latestResult);
+    appendStudyResult(completedSession.historyResult);
+
+    try {
+      await saveStudyResult(completedSession.summary);
+    } catch {
+      return;
+    } finally {
+      router.push(completedSession.nextRoute);
+    }
+  };
+
   const finishQuiz = () => {
     if (!currentQuiz || quizStartedAt === null) {
       return;
@@ -163,23 +186,8 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
         progressList: nextProgressList
       });
 
-      if (completedSession.nextReviewQueueIds.length > 0) {
-        appendReviewQueue(completedSession.nextReviewQueueIds);
-        appendMistakeLog(completedSession.mistakeLogs);
-      }
-
-      if (mode === "review" && completedSession.recoveredIds.length > 0) {
-        removeRecoveredQuizIds(completedSession.recoveredIds);
-      }
-
-      saveLatestResult(completedSession.summary);
-      appendStudyResult(completedSession.summary);
       setIsSavingResult(true);
-      void saveStudyResult(completedSession.summary)
-        .catch(() => undefined)
-        .finally(() => {
-          router.push("/result");
-        });
+      void persistCompletedSession(completedSession);
       return;
     }
 

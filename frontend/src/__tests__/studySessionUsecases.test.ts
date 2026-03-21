@@ -3,7 +3,7 @@ import {
   completeStudySession,
   startStudySession
 } from "@/application/usecases/studySession";
-import type { Quiz, QuizProgress, Settings } from "@/types/study";
+import type { Quiz, QuizProgress, Settings } from "@/domain/models/study";
 
 const settings: Settings = {
   eikenLevels: ["5", "4"],
@@ -76,8 +76,11 @@ describe("study session use cases", () => {
     expect(result.summary.mistakes).toBe(2);
     expect(result.summary.average_time).toBe(2000);
     expect(result.summary.created_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
-    expect(result.nextReviewQueueIds).toEqual([2]);
-    expect(result.recoveredIds).toEqual([1]);
+    expect(result.reviewQueueToAppend).toEqual([2]);
+    expect(result.recoveredQuizIds).toEqual([1]);
+    expect(result.latestResult).toEqual(result.summary);
+    expect(result.historyResult).toEqual(result.summary);
+    expect(result.nextRoute).toBe("/result");
     expect(result.mistakeLogs).toEqual([
       {
         question_id: 2,
@@ -103,7 +106,7 @@ describe("study session use cases", () => {
       progressList
     });
 
-    expect(result.nextReviewQueueIds).toEqual([]);
-    expect(result.recoveredIds).toEqual([3]);
+    expect(result.reviewQueueToAppend).toEqual([]);
+    expect(result.recoveredQuizIds).toEqual([3]);
   });
 });

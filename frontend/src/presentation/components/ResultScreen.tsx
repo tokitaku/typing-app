@@ -1,64 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { fetchLatestStudyResult, fetchTodayStudySummary } from "@/lib/api";
-import { getLatestResult, getReviewQueue, getTodaySummary } from "@/lib/storage";
-import type { DailySummary, StudyResult } from "@/types/study";
+import { useResultScreen } from "@/presentation/hooks/useResultScreen";
 
 function formatAverageTime(ms: number) {
   return `${(ms / 1000).toFixed(1)}秒`;
 }
 
-const fallbackSummary: DailySummary = {
-  date: new Date().toISOString().slice(0, 10),
-  sessions: 0,
-  solvedProblems: 0,
-  reviewBacklog: 0
-};
-
 export function ResultScreen() {
-  const [result, setResult] = useState<StudyResult | null>(null);
-  const [todaySummary, setTodaySummary] = useState<DailySummary>(fallbackSummary);
-
-  useEffect(() => {
-    let isDisposed = false;
-
-    const loadResultScreen = async () => {
-      const localResult = getLatestResult();
-      const reviewBacklog = getReviewQueue().length;
-
-      if (!isDisposed) {
-        setResult(localResult);
-      }
-
-      try {
-        const [remoteResult, remoteSummary] = await Promise.all([
-          fetchLatestStudyResult(),
-          fetchTodayStudySummary()
-        ]);
-
-        if (isDisposed) {
-          return;
-        }
-
-        setResult(remoteResult ?? localResult);
-        setTodaySummary({ ...remoteSummary, reviewBacklog });
-      } catch {
-        if (isDisposed) {
-          return;
-        }
-
-        setTodaySummary(getTodaySummary());
-      }
-    };
-
-    void loadResultScreen();
-
-    return () => {
-      isDisposed = true;
-    };
-  }, []);
+  const { result, todaySummary } = useResultScreen();
 
   if (!result) {
     return (

@@ -4,8 +4,8 @@ import {
   fetchLatestStudyResult,
   fetchTodayStudySummary,
   saveStudyResult
-} from "@/lib/api";
-import type { Quiz, StudyResult } from "@/types/study";
+} from "@/infrastructure/api/studyApi";
+import type { Quiz, StudyResult } from "@/domain/models/study";
 
 const sampleResult: StudyResult = {
   mode: "learn",

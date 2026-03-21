@@ -5,8 +5,8 @@ import {
   calculateStudyResult,
   countIncrementalMistakes,
   getCharacterStates
-} from "@/lib/study";
-import type { Quiz } from "@/types/study";
+} from "@/domain/services/studyService";
+import type { Quiz } from "@/domain/models/study";
 
 const quizzes: Quiz[] = [
   { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご" },

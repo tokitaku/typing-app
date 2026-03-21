@@ -1,4 +1,9 @@
-import type { DailySummary, MistakeLog, Settings, StudyResult } from "@/types/study";
+import type {
+  DailySummary,
+  MistakeLog,
+  Settings,
+  StudyResult
+} from "@/domain/models/study";
 
 const REVIEW_QUEUE_KEY = "typing-app::review-queue";
 const MISTAKE_LOG_KEY = "typing-app::mistake_log";

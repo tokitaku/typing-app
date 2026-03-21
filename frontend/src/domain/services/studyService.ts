@@ -5,7 +5,7 @@ import type {
   QuizType,
   StudyMode,
   StudyResult
-} from "@/types/study";
+} from "@/domain/models/study";
 
 export type CharacterState = "correct" | "wrong" | "pending";
 export const SESSION_QUESTION_COUNT = 10;
