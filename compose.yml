@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.dev
+    command: npm run dev:frontend:docker
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.dev
+    command: uv run --no-project --python /opt/venv/bin/python uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend
+    environment:
+      WATCHFILES_FORCE_POLLING: "true"
+    healthcheck:
+      test:
+        - CMD
+        - /opt/venv/bin/python
+        - -c
+        - import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/health")
+      timeout: 5s
+      interval: 5s
+      retries: 12
+      start_period: 5s
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend

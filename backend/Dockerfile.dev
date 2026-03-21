@@ -1,0 +1,16 @@
+FROM ghcr.io/astral-sh/uv:0.8.4 AS uv
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY --from=uv /uv /uvx /bin/
+
+COPY backend/requirements.txt ./backend/requirements.txt
+
+RUN uv venv /opt/venv \
+    && uv pip install --python /opt/venv/bin/python -r backend/requirements.txt

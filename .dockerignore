@@ -1,0 +1,14 @@
+.git
+.next
+frontend/.next
+node_modules
+frontend/node_modules
+.venv
+.pytest_cache
+coverage
+dist
+npm-debug.log*
+.DS_Store
+__pycache__/
+*.pyc
+*.tsbuildinfo

@@ -28,24 +28,30 @@
 - 初期データは `word` 30件、`sentence` 12件です
 - フロントは取得した一覧からランダムで10問出題します
 
-## セットアップ
+## 開発サーバー起動
+
+```bash
+docker compose up --build
+```
+
+ブラウザで `http://localhost:3000` を開いてください。  
+`FastAPI` は `http://localhost:8000` で起動します。  
+
+停止する場合は別ターミナルで以下を実行してください。
+
+```bash
+docker compose down
+```
+
+## テストと確認
+
+ホスト環境でテストや lint を実行する場合は、先に依存関係をセットアップします。
 
 ```bash
 npm run setup
 ```
 
-## 開発サーバー起動
-
-```bash
-npm run dev:all
-```
-
-ブラウザで `http://localhost:3000` を開いてください。  
-`FastAPI` は `http://localhost:8000` で起動します。  
-個別に起動したい場合は `npm run dev:frontend` と `npm run dev:backend` を使います。  
-`npm run dev` はフロントエンドのみを最小構成で起動し、`npm run dev:frontend` は API 接続先を明示して起動します。
-
-## テストと確認
+その後に以下を実行してください。
 
 ```bash
 npm test
