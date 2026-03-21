@@ -1,4 +1,4 @@
-.PHONY: setup dev down test test-frontend test-backend lint build openapi
+.PHONY: setup dev down test test-frontend test-backend lint build openapi migrate-backend revision-backend
 
 setup:
 	cd frontend && npm ci
@@ -17,6 +17,12 @@ test-frontend:
 
 test-backend:
 	uv run --project backend pytest backend/tests
+
+migrate-backend:
+	uv run --project backend alembic -c backend/alembic.ini upgrade head
+
+revision-backend:
+	uv run --project backend alembic -c backend/alembic.ini revision --autogenerate -m "$(message)"
 
 lint:
 	cd frontend && npm run lint

@@ -9,6 +9,7 @@
 - バックエンド: `FastAPI`
 - DBアクセス: `SQLModel`
 - 永続化DB: `SQLite`
+- マイグレーション: `Alembic`
 - 開発環境: `docker compose`
 
 ## 機能
@@ -49,6 +50,7 @@ make dev
 ブラウザで `http://localhost:3000` を開いてください。  
 `FastAPI` は `http://localhost:8000` で起動します。  
 SQLite のデータは `docker compose` の named volume `sqlite_data` に保存されるため、`docker compose down` では消えません。  
+DB スキーマ変更は backend 起動時に `Alembic` の `head` まで自動適用されます。  
 
 停止する場合は別ターミナルで以下を実行してください。
 
@@ -102,6 +104,18 @@ make test
 make openapi
 make lint
 make build
+```
+
+手動で migration を適用する場合は以下を実行してください。
+
+```bash
+make migrate-backend
+```
+
+新しい migration を自動生成する場合は以下を実行してください。
+
+```bash
+make revision-backend message="add new table"
 ```
 
 OpenAPI spec をファイル出力したい場合は、以下でも生成できます。
