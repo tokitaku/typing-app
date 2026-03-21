@@ -7,9 +7,14 @@ npm-debug.log*
 
 # Environment
 .env*.local
+.venv/
 
 # macOS
 .DS_Store
 
 # TypeScript
 *.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc

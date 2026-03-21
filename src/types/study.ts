@@ -9,6 +9,10 @@ export type Problem = {
   level: number;
 };
 
+export type ProblemListResponse = {
+  problems: Problem[];
+};
+
 export type ProblemProgress = {
   problemId: number;
   durationMs: number;

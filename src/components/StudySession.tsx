@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { fetchProblems } from "@/lib/api";
 import {
   buildProblemSet,
   calculateStudyResult,
@@ -34,6 +35,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
   const [problemSet, setProblemSet] = useState<Problem[]>([]);
   const [isEmptyProblemSet, setIsEmptyProblemSet] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -43,11 +45,10 @@ export function StudySession({ mode }: { mode: StudyMode }) {
   const [mistakeCount, setMistakeCount] = useState(0);
 
   useEffect(() => {
-    const reviewQueue = getReviewQueue();
-    const { levels } = getSettings();
-    const nextProblemSet = buildProblemSet(mode, reviewQueue, levels);
-    setProblemSet(nextProblemSet);
-    setIsEmptyProblemSet(mode === "learn" && nextProblemSet.length === 0);
+    const abortController = new AbortController();
+
+    setIsReady(false);
+    setLoadError(false);
     setCurrentIndex(0);
     setInputValue("");
     setElapsedMs(0);
@@ -55,7 +56,34 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     setProblemStartedAt(null);
     setWasMistaken(false);
     setMistakeCount(0);
-    setIsReady(true);
+
+    const loadProblemSet = async () => {
+      try {
+        const problems = await fetchProblems(abortController.signal);
+        const reviewQueue = getReviewQueue();
+        const { levels } = getSettings();
+        const nextProblemSet = buildProblemSet(problems, mode, reviewQueue, levels);
+
+        setProblemSet(nextProblemSet);
+        setIsEmptyProblemSet(mode === "learn" && nextProblemSet.length === 0);
+        setIsReady(true);
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          return;
+        }
+
+        setProblemSet([]);
+        setIsEmptyProblemSet(false);
+        setLoadError(true);
+        setIsReady(true);
+      }
+    };
+
+    void loadProblemSet();
+
+    return () => {
+      abortController.abort();
+    };
   }, [mode]);
 
   const currentProblem = problemSet[currentIndex];
@@ -86,6 +114,21 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <main className="page-shell">
         <section className="empty-card">
           <h1>学習データを読み込み中です。</h1>
+        </section>
+      </main>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <main className="page-shell">
+        <section className="empty-card">
+          <p className="eyebrow">LOAD ERROR</p>
+          <h1>問題データの取得に失敗しました。</h1>
+          <p>FastAPI サーバーが起動しているか確認してから、もう一度お試しください。</p>
+          <Link className="primary-button" href="/">
+            ホームへ戻る
+          </Link>
         </section>
       </main>
     );
