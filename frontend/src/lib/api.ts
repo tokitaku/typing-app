@@ -1,6 +1,6 @@
 import type {
-  Problem,
-  ProblemListResponse,
+  Quiz,
+  QuizListResponse,
   StudyResult,
   StudySummaryResponse
 } from "@/types/study";
@@ -19,18 +19,18 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
   return await response.json() as T;
 }
 
-export async function fetchProblems(signal?: AbortSignal): Promise<Problem[]> {
-  const response = await fetch(`${getApiBaseUrl()}/problems`, {
+export async function fetchQuizzes(signal?: AbortSignal): Promise<Quiz[]> {
+  const response = await fetch(`${getApiBaseUrl()}/quizzes`, {
     cache: "no-store",
     signal
   });
 
-  const body = await readJsonResponse<ProblemListResponse>(
+  const body = await readJsonResponse<QuizListResponse>(
     response,
-    "Failed to fetch problems"
+    "Failed to fetch quizzes"
   );
 
-  return body.problems;
+  return body.quizzes;
 }
 
 export async function saveStudyResult(result: StudyResult): Promise<StudyResult> {

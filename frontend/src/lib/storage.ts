@@ -82,8 +82,8 @@ export function appendReviewQueue(ids: number[]) {
   saveReviewQueue([...existingIds, ...ids]);
 }
 
-export function removeRecoveredProblemIds(ids: number[]) {
-  const nextIds = getReviewQueue().filter((problemId) => !ids.includes(problemId));
+export function removeRecoveredQuizIds(ids: number[]) {
+  const nextIds = getReviewQueue().filter((quizId) => !ids.includes(quizId));
   saveReviewQueue(nextIds);
 }
 

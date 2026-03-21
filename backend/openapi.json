@@ -27,17 +27,150 @@
         }
       }
     },
-    "/problems": {
+    "/words": {
       "get": {
-        "summary": "Get Problems",
-        "operationId": "get_problems_problems_get",
+        "summary": "Get Words",
+        "operationId": "get_words_words_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemListResponse"
+                  "$ref": "#/components/schemas/WordListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Post Word",
+        "operationId": "post_word_words_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WordCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WordResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/words/{word_id}": {
+      "patch": {
+        "summary": "Patch Word",
+        "operationId": "patch_word_words__word_id__patch",
+        "parameters": [
+          {
+            "name": "word_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Word Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WordUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WordResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Word",
+        "operationId": "delete_word_words__word_id__delete",
+        "parameters": [
+          {
+            "name": "word_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Word Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quizzes": {
+      "get": {
+        "summary": "Get Quizzes",
+        "operationId": "get_quizzes_quizzes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizListResponse"
                 }
               }
             }
@@ -158,7 +291,7 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "Problem": {
+      "Quiz": {
         "properties": {
           "id": {
             "type": "integer",
@@ -182,6 +315,8 @@
           },
           "level": {
             "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
             "title": "Level"
           }
         },
@@ -193,23 +328,23 @@
           "japanese",
           "level"
         ],
-        "title": "Problem"
+        "title": "Quiz"
       },
-      "ProblemListResponse": {
+      "QuizListResponse": {
         "properties": {
-          "problems": {
+          "quizzes": {
             "items": {
-              "$ref": "#/components/schemas/Problem"
+              "$ref": "#/components/schemas/Quiz"
             },
             "type": "array",
-            "title": "Problems"
+            "title": "Quizzes"
           }
         },
         "type": "object",
         "required": [
-          "problems"
+          "quizzes"
         ],
-        "title": "ProblemListResponse"
+        "title": "QuizListResponse"
       },
       "StudyResult": {
         "properties": {
@@ -290,6 +425,140 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WordCreate": {
+        "properties": {
+          "english": {
+            "type": "string",
+            "minLength": 1,
+            "title": "English"
+          },
+          "japanese": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Japanese"
+          },
+          "level": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "english",
+          "japanese",
+          "level"
+        ],
+        "title": "WordCreate"
+      },
+      "WordListResponse": {
+        "properties": {
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/WordResponse"
+            },
+            "type": "array",
+            "title": "Words"
+          }
+        },
+        "type": "object",
+        "required": [
+          "words"
+        ],
+        "title": "WordListResponse"
+      },
+      "WordResponse": {
+        "properties": {
+          "english": {
+            "type": "string",
+            "minLength": 1,
+            "title": "English"
+          },
+          "japanese": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Japanese"
+          },
+          "level": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Level"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "english",
+          "japanese",
+          "level",
+          "id",
+          "is_active"
+        ],
+        "title": "WordResponse"
+      },
+      "WordUpdate": {
+        "properties": {
+          "english": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "English"
+          },
+          "japanese": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Japanese"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "WordUpdate"
       }
     }
   }

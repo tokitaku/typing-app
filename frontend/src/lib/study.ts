@@ -1,6 +1,6 @@
 import type {
-  Problem,
-  ProblemProgress,
+  Quiz,
+  QuizProgress,
   StudyResult,
   StudyMode
 } from "@/types/study";
@@ -8,7 +8,7 @@ import type {
 export type CharacterState = "correct" | "wrong" | "pending";
 export const SESSION_QUESTION_COUNT = 10;
 
-function shuffleProblems(items: Problem[]): Problem[] {
+function shuffleQuizzes(items: Quiz[]): Quiz[] {
   const shuffled = [...items];
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -19,23 +19,23 @@ function shuffleProblems(items: Problem[]): Problem[] {
   return shuffled;
 }
 
-export function buildProblemSet(
-  problems: Problem[],
+export function buildQuizSet(
+  quizzes: Quiz[],
   mode: StudyMode,
   missedIds: number[],
   levels: number[] = [1, 2, 3],
   sessionQuestionCount = SESSION_QUESTION_COUNT
-): Problem[] {
+): Quiz[] {
   if (mode === "review") {
     const uniqueMissedIds = Array.from(new Set(missedIds));
-    const reviewSet = problems.filter((problem) => uniqueMissedIds.includes(problem.id));
-    return shuffleProblems(reviewSet).slice(0, sessionQuestionCount);
+    const reviewSet = quizzes.filter((quiz) => uniqueMissedIds.includes(quiz.id));
+    return shuffleQuizzes(reviewSet).slice(0, sessionQuestionCount);
   }
 
   const filtered = levels.length > 0
-    ? problems.filter((problem) => levels.includes(problem.level))
-    : problems;
-  return shuffleProblems(filtered).slice(0, Math.min(sessionQuestionCount, filtered.length));
+    ? quizzes.filter((quiz) => levels.includes(quiz.level))
+    : quizzes;
+  return shuffleQuizzes(filtered).slice(0, Math.min(sessionQuestionCount, filtered.length));
 }
 
 export function getCharacterStates(target: string, input: string): CharacterState[] {
@@ -71,7 +71,7 @@ export function countIncrementalMistakes(
 }
 
 export function calculateStudyResult(
-  progressList: ProblemProgress[],
+  progressList: QuizProgress[],
   mode: StudyMode
 ): StudyResult {
   const totalProblems = progressList.length;

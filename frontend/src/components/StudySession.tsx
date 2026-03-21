@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchProblems, saveStudyResult } from "@/lib/api";
+import { fetchQuizzes, saveStudyResult } from "@/lib/api";
 import {
-  buildProblemSet,
+  buildQuizSet,
   calculateStudyResult,
   countIncrementalMistakes,
   getCharacterStates
@@ -16,10 +16,10 @@ import {
   appendStudyResult,
   getReviewQueue,
   getSettings,
-  removeRecoveredProblemIds,
+  removeRecoveredQuizIds,
   saveLatestResult
 } from "@/lib/storage";
-import type { Problem, ProblemProgress, StudyMode } from "@/types/study";
+import type { Quiz, QuizProgress, StudyMode } from "@/types/study";
 
 function formatMs(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -32,15 +32,15 @@ function formatMs(ms: number) {
 
 export function StudySession({ mode }: { mode: StudyMode }) {
   const router = useRouter();
-  const [problemSet, setProblemSet] = useState<Problem[]>([]);
-  const [isEmptyProblemSet, setIsEmptyProblemSet] = useState(false);
+  const [quizSet, setQuizSet] = useState<Quiz[]>([]);
+  const [isEmptyQuizSet, setIsEmptyQuizSet] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [elapsedMs, setElapsedMs] = useState(0);
-  const [progressList, setProgressList] = useState<ProblemProgress[]>([]);
-  const [problemStartedAt, setProblemStartedAt] = useState<number | null>(null);
+  const [progressList, setProgressList] = useState<QuizProgress[]>([]);
+  const [quizStartedAt, setQuizStartedAt] = useState<number | null>(null);
   const [wasMistaken, setWasMistaken] = useState(false);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [isSavingResult, setIsSavingResult] = useState(false);
@@ -54,53 +54,53 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     setInputValue("");
     setElapsedMs(0);
     setProgressList([]);
-    setProblemStartedAt(null);
+    setQuizStartedAt(null);
     setWasMistaken(false);
     setMistakeCount(0);
     setIsSavingResult(false);
 
-    const loadProblemSet = async () => {
+    const loadQuizSet = async () => {
       try {
-        const problems = await fetchProblems(abortController.signal);
+        const quizzes = await fetchQuizzes(abortController.signal);
         const reviewQueue = getReviewQueue();
         const { levels } = getSettings();
-        const nextProblemSet = buildProblemSet(problems, mode, reviewQueue, levels);
+        const nextQuizSet = buildQuizSet(quizzes, mode, reviewQueue, levels);
 
-        setProblemSet(nextProblemSet);
-        setIsEmptyProblemSet(mode === "learn" && nextProblemSet.length === 0);
+        setQuizSet(nextQuizSet);
+        setIsEmptyQuizSet(mode === "learn" && nextQuizSet.length === 0);
         setIsReady(true);
       } catch (error) {
         if ((error as Error).name === "AbortError") {
           return;
         }
 
-        setProblemSet([]);
-        setIsEmptyProblemSet(false);
+        setQuizSet([]);
+        setIsEmptyQuizSet(false);
         setLoadError(true);
         setIsReady(true);
       }
     };
 
-    void loadProblemSet();
+    void loadQuizSet();
 
     return () => {
       abortController.abort();
     };
   }, [mode]);
 
-  const currentProblem = problemSet[currentIndex];
+  const currentQuiz = quizSet[currentIndex];
 
   useEffect(() => {
-    if (!currentProblem || problemStartedAt !== null) {
+    if (!currentQuiz || quizStartedAt !== null) {
       return;
     }
 
-    // 問題切り替え時点を保持して平均入力時間を計測する。
-    setProblemStartedAt(Date.now());
-  }, [currentProblem, problemStartedAt]);
+    // クイズ切り替え時点を保持して平均入力時間を計測する。
+    setQuizStartedAt(Date.now());
+  }, [currentQuiz, quizStartedAt]);
 
   useEffect(() => {
-    if (!currentProblem) {
+    if (!currentQuiz) {
       return;
     }
 
@@ -109,7 +109,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     }, 100);
 
     return () => window.clearInterval(timerId);
-  }, [currentProblem]);
+  }, [currentQuiz]);
 
   if (!isReady) {
     return (
@@ -126,7 +126,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <main className="page-shell">
         <section className="empty-card">
           <p className="eyebrow">LOAD ERROR</p>
-          <h1>問題データの取得に失敗しました。</h1>
+          <h1>クイズデータの取得に失敗しました。</h1>
           <p>FastAPI サーバーが起動しているか確認してから、もう一度お試しください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
@@ -136,7 +136,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     );
   }
 
-  if (mode === "review" && problemSet.length === 0) {
+  if (mode === "review" && quizSet.length === 0) {
     return (
       <main className="page-shell">
         <section className="empty-card">
@@ -151,12 +151,12 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     );
   }
 
-  if (mode === "learn" && isEmptyProblemSet) {
+  if (mode === "learn" && isEmptyQuizSet) {
     return (
       <main className="page-shell">
         <section className="empty-card">
           <p className="eyebrow">LEARN READY</p>
-          <h1>出題できる問題がありません。</h1>
+          <h1>出題できるクイズがありません。</h1>
           <p>レベル設定を見直して、もう一度学習を開始してください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
@@ -166,21 +166,21 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     );
   }
 
-  if (!currentProblem) {
+  if (!currentQuiz) {
     return null;
   }
 
-  const characterStates = getCharacterStates(currentProblem.english, inputValue);
+  const characterStates = getCharacterStates(currentQuiz.english, inputValue);
 
-  const finishProblem = () => {
-    if (problemStartedAt === null) {
+  const finishQuiz = () => {
+    if (quizStartedAt === null) {
       return;
     }
 
     const completedAt = new Date().toISOString();
-    const nextProgress: ProblemProgress = {
-      problemId: currentProblem.id,
-      durationMs: Date.now() - problemStartedAt,
+    const nextProgress: QuizProgress = {
+      quizId: currentQuiz.id,
+      durationMs: Date.now() - quizStartedAt,
       mistakeCount,
       wasMistaken,
       completedAt
@@ -188,21 +188,21 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     const nextProgressList = [...progressList, nextProgress];
     const nextMistakeIds = nextProgressList
       .filter((progress) => progress.wasMistaken)
-      .map((progress) => progress.problemId);
+      .map((progress) => progress.quizId);
     const recoveredIds = nextProgressList
       .filter((progress) => !progress.wasMistaken)
-      .map((progress) => progress.problemId);
+      .map((progress) => progress.quizId);
 
     setProgressList(nextProgressList);
 
-    if (currentIndex === problemSet.length - 1) {
+    if (currentIndex === quizSet.length - 1) {
       if (nextMistakeIds.length > 0) {
         appendReviewQueue(nextMistakeIds);
         appendMistakeLog(
           nextProgressList
             .filter((progress) => progress.wasMistaken)
             .map((progress) => ({
-              question_id: progress.problemId,
+              question_id: progress.quizId,
               mistake_count: progress.mistakeCount,
               created_at: progress.completedAt
             }))
@@ -210,7 +210,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       }
 
       if (mode === "review" && recoveredIds.length > 0) {
-        removeRecoveredProblemIds(recoveredIds);
+        removeRecoveredQuizIds(recoveredIds);
       }
 
       const summary = calculateStudyResult(nextProgressList, mode);
@@ -227,7 +227,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
     setCurrentIndex((value) => value + 1);
     setInputValue("");
-    setProblemStartedAt(null);
+    setQuizStartedAt(null);
     setWasMistaken(false);
     setMistakeCount(0);
   };
@@ -237,14 +237,14 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       return;
     }
 
-    if (nextValue.length > currentProblem.english.length) {
+    if (nextValue.length > currentQuiz.english.length) {
       return;
     }
 
     const nextMistakes = countIncrementalMistakes(
       inputValue,
       nextValue,
-      currentProblem.english
+      currentQuiz.english
     );
 
     setInputValue(nextValue);
@@ -254,8 +254,8 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       setMistakeCount((value) => value + nextMistakes);
     }
 
-    if (nextValue === currentProblem.english) {
-      finishProblem();
+    if (nextValue === currentQuiz.english) {
+      finishQuiz();
     }
   };
 
@@ -265,7 +265,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
         <div>
           <p className="eyebrow">{mode === "learn" ? "LEARN MODE" : "REVIEW MODE"}</p>
           <h1>
-            {currentIndex + 1} / {problemSet.length}
+            {currentIndex + 1} / {quizSet.length}
           </h1>
         </div>
         <div className="timer-badge">{formatMs(elapsedMs)}</div>
@@ -273,15 +273,15 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
       <section className="problem-card">
         <div className="problem-meta">
-          <span>{currentProblem.type === "word" ? "単語" : "短文"}</span>
-          <span>Level {currentProblem.level}</span>
+          <span>{currentQuiz.type === "word" ? "単語" : "短文"}</span>
+          <span>Level {currentQuiz.level}</span>
         </div>
-        <p className="japanese-text">{currentProblem.japanese}</p>
+        <p className="japanese-text">{currentQuiz.japanese}</p>
         <p className="english-target" aria-label="英語の正解文">
-          {Array.from(currentProblem.english).map((character, index) => (
+          {Array.from(currentQuiz.english).map((character, index) => (
             <span
               className={`char-${characterStates[index]}`}
-              key={`${currentProblem.id}-${index}`}
+              key={`${currentQuiz.id}-${index}`}
             >
               {character}
             </span>

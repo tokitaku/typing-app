@@ -1,7 +1,7 @@
 # Type & Learn
 
 英単語と英語短文をタイピングしながら学ぶ MVP です。  
-`FastAPI` から問題データを取得し、SQLite に保存した学習結果と `localStorage` の復習キューを組み合わせて再出題します。
+`FastAPI` で管理する英単語データと組み込みの短文データからクイズを生成し、SQLite に保存した学習結果と `localStorage` の復習キューを組み合わせて再出題します。
 
 ## 技術構成
 
@@ -32,10 +32,12 @@
 
 ## 問題データ API
 
-- `FastAPI` は `GET /problems` で問題一覧を返します
+- `FastAPI` は `GET /words` で登録済み英単語一覧を返します
+- `FastAPI` は `POST /words` `PATCH /words/{word_id}` `DELETE /words/{word_id}` で英単語を管理します
+- `FastAPI` は `GET /quizzes` でクイズ一覧を返します
 - `FastAPI` は `POST /study-results` で学習結果を保存します
 - `FastAPI` は `GET /study-results/latest` と `GET /study-results/summary/today` で結果表示と日次集計を返します
-- 初期データは `word` 30件、`sentence` 12件です
+- 初期データは英単語 30 件、短文 12 件です
 - フロントは取得した一覧からランダムで10問出題します
 
 ## 開発サーバー起動
@@ -63,7 +65,8 @@ docker compose down -v
 ## 永続化の考え方
 
 - サーバー側の永続データ
-  - 問題データ: 起動時に SQLite へシード
+  - 英単語データ: 起動時に SQLite へシード
+  - 短文データ: アプリ内の組み込みデータとして配信
   - 学習結果: `POST /study-results` で SQLite に保存
 - ブラウザ側のローカルデータ
   - 復習キュー
@@ -127,19 +130,20 @@ npm run openapi:generate
 ## 実装方針
 
 - リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
-- 問題データは起動時に SQLite へシードし、`SQLModel` 経由で API から配信
+- 英単語データは起動時に SQLite へシードし、`SQLModel` 経由で CRUD と問題配信を行う
+- 短文クイズは後方互換のためアプリ内データとして配信する
 - 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、API 呼び出しは [`frontend/src/lib/api.ts`](./frontend/src/lib/api.ts)、ローカル保存は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
 - `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
 - SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用
 
 ## DBスキーマ概要
 
-- `problems`
+- `words`
   - `id`
-  - `type`
   - `english`
   - `japanese`
   - `level`
+  - `is_active`
 - `study_results`
   - `id`
   - `mode`

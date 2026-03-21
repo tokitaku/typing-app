@@ -1,20 +1,20 @@
-export type ProblemType = "word" | "sentence";
+export type QuizType = "word" | "sentence";
 export type StudyMode = "learn" | "review";
 
-export type Problem = {
+export type Quiz = {
   id: number;
-  type: ProblemType;
+  type: QuizType;
   english: string;
   japanese: string;
   level: number;
 };
 
-export type ProblemListResponse = {
-  problems: Problem[];
+export type QuizListResponse = {
+  quizzes: Quiz[];
 };
 
-export type ProblemProgress = {
-  problemId: number;
+export type QuizProgress = {
+  quizId: number;
   durationMs: number;
   mistakeCount: number;
   wasMistaken: boolean;
