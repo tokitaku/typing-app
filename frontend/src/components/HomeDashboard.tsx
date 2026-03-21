@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getSettings, getTodaySummary, saveSettings } from "@/lib/storage";
+import { fetchTodayStudySummary } from "@/lib/api";
+import { getReviewQueue, getSettings, getTodaySummary, saveSettings } from "@/lib/storage";
 import type { DailySummary, Settings } from "@/types/study";
 
 const ALL_LEVELS = [1, 2, 3] as const;
@@ -19,8 +20,38 @@ export function HomeDashboard() {
   const [settings, setSettings] = useState<Settings>({ levels: [1] });
 
   useEffect(() => {
-    setSummary(getTodaySummary());
-    setSettings(getSettings());
+    let isDisposed = false;
+
+    const loadDashboard = async () => {
+      const nextSettings = getSettings();
+      const reviewBacklog = getReviewQueue().length;
+
+      if (!isDisposed) {
+        setSettings(nextSettings);
+      }
+
+      try {
+        const remoteSummary = await fetchTodayStudySummary();
+
+        if (isDisposed) {
+          return;
+        }
+
+        setSummary({ ...remoteSummary, reviewBacklog });
+      } catch {
+        if (isDisposed) {
+          return;
+        }
+
+        setSummary(getTodaySummary());
+      }
+    };
+
+    void loadDashboard();
+
+    return () => {
+      isDisposed = true;
+    };
   }, []);
 
   const selectLevel = (level: number) => {

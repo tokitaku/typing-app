@@ -43,6 +43,8 @@ export type DailySummary = {
   reviewBacklog: number;
 };
 
+export type StudySummaryResponse = Omit<DailySummary, "reviewBacklog">;
+
 export type Settings = {
   levels: number[];
 };

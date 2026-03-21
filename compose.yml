@@ -23,6 +23,7 @@ services:
       dockerfile: backend/Dockerfile.dev
     command: uv run --no-project --python /opt/venv/bin/python uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend
     environment:
+      DATABASE_URL: sqlite:///./backend/app.db
       WATCHFILES_FORCE_POLLING: "true"
     healthcheck:
       test:

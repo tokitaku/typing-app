@@ -1,7 +1,7 @@
 # Type & Learn
 
 英単語と英語短文をタイピングしながら学ぶ MVP です。  
-`FastAPI` から問題データを取得し、ミスした問題を `localStorage` に保存して復習モードで再出題します。
+`FastAPI` から問題データを取得し、SQLite に保存した学習結果と `localStorage` の復習キューを組み合わせて再出題します。
 
 ## 機能
 
@@ -25,6 +25,8 @@
 ## 問題データ API
 
 - `FastAPI` は `GET /problems` で問題一覧を返します
+- `FastAPI` は `POST /study-results` で学習結果を保存します
+- `FastAPI` は `GET /study-results/latest` と `GET /study-results/summary/today` で結果表示と日次集計を返します
 - 初期データは `word` 30件、`sentence` 12件です
 - フロントは取得した一覧からランダムで10問出題します
 
@@ -77,10 +79,10 @@ npm run build
 ## 実装方針
 
 - リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
-- 問題データは `backend/main.py` の固定配列から API 配信
-- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、保存処理は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
-- `localStorage` には `mistake_log`、`study_result`、復習用キューを保存
-- PostgreSQL は今回の MVP スコープでは未導入
+- 問題データは起動時に SQLite へシードし、API は DB 経由で配信
+- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、API 呼び出しは [`frontend/src/lib/api.ts`](./frontend/src/lib/api.ts)、ローカル保存は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
+- `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
+- SQLite は `DATABASE_URL` で切り替え可能で、デフォルトは `sqlite:///./backend/app.db`
 
 ## ローカル保存データ
 
@@ -89,8 +91,6 @@ npm run build
   - `mistake_count`
   - `created_at`
 - `typing-app::study_result`
-  - `total_questions`
-  - `correct_rate`
-  - `mistakes`
-  - `average_time`
-  - `created_at`
+  - API 保存失敗時のフォールバック用セッション履歴
+- `typing-app::latest-result`
+  - 結果画面の即時表示用キャッシュ

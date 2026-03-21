@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { fetchProblems } from "@/lib/api";
+import { fetchProblems, saveStudyResult } from "@/lib/api";
 import {
   buildProblemSet,
   calculateStudyResult,
@@ -43,6 +43,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
   const [problemStartedAt, setProblemStartedAt] = useState<number | null>(null);
   const [wasMistaken, setWasMistaken] = useState(false);
   const [mistakeCount, setMistakeCount] = useState(0);
+  const [isSavingResult, setIsSavingResult] = useState(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -56,6 +57,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     setProblemStartedAt(null);
     setWasMistaken(false);
     setMistakeCount(0);
+    setIsSavingResult(false);
 
     const loadProblemSet = async () => {
       try {
@@ -214,7 +216,12 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       const summary = calculateStudyResult(nextProgressList, mode);
       saveLatestResult(summary);
       appendStudyResult(summary);
-      router.push("/result");
+      setIsSavingResult(true);
+      void saveStudyResult(summary)
+        .catch(() => undefined)
+        .finally(() => {
+          router.push("/result");
+        });
       return;
     }
 
@@ -226,6 +233,10 @@ export function StudySession({ mode }: { mode: StudyMode }) {
   };
 
   const handleChange = (nextValue: string) => {
+    if (isSavingResult) {
+      return;
+    }
+
     if (nextValue.length > currentProblem.english.length) {
       return;
     }
@@ -283,9 +294,10 @@ export function StudySession({ mode }: { mode: StudyMode }) {
           autoComplete="off"
           autoFocus
           className={`typing-input ${wasMistaken ? "is-mistaken" : ""}`}
+          disabled={isSavingResult}
           id="typing-input"
           onChange={(event) => handleChange(event.target.value)}
-          placeholder="ここに入力してください"
+          placeholder={isSavingResult ? "結果を保存中です..." : "ここに入力してください"}
           spellCheck={false}
           type="text"
           value={inputValue}
