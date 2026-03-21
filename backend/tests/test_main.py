@@ -146,6 +146,31 @@ def test_patch_question_returns_not_found_for_unknown_id(client: TestClient) -> 
     assert response.status_code == 404
 
 
+def test_post_question_rejects_invalid_master_code(client: TestClient) -> None:
+    response = client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "unknown",  # 未定義の英検級コードを送る
+            "question_type": "word",  # 種別は有効値にして原因を絞る
+            "english": "ghost",  # 正常な本文でマスターコード検証だけを見る
+            "japanese": "ゴースト",  # 正常な本文でマスターコード検証だけを見る
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_patch_question_rejects_invalid_master_code(client: TestClient) -> None:
+    response = client.patch(
+        "/questions/1",
+        json={
+            "question_type": "unknown",  # 未定義の問題種別コードを送る
+        },
+    )
+
+    assert response.status_code == 422
+
+
 def test_post_question_rejects_whitespace_only_fields(client: TestClient) -> None:
     response = client.post(
         "/questions",

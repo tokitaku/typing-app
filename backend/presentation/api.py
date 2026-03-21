@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from typing import NoReturn
 
 from fastapi import FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -47,7 +48,7 @@ def _parse_csv_query(value: str | None) -> list[str] | None:
     return parsed_values if parsed_values else None  # 空配列ならフィルタなし扱いにする
 
 
-def _handle_invalid_master_code(error: ValueError) -> None:
+def _handle_invalid_master_code(error: ValueError) -> NoReturn:
     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(error)) from error
 
 
