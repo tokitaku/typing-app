@@ -284,7 +284,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudyResult"
+                "$ref": "#/components/schemas/StudyResultRequest"
               }
             }
           },
@@ -296,7 +296,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudyResult"
+                  "$ref": "#/components/schemas/StudyResultRequest"
                 }
               }
             }
@@ -324,7 +324,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudyResult"
+                  "$ref": "#/components/schemas/StudyResultRequest"
                 }
               }
             }
@@ -342,7 +342,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DailyStudySummary"
+                  "$ref": "#/components/schemas/DailyStudySummaryResponse"
                 }
               }
             }
@@ -353,7 +353,7 @@
   },
   "components": {
     "schemas": {
-      "DailyStudySummary": {
+      "DailyStudySummaryResponse": {
         "properties": {
           "date": {
             "type": "string",
@@ -374,7 +374,7 @@
           "sessions",
           "solvedProblems"
         ],
-        "title": "DailyStudySummary"
+        "title": "DailyStudySummaryResponse"
       },
       "HTTPValidationError": {
         "properties": {
@@ -603,7 +603,7 @@
         ],
         "title": "QuizResponse"
       },
-      "StudyResult": {
+      "StudyResultRequest": {
         "properties": {
           "mode": {
             "type": "string",
@@ -648,7 +648,7 @@
           "average_time",
           "created_at"
         ],
-        "title": "StudyResult"
+        "title": "StudyResultRequest"
       },
       "ValidationError": {
         "properties": {

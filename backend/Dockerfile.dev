@@ -6,11 +6,11 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY --from=uv /uv /uvx /bin/
 
-COPY backend/requirements.txt ./backend/requirements.txt
+COPY backend/pyproject.toml backend/uv.lock ./backend/
 
-RUN uv venv /opt/venv \
-    && uv pip install --python /opt/venv/bin/python -r backend/requirements.txt
+RUN cd backend && uv sync --frozen
