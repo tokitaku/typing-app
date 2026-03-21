@@ -42,21 +42,37 @@ npm run dev:all
 
 ブラウザで `http://localhost:3000` を開いてください。  
 `FastAPI` は `http://localhost:8000` で起動します。  
-個別に起動したい場合は `npm run dev:frontend` と `npm run dev:backend` を使います。
+個別に起動したい場合は `npm run dev:frontend` と `npm run dev:backend` を使います。  
+`npm run dev` はフロントエンドのみを最小構成で起動し、`npm run dev:frontend` は API 接続先を明示して起動します。
 
 ## テストと確認
 
 ```bash
 npm test
 uv run --python .venv/bin/python pytest backend/tests
+npm run lint
 npm run build
+```
+
+## ディレクトリ構成
+
+```text
+.
+├── frontend/  # Next.js フロントエンド一式
+│   ├── app/   # App Router のページ
+│   ├── src/   # components, lib, types, tests
+│   ├── public/
+│   ├── next.config.mjs
+│   ├── tsconfig.json
+│   └── vitest.config.ts
+└── backend/   # FastAPI バックエンド
 ```
 
 ## 実装方針
 
 - リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
 - 問題データは `backend/main.py` の固定配列から API 配信
-- 出題ロジックは [`src/lib/study.ts`](./src/lib/study.ts)、保存処理は [`src/lib/storage.ts`](./src/lib/storage.ts) に分離
+- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、保存処理は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
 - `localStorage` には `mistake_log`、`study_result`、復習用キューを保存
 - PostgreSQL は今回の MVP スコープでは未導入
 
@@ -72,4 +88,3 @@ npm run build
   - `mistakes`
   - `average_time`
   - `created_at`
-# typing-app

@@ -1,5 +1,7 @@
 .next
+frontend/.next
 node_modules
+frontend/node_modules
 coverage
 dist
 npm-debug.log*
