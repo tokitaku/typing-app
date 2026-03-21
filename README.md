@@ -97,9 +97,18 @@ npm run setup
 ```bash
 npm test
 uv run --python .venv/bin/python pytest backend/tests
+npm run openapi:generate
 npm run lint
 npm run build
 ```
+
+OpenAPI spec をファイル出力したい場合は、以下でも生成できます。
+
+```bash
+npm run openapi:generate
+```
+
+生成先は `backend/openapi.json` です。実行中のサーバーがある場合は、`http://localhost:8000/openapi.json` でも同じ schema を取得できます。
 
 ## ディレクトリ構成
 
