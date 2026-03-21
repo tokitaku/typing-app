@@ -43,7 +43,7 @@
 ## 開発サーバー起動
 
 ```bash
-docker compose up --build
+make dev
 ```
 
 ブラウザで `http://localhost:3000` を開いてください。  
@@ -53,7 +53,7 @@ SQLite のデータは `docker compose` の named volume `sqlite_data` に保存
 停止する場合は別ターミナルで以下を実行してください。
 
 ```bash
-docker compose down
+make down
 ```
 
 DBデータも削除したい場合は以下を実行してください。
@@ -92,23 +92,22 @@ docker compose down -v
 ホスト環境でテストや lint を実行する場合は、先に依存関係をセットアップします。
 
 ```bash
-npm run setup
+make setup
 ```
 
 その後に以下を実行してください。
 
 ```bash
-npm test
-uv run --project backend pytest backend/tests
-npm run openapi:generate
-npm run lint
-npm run build
+make test
+make openapi
+make lint
+make build
 ```
 
 OpenAPI spec をファイル出力したい場合は、以下でも生成できます。
 
 ```bash
-npm run openapi:generate
+make openapi
 ```
 
 生成先は `backend/openapi.json` です。実行中のサーバーがある場合は、`http://localhost:8000/openapi.json` でも同じ schema を取得できます。
