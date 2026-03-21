@@ -1,8 +1,8 @@
+import type { StudyResult } from "@/domain/models/study";
 import type {
   QuizListResponseDto,
   StudySummaryResponseDto
-} from "@/application/dtos/study";
-import type { StudyResult } from "@/domain/models/study";
+} from "@/shared/api/studyApiTypes";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 

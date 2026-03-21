@@ -6,6 +6,7 @@ import {
   selectEikenLevel,
   toggleQuestionType
 } from "@/features/home-dashboard/application/homeDashboard";
+import type { HomeDashboardDto } from "@/features/home-dashboard/application/homeDashboard";
 import { fetchTodayStudySummary } from "@/features/home-dashboard/api/homeDashboardApi";
 import {
   getReviewQueue,
@@ -13,7 +14,6 @@ import {
   getTodaySummary,
   saveSettings
 } from "@/features/home-dashboard/storage/homeDashboardStorage";
-import type { HomeDashboardDto } from "@/application/dtos/study";
 import type { EikenLevel, QuizType } from "@/domain/models/study";
 
 function createFallbackDashboard(): HomeDashboardDto {

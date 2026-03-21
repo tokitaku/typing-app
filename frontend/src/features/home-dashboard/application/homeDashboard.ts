@@ -1,13 +1,15 @@
 import type {
-  HomeDashboardDto,
-  StudySummaryResponseDto
-} from "@/application/dtos/study";
-import type {
   DailySummary,
   EikenLevel,
   QuizType,
   Settings
 } from "@/domain/models/study";
+import type { StudySummaryResponseDto } from "@/shared/api/studyApiTypes";
+
+export type HomeDashboardDto = {
+  summary: DailySummary;
+  settings: Settings;
+};
 
 type CreateHomeDashboardInput = {
   settings: Settings;

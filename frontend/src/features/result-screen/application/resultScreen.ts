@@ -1,8 +1,10 @@
-import type {
-  ResultScreenDto,
-  StudySummaryResponseDto
-} from "@/application/dtos/study";
 import type { DailySummary, StudyResult } from "@/domain/models/study";
+import type { StudySummaryResponseDto } from "@/shared/api/studyApiTypes";
+
+export type ResultScreenDto = {
+  result: StudyResult | null;
+  todaySummary: DailySummary;
+};
 
 type CreateResultScreenInput = {
   localResult: StudyResult | null;

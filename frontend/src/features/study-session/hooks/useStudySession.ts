@@ -6,6 +6,7 @@ import {
   completeStudySession,
   startStudySession
 } from "@/features/study-session/application/studySession";
+import type { CompletedStudySessionDto } from "@/features/study-session/application/studySession";
 import {
   countIncrementalMistakes,
   getCharacterStates
@@ -23,7 +24,6 @@ import {
   removeRecoveredQuizIds,
   saveLatestResult
 } from "@/features/study-session/storage/studySessionStorage";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import type { Quiz, QuizProgress, StudyMode } from "@/domain/models/study";
 
 type UseStudySessionResult = {

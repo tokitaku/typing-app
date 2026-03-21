@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createResultScreenModel } from "@/features/result-screen/application/resultScreen";
+import type { ResultScreenDto } from "@/features/result-screen/application/resultScreen";
 import {
   fetchLatestStudyResult,
   fetchTodayStudySummary
@@ -11,7 +12,6 @@ import {
   getReviewQueue,
   getTodaySummary
 } from "@/features/result-screen/storage/resultScreenStorage";
-import type { ResultScreenDto } from "@/application/dtos/study";
 
 function createFallbackResultScreen(): ResultScreenDto {
   return {
