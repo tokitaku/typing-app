@@ -1,0 +1,296 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Typing App API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/problems": {
+      "get": {
+        "summary": "Get Problems",
+        "operationId": "get_problems_problems_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/study-results": {
+      "post": {
+        "summary": "Create Study Result",
+        "operationId": "create_study_result_study_results_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudyResult"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/study-results/latest": {
+      "get": {
+        "summary": "Fetch Latest Study Result",
+        "operationId": "fetch_latest_study_result_study_results_latest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/study-results/summary/today": {
+      "get": {
+        "summary": "Fetch Today Study Summary",
+        "operationId": "fetch_today_study_summary_study_results_summary_today_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyStudySummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DailyStudySummary": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "title": "Date"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "solvedProblems": {
+            "type": "integer",
+            "title": "Solvedproblems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "sessions",
+          "solvedProblems"
+        ],
+        "title": "DailyStudySummary"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Problem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "word",
+              "sentence"
+            ],
+            "title": "Type"
+          },
+          "english": {
+            "type": "string",
+            "title": "English"
+          },
+          "japanese": {
+            "type": "string",
+            "title": "Japanese"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "english",
+          "japanese",
+          "level"
+        ],
+        "title": "Problem"
+      },
+      "ProblemListResponse": {
+        "properties": {
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "type": "array",
+            "title": "Problems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "problems"
+        ],
+        "title": "ProblemListResponse"
+      },
+      "StudyResult": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "learn",
+              "review"
+            ],
+            "title": "Mode"
+          },
+          "total_questions": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Total Questions"
+          },
+          "correct_rate": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Correct Rate"
+          },
+          "mistakes": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Mistakes"
+          },
+          "average_time": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Average Time"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "total_questions",
+          "correct_rate",
+          "mistakes",
+          "average_time",
+          "created_at"
+        ],
+        "title": "StudyResult"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
