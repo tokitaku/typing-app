@@ -3,12 +3,12 @@ import {
   SESSION_QUESTION_COUNT,
   buildQuizSet,
   calculateStudyResult
-} from "@/domain/services/studyService";
+} from "@/features/study-session/model/session";
 import {
   countIncrementalMistakes,
   getCharacterStates
 } from "@/features/study-session/typing/typing";
-import type { Quiz } from "@/domain/models/study";
+import type { Quiz } from "@/shared/types/study";
 
 const quizzes: Quiz[] = [
   { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご" },

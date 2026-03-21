@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createResultScreenModel } from "@/features/result-screen/application/resultScreen";
-import type { DailySummary, StudyResult } from "@/domain/models/study";
+import type { DailySummary, StudyResult } from "@/shared/types/study";
 
 const localResult: StudyResult = {
   mode: "learn",

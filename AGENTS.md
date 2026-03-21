@@ -23,7 +23,10 @@
 - `infrastructure` には DB 実装、API クライアント、ストレージ実装、外部サービス連携を置き、`domain` / `application` で定義した境界を実装する。
 - 既存規模では過剰設計を避け、Aggregate、Domain Event、Factory などは必要性が明確な場合のみ導入する。
 - 既存コードを移行する際は、まずユースケース単位で境界を切り出し、公開 API や画面挙動を維持したまま内部構造だけを段階的に置き換える。
-- フロントエンドでも同じ責務分割を適用し、`components` から直接 API / storage / 業務ロジックを抱え込ませず、必要に応じて `application` と `presentation/hooks` に分離する。
+- フロントエンドは `feature-first` を基本とし、`app` は Next.js のルーティング入口、実装本体は `features/*` に集約する。
+- フロントエンドの各 feature には必要に応じて `ui`、`hooks`、`application`、`api`、`storage`、`model`、`typing` を置き、画面単位で責務を閉じ込める。
+- フロントエンドの `shared` には複数 feature で再利用が明確なものだけを置き、共通型は `shared/types`、共有 API DTO は `shared/api` に置く。
+- フロントエンドでは `components` や `ui` から直接 API / storage / 業務ロジックを抱え込ませず、必要に応じて feature 内の `application`、`hooks`、`model` に分離する。
 - 命名は業務用語を優先し、`manager` や `util` のような曖昧な名前へ逃がさず、`QuestionRepository`、`RecordStudyResultUseCase` のように役割が分かる名前にする。
 
 ## ブランチ運用

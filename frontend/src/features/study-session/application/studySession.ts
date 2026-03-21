@@ -1,14 +1,25 @@
 import {
   buildQuizSet,
   calculateStudyResult
-} from "@/domain/services/studyService";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
+} from "@/features/study-session/model/session";
 import type {
+  MistakeLog,
   Quiz,
   QuizProgress,
   Settings,
-  StudyMode
-} from "@/domain/models/study";
+  StudyMode,
+  StudyResult
+} from "@/shared/types/study";
+
+export type CompletedStudySessionDto = {
+  summary: StudyResult;
+  reviewQueueToAppend: number[];
+  recoveredQuizIds: number[];
+  mistakeLogs: MistakeLog[];
+  latestResult: StudyResult;
+  historyResult: StudyResult;
+  nextRoute: "/result";
+};
 
 type StartStudySessionInput = {
   quizzes: Quiz[];

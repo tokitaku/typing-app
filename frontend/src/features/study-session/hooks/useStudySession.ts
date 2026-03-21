@@ -6,12 +6,15 @@ import {
   completeStudySession,
   startStudySession
 } from "@/features/study-session/application/studySession";
+import type { CompletedStudySessionDto } from "@/features/study-session/application/studySession";
 import {
   countIncrementalMistakes,
   getCharacterStates
 } from "@/features/study-session/typing/typing";
-import type { CompletedStudySessionDto } from "@/application/dtos/study";
-import { fetchQuizzes, saveStudyResult } from "@/infrastructure/api/studyApi";
+import {
+  fetchQuizzes,
+  saveStudyResult
+} from "@/features/study-session/api/studySessionApi";
 import {
   appendMistakeLog,
   appendReviewQueue,
@@ -20,8 +23,8 @@ import {
   getSettings,
   removeRecoveredQuizIds,
   saveLatestResult
-} from "@/infrastructure/storage/studyStorage";
-import type { Quiz, QuizProgress, StudyMode } from "@/domain/models/study";
+} from "@/features/study-session/storage/studySessionStorage";
+import type { Quiz, QuizProgress, StudyMode } from "@/shared/types/study";
 
 type UseStudySessionResult = {
   quizSet: Quiz[];

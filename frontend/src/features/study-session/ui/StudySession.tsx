@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useStudySession } from "@/features/study-session/hooks/useStudySession";
-import type { StudyMode } from "@/domain/models/study";
+import type { StudyMode } from "@/shared/types/study";
 
 function formatMs(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);

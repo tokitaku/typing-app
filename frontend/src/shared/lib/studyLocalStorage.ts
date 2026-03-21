@@ -3,7 +3,7 @@ import type {
   MistakeLog,
   Settings,
   StudyResult
-} from "@/domain/models/study";
+} from "@/shared/types/study";
 
 const REVIEW_QUEUE_KEY = "typing-app::review-queue";
 const MISTAKE_LOG_KEY = "typing-app::mistake_log";

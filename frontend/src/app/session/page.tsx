@@ -1,5 +1,5 @@
 import { StudySession } from "@/features/study-session/ui/StudySession";
-import type { StudyMode } from "@/domain/models/study";
+import type { StudyMode } from "@/shared/types/study";
 
 export default function SessionPage({
   searchParams

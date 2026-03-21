@@ -1,24 +1,14 @@
 import type {
   QuizListResponseDto,
   StudySummaryResponseDto
-} from "@/application/dtos/study";
-import type {
-  EikenLevel,
-  Quiz,
-  QuizType,
-  StudyResult
-} from "@/domain/models/study";
+} from "@/shared/api/studyApiTypes";
+import type { StudyResult } from "@/shared/types/study";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 
 function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 }
-
-export type FetchQuizzesOptions = {
-  eikenLevels?: EikenLevel[];
-  questionTypes?: QuizType[];
-};
 
 async function readJsonResponse<T>(response: Response, errorMessage: string): Promise<T> {
   if (!response.ok) {
@@ -28,36 +18,19 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
   return await response.json() as T;
 }
 
-export async function fetchQuizzes(
-  options: FetchQuizzesOptions = {},
+export async function fetchQuizList(
+  queryString = "",
   signal?: AbortSignal
-): Promise<Quiz[]> {
-  const searchParams = new URLSearchParams();
-
-  if (options.eikenLevels && options.eikenLevels.length > 0) {
-    searchParams.set("eiken_levels", options.eikenLevels.join(",")); // 英検級フィルタを付与する
-  }
-
-  if (options.questionTypes && options.questionTypes.length > 0) {
-    searchParams.set("question_types", options.questionTypes.join(",")); // 種別フィルタを付与する
-  }
-
-  const queryString = searchParams.toString();
-  const url = `${getApiBaseUrl()}/quizzes${queryString ? `?${queryString}` : ""}`;
-  const response = await fetch(url, {
+): Promise<QuizListResponseDto> {
+  const response = await fetch(`${getApiBaseUrl()}/quizzes${queryString}`, {
     cache: "no-store",
     signal
   });
 
-  const body = await readJsonResponse<QuizListResponseDto>(
-    response,
-    "Failed to fetch quizzes"
-  );
-
-  return body.quizzes;
+  return readJsonResponse<QuizListResponseDto>(response, "Failed to fetch quizzes");
 }
 
-export async function saveStudyResult(result: StudyResult): Promise<StudyResult> {
+export async function postStudyResult(result: StudyResult): Promise<StudyResult> {
   const response = await fetch(`${getApiBaseUrl()}/study-results`, {
     method: "POST",
     headers: {
@@ -69,7 +42,7 @@ export async function saveStudyResult(result: StudyResult): Promise<StudyResult>
   return readJsonResponse<StudyResult>(response, "Failed to save study result");
 }
 
-export async function fetchLatestStudyResult(
+export async function fetchLatestStudyResultResponse(
   signal?: AbortSignal
 ): Promise<StudyResult | null> {
   const response = await fetch(`${getApiBaseUrl()}/study-results/latest`, {
@@ -84,7 +57,7 @@ export async function fetchLatestStudyResult(
   return readJsonResponse<StudyResult>(response, "Failed to fetch latest study result");
 }
 
-export async function fetchTodayStudySummary(
+export async function fetchTodayStudySummaryResponse(
   signal?: AbortSignal
 ): Promise<StudySummaryResponseDto> {
   const response = await fetch(`${getApiBaseUrl()}/study-results/summary/today`, {

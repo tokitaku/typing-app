@@ -4,7 +4,7 @@ import {
   selectEikenLevel,
   toggleQuestionType
 } from "@/features/home-dashboard/application/homeDashboard";
-import type { DailySummary, Settings } from "@/domain/models/study";
+import type { DailySummary, Settings } from "@/shared/types/study";
 
 const settings: Settings = {
   eikenLevels: ["5"],
