@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { fetchTodayStudySummary } from "@/lib/api";
-import { getReviewQueue, getSettings, getTodaySummary, saveSettings } from "@/lib/storage";
-import type { DailySummary, EikenLevel, QuizType, Settings } from "@/types/study";
+import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
+import type { EikenLevel, QuizType } from "@/domain/models/study";
 
 const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [
   { value: "5", label: "英検5級" },
@@ -20,76 +18,8 @@ const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
   { value: "sentence", label: "英文章" }
 ];
 
-const defaultSummary: DailySummary = {
-  date: new Date().toISOString().slice(0, 10),
-  sessions: 0,
-  solvedProblems: 0,
-  reviewBacklog: 0
-};
-
 export function HomeDashboard() {
-  const [summary, setSummary] = useState<DailySummary>(defaultSummary);
-  const [settings, setSettings] = useState<Settings>({
-    eikenLevels: ["5"],
-    questionTypes: ["word", "sentence"]
-  });
-
-  useEffect(() => {
-    let isDisposed = false;
-
-    const loadDashboard = async () => {
-      const nextSettings = getSettings();
-      const reviewBacklog = getReviewQueue().length;
-
-      if (!isDisposed) {
-        setSettings(nextSettings);
-      }
-
-      try {
-        const remoteSummary = await fetchTodayStudySummary();
-
-        if (isDisposed) {
-          return;
-        }
-
-        setSummary({ ...remoteSummary, reviewBacklog });
-      } catch {
-        if (isDisposed) {
-          return;
-        }
-
-        setSummary(getTodaySummary());
-      }
-    };
-
-    void loadDashboard();
-
-    return () => {
-      isDisposed = true;
-    };
-  }, []);
-
-  const selectEikenLevel = (eikenLevel: EikenLevel) => {
-    const nextSettings = { ...settings, eikenLevels: [eikenLevel] };
-    setSettings(nextSettings);
-    saveSettings(nextSettings);
-  };
-
-  const toggleQuestionType = (questionType: QuizType) => {
-    const nextQuestionTypes = settings.questionTypes.includes(questionType)
-      ? settings.questionTypes.filter((value) => value !== questionType)
-      : [...settings.questionTypes, questionType];
-    const nextSettings = {
-      ...settings,
-      questionTypes:
-        nextQuestionTypes.length > 0
-          ? nextQuestionTypes
-          : settings.questionTypes
-    };
-
-    setSettings(nextSettings);
-    saveSettings(nextSettings);
-  };
+  const { settings, summary, selectEikenLevel, toggleQuestionType } = useHomeDashboard();
 
   return (
     <main className="page-shell">

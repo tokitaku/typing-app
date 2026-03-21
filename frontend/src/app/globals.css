@@ -238,87 +238,47 @@ a {
   border: 1px solid rgba(25, 35, 31, 0.18);
   border-radius: 18px;
   background: white;
-  font-size: 1.1rem;
 }
 
 .typing-input:focus {
-  outline: 2px solid rgba(24, 78, 59, 0.18);
+  outline: 2px solid rgba(24, 78, 59, 0.25);
   border-color: var(--primary);
 }
 
 .typing-input.is-mistaken {
-  animation: shake 0.18s linear;
-}
-
-.session-footer {
-  margin-top: 18px;
-}
-
-.today-note {
-  margin-top: 16px;
-}
-
-.text-link {
-  color: var(--primary);
-  font-weight: 700;
-}
-
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-4px);
-  }
-  50% {
-    transform: translateX(4px);
-  }
-  75% {
-    transform: translateX(-2px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  border-color: rgba(209, 79, 79, 0.56);
+  box-shadow: 0 0 0 4px rgba(209, 79, 79, 0.12);
 }
 
 .settings-section {
   margin-top: 24px;
-  padding: 24px 28px;
+  padding: 28px;
   border: 1px solid var(--border);
-  border-radius: 24px;
-  background: var(--surface);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.56);
 }
 
 .settings-label {
-  margin: 0 0 14px;
-  color: var(--text-soft);
-  font-size: 0.9rem;
+  display: block;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
 }
 
 .settings-subtitle {
-  margin-top: 20px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 }
 
 .level-select {
-  appearance: none;
-  padding: 10px 40px 10px 16px;
-  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 280px;
+  min-height: 48px;
+  margin-top: 10px;
+  padding: 0 14px;
+  border: 1px solid rgba(25, 35, 31, 0.18);
   border-radius: 14px;
-  background:
-    var(--surface-strong)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b655e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
-    no-repeat right 14px center;
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.level-select:focus {
-  outline: 2px solid rgba(24, 78, 59, 0.18);
-  border-color: var(--primary);
+  background: white;
+  font-size: 1rem;
 }
 
 .settings-chip-group {
@@ -335,27 +295,28 @@ a {
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-strong);
-  color: var(--text-main);
-  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.today-note {
+  margin-top: 20px;
+}
+
+.text-link {
   font-weight: 700;
-  cursor: pointer;
 }
 
-.settings-chip input {
-  margin: 0;
-  accent-color: var(--primary);
-}
-
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .page-shell {
-    width: min(100% - 20px, 960px);
-    padding-top: 24px;
+    width: min(100%, calc(100% - 24px));
+    padding: 24px 0 40px;
   }
 
   .hero-card,
+  .problem-card,
   .result-card,
   .empty-card,
-  .problem-card {
+  .settings-section {
     padding: 24px;
     border-radius: 24px;
   }
@@ -365,8 +326,7 @@ a {
     flex-direction: column;
   }
 
-  .summary-card strong,
-  .result-item strong {
-    font-size: 1.8rem;
+  .english-target {
+    padding: 16px 18px;
   }
 }

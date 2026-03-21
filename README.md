@@ -118,8 +118,13 @@ npm run openapi:generate
 ```text
 .
 ├── frontend/  # Next.js フロントエンド一式
-│   ├── app/   # App Router のページ
-│   ├── src/   # components, lib, types, tests
+│   ├── src/
+│   │   ├── app/            # App Router のページと layout
+│   │   ├── features/       # feature 単位で切り出した画面実装
+│   │   ├── application/    # 画面・通信 DTO
+│   │   ├── domain/         # 業務ルールと業務型
+│   │   ├── infrastructure/ # API / localStorage 実装
+│   │   └── __tests__/      # フロントのユースケース / infrastructure テスト
 │   ├── public/
 │   ├── next.config.mjs
 │   ├── tsconfig.json
@@ -138,7 +143,11 @@ npm run openapi:generate
 - 英単語データは起動時に SQLite へシードし、`SQLModel` 経由で CRUD と問題配信を行う
 - 短文クイズは後方互換のためアプリ内データとして配信する
 - バックエンドは `domain -> application -> infrastructure -> presentation` の依存方向で責務分離する
-- 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、API 呼び出しは [`frontend/src/lib/api.ts`](./frontend/src/lib/api.ts)、ローカル保存は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
+- フロントエンドも `presentation -> application -> domain` を基本にし、`infrastructure` が API と `localStorage` の詳細を担当する
+- `home-dashboard`、`result-screen`、`study-session` は `frontend/src/features` 配下へ移し、画面単位で責務を閉じ込める
+- タイピング中の入力判定は `frontend/src/features/study-session/typing` に寄せ、フロント固有ロジックとして扱う
+- `frontend/src/application` には DTO を置き、画面実装は `features` と `app` を中心に構成する
+- 業務型は [`frontend/src/domain/models/study.ts`](./frontend/src/domain/models/study.ts)、画面・通信 DTO は [`frontend/src/application/dtos/study.ts`](./frontend/src/application/dtos/study.ts) に分離する
 - `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
 - SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用
 

@@ -1,11 +1,13 @@
 import type {
+  QuizListResponseDto,
+  StudySummaryResponseDto
+} from "@/application/dtos/study";
+import type {
   EikenLevel,
   Quiz,
-  QuizListResponse,
   QuizType,
-  StudyResult,
-  StudySummaryResponse
-} from "@/types/study";
+  StudyResult
+} from "@/domain/models/study";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 
@@ -47,7 +49,7 @@ export async function fetchQuizzes(
     signal
   });
 
-  const body = await readJsonResponse<QuizListResponse>(
+  const body = await readJsonResponse<QuizListResponseDto>(
     response,
     "Failed to fetch quizzes"
   );
@@ -84,13 +86,13 @@ export async function fetchLatestStudyResult(
 
 export async function fetchTodayStudySummary(
   signal?: AbortSignal
-): Promise<StudySummaryResponse> {
+): Promise<StudySummaryResponseDto> {
   const response = await fetch(`${getApiBaseUrl()}/study-results/summary/today`, {
     cache: "no-store",
     signal
   });
 
-  return readJsonResponse<StudySummaryResponse>(
+  return readJsonResponse<StudySummaryResponseDto>(
     response,
     "Failed to fetch today summary"
   );

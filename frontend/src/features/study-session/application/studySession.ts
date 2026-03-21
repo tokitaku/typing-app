@@ -2,14 +2,13 @@ import {
   buildQuizSet,
   calculateStudyResult
 } from "@/domain/services/studyService";
+import type { CompletedStudySessionDto } from "@/application/dtos/study";
 import type {
-  MistakeLog,
   Quiz,
   QuizProgress,
   Settings,
-  StudyMode,
-  StudyResult
-} from "@/types/study";
+  StudyMode
+} from "@/domain/models/study";
 
 type StartStudySessionInput = {
   quizzes: Quiz[];
@@ -27,14 +26,7 @@ type StartStudySessionResult = {
 type CompleteStudySessionInput = {
   mode: StudyMode;
   progressList: QuizProgress[];
-  createStudyResult?: (progressList: QuizProgress[], mode: StudyMode) => StudyResult;
-};
-
-type CompleteStudySessionResult = {
-  summary: StudyResult;
-  nextReviewQueueIds: number[];
-  recoveredIds: number[];
-  mistakeLogs: MistakeLog[];
+  createStudyResult?: typeof calculateStudyResult;
 };
 
 export function startStudySession({
@@ -63,24 +55,28 @@ export function completeStudySession({
   mode,
   progressList,
   createStudyResult = calculateStudyResult
-}: CompleteStudySessionInput): CompleteStudySessionResult {
-  const nextReviewQueueIds = progressList
+}: CompleteStudySessionInput): CompletedStudySessionDto {
+  const reviewQueueToAppend = progressList
     .filter((progress) => progress.wasMistaken)
     .map((progress) => progress.quizId);
-  const recoveredIds = progressList
+  const recoveredQuizIds = progressList
     .filter((progress) => !progress.wasMistaken)
     .map((progress) => progress.quizId);
+  const summary = createStudyResult(progressList, mode);
 
   return {
-    summary: createStudyResult(progressList, mode),
-    nextReviewQueueIds,
-    recoveredIds,
+    summary,
+    reviewQueueToAppend,
+    recoveredQuizIds,
     mistakeLogs: progressList
       .filter((progress) => progress.wasMistaken)
       .map((progress) => ({
         question_id: progress.quizId,
         mistake_count: progress.mistakeCount,
         created_at: progress.completedAt
-      }))
+      })),
+    latestResult: summary,
+    historyResult: summary,
+    nextRoute: "/result"
   };
 }

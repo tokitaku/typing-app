@@ -10,10 +10,6 @@ export type Quiz = {
   japanese: string;
 };
 
-export type QuizListResponse = {
-  quizzes: Quiz[];
-};
-
 export type QuizProgress = {
   quizId: number;
   durationMs: number;
@@ -43,8 +39,6 @@ export type DailySummary = {
   solvedProblems: number;
   reviewBacklog: number;
 };
-
-export type StudySummaryResponse = Omit<DailySummary, "reviewBacklog">;
 
 export type Settings = {
   eikenLevels: EikenLevel[];

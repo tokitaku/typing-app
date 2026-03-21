@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getSettings, saveSettings } from "@/lib/storage";
-import type { Settings } from "@/types/study";
+import { getSettings, saveSettings } from "@/infrastructure/storage/studyStorage";
+import type { Settings } from "@/domain/models/study";
 
 const SETTINGS_KEY = "typing-app::settings";
 
