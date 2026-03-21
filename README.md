@@ -125,6 +125,11 @@ npm run openapi:generate
 │   ├── tsconfig.json
 │   └── vitest.config.ts
 └── backend/   # FastAPI バックエンド
+    ├── application/      # ユースケースと DTO
+    ├── domain/           # ドメインエンティティと repository 境界
+    ├── infrastructure/   # SQLModel 実装と DB bootstrap
+    ├── presentation/     # FastAPI ルートと schema
+    └── tests/            # API / usecase テスト
 ```
 
 ## 実装方針
@@ -132,6 +137,7 @@ npm run openapi:generate
 - リポジトリが空だったため、MVP は Next.js と FastAPI の最小構成で作成
 - 英単語データは起動時に SQLite へシードし、`SQLModel` 経由で CRUD と問題配信を行う
 - 短文クイズは後方互換のためアプリ内データとして配信する
+- バックエンドは `domain -> application -> infrastructure -> presentation` の依存方向で責務分離する
 - 出題ロジックは [`frontend/src/lib/study.ts`](./frontend/src/lib/study.ts)、API 呼び出しは [`frontend/src/lib/api.ts`](./frontend/src/lib/api.ts)、ローカル保存は [`frontend/src/lib/storage.ts`](./frontend/src/lib/storage.ts) に分離
 - `localStorage` には `mistake_log`、最新結果、復習用キュー、設定値を保存
 - SQLite は `DATABASE_URL` で切り替え可能で、`docker compose` では named volume 上の `sqlite:////data/app.db` を使用
