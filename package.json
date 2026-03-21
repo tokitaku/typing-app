@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "setup": "npm ci && uv venv .venv --allow-existing && uv pip install --python .venv/bin/python -r backend/requirements.txt",
+    "setup": "npm ci && cd backend && uv sync && cd ..",
     "dev": "docker compose up --build",
     "dev:down": "docker compose down",
-    "openapi:generate": "uv run --python .venv/bin/python python -m backend.openapi --output backend/openapi.json",
+    "openapi:generate": "uv run --project backend python -m backend.openapi --output backend/openapi.json",
     "dev:frontend:docker": "next dev ./frontend --hostname 0.0.0.0 --port 3000",
     "build": "next build ./frontend",
     "start": "next start ./frontend",

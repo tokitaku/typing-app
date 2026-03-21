@@ -99,7 +99,7 @@ npm run setup
 
 ```bash
 npm test
-uv run --python .venv/bin/python pytest backend/tests
+uv run --project backend pytest backend/tests
 npm run openapi:generate
 npm run lint
 npm run build
