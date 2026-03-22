@@ -2,13 +2,6 @@ from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
-class ListQuizzesQuery:
-    eiken_level_codes: list[str] | None = None
-    question_type_codes: list[str] | None = None
-    tag_codes: list[str] | None = None
-
-
-@dataclass(frozen=True)
 class ListQuestionsQuery:
     eiken_level_codes: list[str] | None = None
     question_type_codes: list[str] | None = None
@@ -43,16 +36,6 @@ class RecordStudyResultCommand:
     mistakes: int
     average_time: int
     created_at: str
-
-
-@dataclass(frozen=True)
-class QuizDto:
-    id: int
-    type: str
-    eikenLevel: str
-    english: str
-    japanese: str
-    tags: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

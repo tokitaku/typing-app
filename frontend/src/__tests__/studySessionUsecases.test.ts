@@ -3,23 +3,23 @@ import {
   completeStudySession,
   startStudySession
 } from "@/features/study-session/application/studySession";
-import type { Quiz, QuizProgress, Settings } from "@/shared/types/study";
+import type { Question, QuizProgress, Settings } from "@/shared/types/study";
 
 const settings: Settings = {
   eikenLevels: ["5", "4"],
   questionTypes: ["word", "sentence"]
 };
 
-const quizzes: Quiz[] = [
-  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご" },
-  { id: 2, type: "word", eikenLevel: "4", english: "library", japanese: "図書館" },
-  { id: 3, type: "sentence", eikenLevel: "3", english: "I read books.", japanese: "私は本を読みます。" }
+const quizzes: Question[] = [
+  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true },
+  { id: 2, type: "word", eikenLevel: "4", english: "library", japanese: "図書館", isActive: true },
+  { id: 3, type: "sentence", eikenLevel: "3", english: "I read books.", japanese: "私は本を読みます。", isActive: true }
 ];
 
 describe("study session use cases", () => {
   it("builds a learn session with settings filters", () => {
     const result = startStudySession({
-      quizzes,
+      questions: quizzes,
       mode: "learn",
       reviewQueue: [3],
       settings,
@@ -33,7 +33,7 @@ describe("study session use cases", () => {
 
   it("returns empty flag when learn session has no matching quizzes", () => {
     const result = startStudySession({
-      quizzes,
+      questions: quizzes,
       mode: "learn",
       reviewQueue: [],
       settings: {

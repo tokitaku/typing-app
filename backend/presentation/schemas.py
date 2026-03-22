@@ -6,19 +6,6 @@ from pydantic import BaseModel, Field, field_validator
 from backend.domain.tag_rules import normalize_tags
 
 
-class QuizResponse(BaseModel):
-    id: int
-    type: Literal["word", "sentence"]
-    eikenLevel: str
-    english: str
-    japanese: str
-    tags: list[str]
-
-
-class QuizListResponse(BaseModel):
-    quizzes: list[QuizResponse]
-
-
 class QuestionBase(BaseModel):
     eiken_level_code: str = Field(min_length=1)
     question_type: Literal["word", "sentence"]

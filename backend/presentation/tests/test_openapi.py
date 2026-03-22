@@ -8,7 +8,7 @@ def test_build_openapi_schema_includes_core_metadata() -> None:
 
     assert schema["openapi"].startswith("3.")  # OpenAPI 3 系で出力されることを確認する
     assert schema["info"]["title"] == "Typing App API"  # 既存 API タイトルが spec に反映されることを確認する
-    assert "/quizzes" in schema["paths"]  # 主要エンドポイントが spec に含まれることを確認する
+    assert "/quizzes" not in schema["paths"]  # issue #60 の完了条件として quizzes API が spec から除去されることを確認する
     assert "/study-results" in schema["paths"]  # POST エンドポイントも含まれることを確認する
 
 

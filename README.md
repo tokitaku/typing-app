@@ -16,6 +16,12 @@
 - 結果画面 `/result`
   - 出題数、正答率、ミス数、平均入力時間の表示
 
+## API 方針
+
+- 出題用データ取得と問題管理の単一ソースとして `GET /questions` を利用する
+- 学習画面の出題導線では `include_inactive=false` を付与し、inactive 問題を除外する
+- 旧 `GET /quizzes` は廃止済みで、関連する DTO / OpenAPI schema も削除している
+
 ## 技術スタック
 
 - フロントエンド: `Next.js 14` / `React 18` / `TypeScript`
@@ -103,10 +109,15 @@ make openapi
 │       └── __tests__/
 ├── backend/
 │   ├── application/
+│   │   └── tests/
 │   ├── domain/
 │   ├── infrastructure/
+│   │   └── sqlmodel/
+│   │       └── tests/
 │   ├── presentation/
-│   └── tests/
+│   │   └── tests/
+│   ├── alembic/
+│   └── commands/
 ├── compose.yml
 ├── Makefile
 └── README.md

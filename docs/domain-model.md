@@ -26,6 +26,7 @@ classDiagram
         +english: str
         +japanese: str
         +is_active: bool
+        +tags: tuple~str~
     }
 
     class StudyResult {
@@ -47,7 +48,7 @@ classDiagram
 
     class QuestionRepository {
         <<interface>>
-        +list_questions(eiken_level_codes, question_type_codes, include_inactive) list~Question~
+        +list_questions(eiken_level_codes, question_type_codes, tag_codes, include_inactive) list~Question~
         +create(question) Question
         +update(question_id, updates) Question | None
         +deactivate(question_id) bool
@@ -70,6 +71,8 @@ classDiagram
 
 補足:
 - `Question` は `QuestionType` を保持し、出題種別を表現します。
+- `Question` は自由タグを 0 件以上保持し、出題条件と教材分類の両方に利用されます。
 - `StudyResult` は `StudyMode` を保持し、学習モードごとの結果を表現します。
-- `QuestionRepository` は `Question` の検索・作成・更新・無効化を担当します。
+- `QuestionRepository` は `Question` の検索・作成・更新・無効化を担当し、タグ条件でも検索できます。
 - `StudyResultRepository` は `StudyResult` の保存と、日次集計 `DailyStudySummary` の取得を担当します。
+- 出題用の独立した `Quiz` エンティティは持たず、学習導線も `Question` を単一ソースとして扱います。

@@ -1,44 +1,11 @@
 from backend.application.dtos import (
     CreateQuestionCommand,
     ListQuestionsQuery,
-    ListQuizzesQuery,
-    QuizDto,
     UpdateQuestionCommand,
 )
-from backend.application.usecases import create_question, list_questions, list_quizzes, update_question
+from backend.application.usecases import create_question, list_questions, update_question
 from backend.domain.entities import Question, QuestionType
 from backend.application.tests.fakes import FakeQuestionRepository
-
-
-def test_list_quizzes_use_case_excludes_inactive_questions() -> None:
-    repository = FakeQuestionRepository(
-        [
-            Question(
-                id=1,
-                eiken_level_code="5",
-                question_type=QuestionType.WORD,
-                english="apple",
-                japanese="りんご",
-                is_active=True,
-            ),
-            Question(
-                id=2,
-                eiken_level_code="5",
-                question_type=QuestionType.SENTENCE,
-                english="I read every day.",
-                japanese="私は毎日読書します。",
-                is_active=False,
-            ),
-        ]
-    )
-
-    quizzes = list_quizzes(
-        repository,
-        ListQuizzesQuery(eiken_level_codes=["5"], question_type_codes=["word", "sentence"]),
-    )
-
-    assert quizzes == [QuizDto(id=1, type="word", eikenLevel="5", english="apple", japanese="りんご")]
-
 
 def test_list_questions_use_case_includes_inactive_by_default() -> None:
     repository = FakeQuestionRepository(

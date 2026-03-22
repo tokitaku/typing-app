@@ -2,9 +2,7 @@ from backend.application.dtos import (
     CreateQuestionCommand,
     DailyStudySummaryDto,
     ListQuestionsQuery,
-    ListQuizzesQuery,
     QuestionDto,
-    QuizDto,
     RecordStudyResultCommand,
     StudyResultDto,
     UpdateQuestionCommand,
@@ -27,17 +25,6 @@ def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
 
     normalized_codes = list(normalize_tags(codes))
     return normalized_codes if normalized_codes else None  # 空配列相当ならフィルタなしとして扱う
-
-
-def _to_quiz_dto(question: Question) -> QuizDto:
-    return QuizDto(
-        id=int(question.id),
-        type=question.question_type.value,
-        eikenLevel=question.eiken_level_code,
-        english=question.english,
-        japanese=question.japanese,
-        tags=list(question.tags),
-    )  # 出題用 DTO へ詰め替える
 
 
 def _to_question_dto(question: Question) -> QuestionDto:
@@ -69,16 +56,6 @@ def _to_summary_dto(summary: DailyStudySummary) -> DailyStudySummaryDto:
         sessions=summary.sessions,
         solvedProblems=summary.solved_problems,
     )  # 表示用 summary DTO へ詰め替える
-
-
-def list_quizzes(repository: QuestionRepository, query: ListQuizzesQuery) -> list[QuizDto]:
-    questions = repository.list_questions(
-        eiken_level_codes=query.eiken_level_codes,
-        question_type_codes=_parse_question_types(query.question_type_codes),
-        tag_codes=_parse_tag_codes(query.tag_codes),
-        include_inactive=False,
-    )
-    return [_to_quiz_dto(question) for question in questions]  # 出題画面向け DTO 一覧を返す
 
 
 def list_questions(repository: QuestionRepository, query: ListQuestionsQuery) -> list[QuestionDto]:

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  fetchQuizzes,
+  fetchStudyQuestions,
   saveStudyResult
 } from "@/features/study-session/api/studySessionApi";
 import {
@@ -8,7 +8,7 @@ import {
   fetchTodayStudySummary
 } from "@/features/result-screen/api/resultScreenApi";
 import { fetchQuestionListResponse } from "@/shared/api/studyApiClient";
-import type { Question, Quiz, StudyResult } from "@/shared/types/study";
+import type { Question, StudyResult } from "@/shared/types/study";
 
 const sampleResult: StudyResult = {
   mode: "learn",
@@ -18,16 +18,6 @@ const sampleResult: StudyResult = {
   average_time: 1234,
   created_at: "2026-03-21T01:23:45.000Z"
 };
-
-const sampleQuizzes: Quiz[] = [
-  {
-    id: 1,
-    type: "word",
-    eikenLevel: "5",
-    english: "apple",
-    japanese: "りんご"
-  }
-];
 
 const sampleQuestions: Question[] = [
   {
@@ -45,37 +35,37 @@ afterEach(() => {
 });
 
 describe("study result api", () => {
-  it("fetches quizzes from the backend", async () => {
+  it("fetches study questions from the backend", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
-      json: async () => ({ quizzes: sampleQuizzes })
+      json: async () => ({ questions: sampleQuestions })
     }));
 
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(fetchQuizzes()).resolves.toEqual(sampleQuizzes);
+    await expect(fetchStudyQuestions()).resolves.toEqual(sampleQuestions);
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/quizzes",
+      "http://localhost:8000/questions?include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });
 
-  it("fetches quizzes with filters when requested", async () => {
+  it("fetches study questions with filters when requested", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
-      json: async () => ({ quizzes: sampleQuizzes })
+      json: async () => ({ questions: sampleQuestions })
     }));
 
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(
-      fetchQuizzes({
+      fetchStudyQuestions({
         eikenLevels: ["3", "pre2"],
         questionTypes: ["word"]
       })
-    ).resolves.toEqual(sampleQuizzes);
+    ).resolves.toEqual(sampleQuestions);
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/quizzes?eiken_levels=3%2Cpre2&question_types=word",
+      "http://localhost:8000/questions?eiken_levels=3%2Cpre2&question_types=word&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });

@@ -1,6 +1,6 @@
 import type {
   EikenLevel,
-  Quiz,
+  Question,
   QuizProgress,
   QuizType,
   StudyMode,
@@ -9,7 +9,7 @@ import type {
 
 export const SESSION_QUESTION_COUNT = 10;
 
-function shuffleQuizzes(items: Quiz[]): Quiz[] {
+function shuffleQuizzes(items: Question[]): Question[] {
   const shuffled = [...items];
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -21,13 +21,13 @@ function shuffleQuizzes(items: Quiz[]): Quiz[] {
 }
 
 export function buildQuizSet(
-  quizzes: Quiz[],
+  quizzes: Question[],
   mode: StudyMode,
   missedIds: number[],
   eikenLevels: EikenLevel[] = ["5", "4", "3", "pre2", "2", "pre1", "1"],
   questionTypes: QuizType[] = ["word", "sentence"],
   sessionQuestionCount = SESSION_QUESTION_COUNT
-): Quiz[] {
+): Question[] {
   if (mode === "review") {
     const uniqueMissedIds = Array.from(new Set(missedIds));
     const reviewSet = quizzes.filter((quiz) => uniqueMissedIds.includes(quiz.id));

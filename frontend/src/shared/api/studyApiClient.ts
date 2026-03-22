@@ -1,6 +1,5 @@
 import type {
   QuestionListResponseDto,
-  QuizListResponseDto,
   StudySummaryResponseDto
 } from "@/shared/api/studyApiTypes";
 import type {
@@ -27,18 +26,6 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
   }
 
   return await response.json() as T;
-}
-
-export async function fetchQuizList(
-  queryString = "",
-  signal?: AbortSignal
-): Promise<QuizListResponseDto> {
-  const response = await fetch(`${getApiBaseUrl()}/quizzes${queryString}`, {
-    cache: "no-store",
-    signal
-  });
-
-  return readJsonResponse<QuizListResponseDto>(response, "Failed to fetch quizzes");
 }
 
 export async function fetchQuestionListResponse(

@@ -45,7 +45,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <main className="page-shell">
         <section className="empty-card">
           <p className="eyebrow">LOAD ERROR</p>
-          <h1>クイズデータの取得に失敗しました。</h1>
+          <h1>問題データの取得に失敗しました。</h1>
           <p>FastAPI サーバーが起動しているか確認してから、もう一度お試しください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
@@ -75,7 +75,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <main className="page-shell">
         <section className="empty-card">
           <p className="eyebrow">LEARN READY</p>
-          <h1>出題できるクイズがありません。</h1>
+          <h1>出題できる問題がありません。</h1>
           <p>英検級または出題タイプ設定を見直して、もう一度学習を開始してください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
