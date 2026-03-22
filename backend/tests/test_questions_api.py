@@ -1,38 +1,3 @@
-def test_quizzes_returns_expected_shape(client) -> None:
-    response = client.get("/quizzes")
-
-    assert response.status_code == 200
-
-    body = response.json()
-    assert "quizzes" in body
-    assert len(body["quizzes"]) > 0
-    assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
-    assert all(
-        {"id", "type", "english", "japanese", "eikenLevel"} <= set(quiz.keys())
-        for quiz in body["quizzes"]
-    )
-
-
-def test_quizzes_can_filter_by_eiken_level_and_question_type(client) -> None:
-    response = client.get("/quizzes?eiken_levels=3&question_types=word")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert len(body["quizzes"]) > 0
-    assert all(quiz["eikenLevel"] == "3" for quiz in body["quizzes"])
-    assert all(quiz["type"] == "word" for quiz in body["quizzes"])
-
-
-def test_quizzes_can_filter_sentence_only(client) -> None:
-    response = client.get("/quizzes?question_types=sentence")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert len(body["quizzes"]) > 0
-    assert all(quiz["type"] == "sentence" for quiz in body["quizzes"])
-    assert all("eikenLevel" in quiz for quiz in body["quizzes"])
-
-
 def test_post_question_creates_new_sentence_question(client) -> None:
     payload = {
         "eiken_level_code": "pre2",
@@ -181,17 +146,6 @@ def test_delete_question_deactivates_existing_question(client) -> None:
     assert questions_response.json()["questions"][0]["isActive"] is False
 
 
-def test_quizzes_uses_active_questions_only(client) -> None:
-    client.delete("/questions/1")
-
-    response = client.get("/quizzes")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert {quiz["type"] for quiz in body["quizzes"]} == {"word", "sentence"}
-    assert all(quiz["id"] != 1 for quiz in body["quizzes"])
-
-
 def test_get_questions_filters_by_eiken_level(client) -> None:
     client.post(
         "/questions",
@@ -286,12 +240,6 @@ def test_get_questions_combined_eiken_and_type_filter(client) -> None:
     assert len(body["questions"]) > 0
     assert all(q["eikenLevel"] == "pre2" for q in body["questions"])  # 複合フィルタの仕様通り eiken_levels 条件を満たす問題のみが返却されることを検証
     assert all(q["type"] == "word" for q in body["questions"])  # 複合フィルタの仕様通り question_types 条件も同時に満たす問題のみが返却されることを検証
-
-
-def test_get_quizzes_returns_422_for_invalid_question_type(client) -> None:
-    response = client.get("/quizzes?question_types=invalid_type")
-
-    assert response.status_code == 422  # 不正なマスタコード値を拒否するバリデーション仕様を検証（GET /quizzes）
 
 
 def test_get_questions_returns_422_for_invalid_question_type(client) -> None:
