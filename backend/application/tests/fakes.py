@@ -1,5 +1,4 @@
-from backend.application.dtos import StudyResultDto
-from backend.domain.entities import DailyStudySummary, Question, QuestionType
+from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyResult
 
 
 class FakeQuestionRepository:
@@ -66,23 +65,23 @@ class FakeQuestionRepository:
 
 class FakeStudyResultRepository:
     def __init__(self) -> None:
-        self.saved_results: list[StudyResultDto] = []
+        self.saved_results: list[StudyResult] = []
 
-    def save(self, result: StudyResultDto) -> StudyResultDto:
+    def save(self, result: StudyResult) -> StudyResult:
         self.saved_results.append(result)  # 保存された結果をそのまま記録する
         return result
 
-    def get_latest(self) -> StudyResultDto | None:
+    def get_latest(self) -> StudyResult | None:
         return self.saved_results[-1] if self.saved_results else None  # 最後の要素を最新として返す
 
     def get_today_summary(self, target_date: str) -> DailyStudySummary:
         solved_problems = sum(
             result.total_questions
             for result in self.saved_results
-            if result.created_at.startswith(target_date)
+            if result.created_at.date().isoformat() == target_date
         )
         sessions = sum(
-            1 for result in self.saved_results if result.created_at.startswith(target_date)
+            1 for result in self.saved_results if result.created_at.date().isoformat() == target_date
         )
         return DailyStudySummary(
             date=target_date,

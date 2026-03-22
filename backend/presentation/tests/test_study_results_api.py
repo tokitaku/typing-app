@@ -2,24 +2,31 @@ from datetime import datetime, timezone
 
 
 def test_post_study_result_persists_payload(client) -> None:
+    created_at = "2026-03-21T17:00:00+09:00"
     payload = {
         "mode": "learn",
         "total_questions": 10,
         "correct_rate": 80,
         "mistakes": 3,
         "average_time": 1200,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": created_at,
     }
 
     response = client.post("/study-results", json=payload)
 
     assert response.status_code == 201
-    assert response.json() == payload
+    assert response.json() == {
+        **payload,
+        "created_at": "2026-03-21T08:00:00Z",
+    }  # API 境界では ISO 文字列を受け取りつつ、内部 datetime を UTC の ISO 文字列で返すことを確認する
 
     latest_response = client.get("/study-results/latest")
 
     assert latest_response.status_code == 200
-    assert latest_response.json() == payload
+    assert latest_response.json() == {
+        **payload,
+        "created_at": "2026-03-21T08:00:00Z",
+    }
 
 
 def test_post_study_result_rejects_invalid_payload(client) -> None:

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,7 @@ class RecordStudyResultCommand:
     correct_rate: int
     mistakes: int
     average_time: int
-    created_at: str
+    created_at: datetime
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,7 @@ class StudyResultDto:
     correct_rate: int
     mistakes: int
     average_time: int
-    created_at: str
+    created_at: datetime
 
 
 @dataclass(frozen=True)

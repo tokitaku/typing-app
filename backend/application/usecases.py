@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from backend.application.dtos import (
     CreateQuestionCommand,
     DailyStudySummaryDto,
@@ -10,6 +12,13 @@ from backend.application.dtos import (
 from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyMode, StudyResult
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.domain.tag_rules import normalize_tags
+
+
+def _normalize_created_at(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
+
+    return value.astimezone(timezone.utc)  # 内部では UTC に正規化して扱う
 
 
 def _parse_question_types(codes: list[str] | None) -> list[QuestionType] | None:
@@ -114,6 +123,7 @@ def record_study_result(
     repository: StudyResultRepository,
     command: RecordStudyResultCommand,
 ) -> StudyResultDto:
+    normalized_created_at = _normalize_created_at(command.created_at)
     saved_result = repository.save(
         StudyResult(
             mode=StudyMode(command.mode),
@@ -121,7 +131,7 @@ def record_study_result(
             correct_rate=command.correct_rate,
             mistakes=command.mistakes,
             average_time=command.average_time,
-            created_at=command.created_at,
+            created_at=normalized_created_at,
         )
     )
     return _to_study_result_dto(saved_result)  # 保存結果を返す
