@@ -22,3 +22,6 @@ npm-debug.log*
 __pycache__/
 *.pyc
 backend/app.db
+
+# Claude
+.claude/settings.local.json
