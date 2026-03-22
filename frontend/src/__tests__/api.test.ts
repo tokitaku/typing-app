@@ -7,7 +7,8 @@ import {
   fetchLatestStudyResult,
   fetchTodayStudySummary
 } from "@/features/result-screen/api/resultScreenApi";
-import type { Quiz, StudyResult } from "@/shared/types/study";
+import { fetchQuestionListResponse } from "@/shared/api/studyApiClient";
+import type { Question, Quiz, StudyResult } from "@/shared/types/study";
 
 const sampleResult: StudyResult = {
   mode: "learn",
@@ -25,6 +26,17 @@ const sampleQuizzes: Quiz[] = [
     eikenLevel: "5",
     english: "apple",
     japanese: "りんご"
+  }
+];
+
+const sampleQuestions: Question[] = [
+  {
+    id: 1,
+    type: "word",
+    eikenLevel: "5",
+    english: "apple",
+    japanese: "りんご",
+    isActive: true
   }
 ];
 
@@ -121,6 +133,44 @@ describe("study result api", () => {
     });
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:8000/study-results/summary/today",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
+  it("fetches questions with typed filters", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ questions: sampleQuestions })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      fetchQuestionListResponse({
+        eikenLevels: ["3", "pre2"],
+        questionTypes: ["word"],
+        includeInactive: false
+      })
+    ).resolves.toEqual({ questions: sampleQuestions });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions?eiken_levels=3%2Cpre2&question_types=word&include_inactive=false",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
+  it("fetches questions without filters when no options are provided", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ questions: sampleQuestions })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchQuestionListResponse()).resolves.toEqual({
+      questions: sampleQuestions
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions",
       expect.objectContaining({ cache: "no-store" })
     );
   });

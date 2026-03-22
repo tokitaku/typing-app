@@ -10,6 +10,15 @@ export type Quiz = {
   japanese: string;
 };
 
+export type Question = {
+  id: number;
+  type: QuizType;
+  eikenLevel: EikenLevel;
+  english: string;
+  japanese: string;
+  isActive: boolean;
+};
+
 export type QuizProgress = {
   quizId: number;
   durationMs: number;

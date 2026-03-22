@@ -1,14 +1,25 @@
 import type {
+  QuestionListResponseDto,
   QuizListResponseDto,
   StudySummaryResponseDto
 } from "@/shared/api/studyApiTypes";
-import type { StudyResult } from "@/shared/types/study";
+import type {
+  EikenLevel,
+  QuizType,
+  StudyResult
+} from "@/shared/types/study";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 
 function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 }
+
+export type FetchQuestionListOptions = {
+  eikenLevels?: EikenLevel[];
+  questionTypes?: QuizType[];
+  includeInactive?: boolean;
+};
 
 async function readJsonResponse<T>(response: Response, errorMessage: string): Promise<T> {
   if (!response.ok) {
@@ -28,6 +39,36 @@ export async function fetchQuizList(
   });
 
   return readJsonResponse<QuizListResponseDto>(response, "Failed to fetch quizzes");
+}
+
+export async function fetchQuestionListResponse(
+  options: FetchQuestionListOptions = {},
+  signal?: AbortSignal
+): Promise<QuestionListResponseDto> {
+  const searchParams = new URLSearchParams();
+
+  if (options.eikenLevels && options.eikenLevels.length > 0) {
+    searchParams.set("eiken_levels", options.eikenLevels.join(",")); // 英検級フィルタを API 契約へ変換する
+  }
+
+  if (options.questionTypes && options.questionTypes.length > 0) {
+    searchParams.set("question_types", options.questionTypes.join(",")); // 問題種別フィルタを API 契約へ変換する
+  }
+
+  if (options.includeInactive !== undefined) {
+    searchParams.set("include_inactive", String(options.includeInactive)); // true/false を query string へ明示的に変換する
+  }
+
+  const queryString = searchParams.toString();
+  const response = await fetch(
+    `${getApiBaseUrl()}/questions${queryString ? `?${queryString}` : ""}`,
+    {
+      cache: "no-store",
+      signal
+    }
+  );
+
+  return readJsonResponse<QuestionListResponseDto>(response, "Failed to fetch questions");
 }
 
 export async function postStudyResult(result: StudyResult): Promise<StudyResult> {
