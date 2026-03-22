@@ -133,4 +133,4 @@ describe("question browser use cases", () => {
       ).toEqual({ mode: "create" }); // 非保存中は新規作成フォームを開けることを検証
     });
   });
-}
+});

@@ -180,4 +180,4 @@ describe("question browser ui", () => {
     expect(html).toContain("question-browser-button\" disabled=\"\" type=\"button\">新規作成");
     expect(html).toContain(">処理中...<");
   });
-}
+});

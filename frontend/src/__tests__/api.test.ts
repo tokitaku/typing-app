@@ -176,10 +176,8 @@ describe("study result api", () => {
 
     vi.stubGlobal("fetch", fetchMock);
 
-    const { patchQuestion } = await import("@/shared/api/studyApiClient");
-
     await expect(
-      patchQuestion(1, { tags: ["business", "daily"] })
+      updateQuestionResponse(1, { tags: ["business", "daily"] })
     ).resolves.toEqual(updatedQuestion);
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:8000/questions/1",
