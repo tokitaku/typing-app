@@ -1,7 +1,7 @@
 # Type & Learn
 
-英語を入力しながら、英単語と英文章を反復練習するタイピング学習アプリです。  
-フロントエンドは `Next.js 14`、バックエンドは `FastAPI` で構成され、学習結果は `SQLite` に保存されます。
+英語を入力しながら、英単語と英文章を反復練習するタイピング学習アプリです。
+フロントエンドは `Next.js 14`、バックエンドは `FastAPI` で構成され、学習結果は `PostgreSQL` に保存されます。
 
 ## できること
 
@@ -26,7 +26,7 @@
 
 - フロントエンド: `Next.js 14` / `React 18` / `TypeScript`
 - バックエンド: `FastAPI` / `SQLModel` / `Alembic`
-- データベース: `SQLite`
+- データベース: `PostgreSQL 16`
 - 開発環境: `docker compose`
 - テスト: `Vitest` / `pytest`
 
@@ -85,6 +85,7 @@ FRONTEND_PORT=3001 BACKEND_PORT=8001 NEXT_PUBLIC_API_BASE_URL=http://localhost:8
 
 - `FRONTEND_PORT`: ホスト側のフロントエンド公開ポート。既定値は `3000`
 - `BACKEND_PORT`: ホスト側のバックエンド公開ポート。既定値は `8000`
+- `POSTGRES_PORT`: ホスト側の PostgreSQL 公開ポート。既定値は `5432`
 - `NEXT_PUBLIC_API_BASE_URL`: フロントエンドが参照する API の URL。未指定時は `http://localhost:${BACKEND_PORT}` を使う
 - `BACKEND_CORS_ORIGINS`: バックエンドが許可する origin。カンマ区切りで複数指定でき、未指定時は `http://localhost:${FRONTEND_PORT}` を使う
 
