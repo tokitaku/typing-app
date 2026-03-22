@@ -17,10 +17,7 @@ def get_database_url(override: str | None = None) -> str:
 
 @lru_cache(maxsize=None)
 def get_engine(database_url: str) -> Engine:
-    # PostgreSQL では connect_args は不要
-    # SQLite の場合は後方互換性のため check_same_thread を設定
-    connect_args = {"check_same_thread": False} if database_url.startswith("sqlite:") else {}
-    return create_engine(database_url, connect_args=connect_args)
+    return create_engine(database_url)
 
 
 def get_session(database_url: str) -> Session:

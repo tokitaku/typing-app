@@ -13,6 +13,5 @@ COPY --from=uv /uv /uvx /bin/
 
 COPY backend/pyproject.toml backend/uv.lock ./backend/
 
-# pyproject.toml 更新時は uv.lock も更新されるように --frozen を削除
-RUN cd backend && uv sync
+RUN cd backend && uv sync --frozen
 
