@@ -1,8 +1,10 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
 import type { EikenLevel, QuizType } from "@/shared/types/study";
+import type { DailySummary, Settings } from "@/shared/types/study";
 
 const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [
   { value: "5", label: "英検5級" },
@@ -18,9 +20,19 @@ const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
   { value: "sentence", label: "英文章" }
 ];
 
-export function HomeDashboard() {
-  const { settings, summary, selectEikenLevel, toggleQuestionType } = useHomeDashboard();
+export type HomeDashboardViewProps = {
+  settings: Settings;
+  summary: DailySummary;
+  onSelectEikenLevel: (eikenLevel: EikenLevel) => void;
+  onToggleQuestionType: (questionType: QuizType) => void;
+};
 
+export function HomeDashboardView({
+  settings,
+  summary,
+  onSelectEikenLevel,
+  onToggleQuestionType
+}: HomeDashboardViewProps) {
   return (
     <main className="page-shell">
       <section className="hero-card">
@@ -35,6 +47,15 @@ export function HomeDashboard() {
           </Link>
           <Link className="secondary-button" href="/session?mode=review">
             復習する
+          </Link>
+        </div>
+        <div className="support-link-card">
+          <div>
+            <p className="support-link-title">登録問題を確認する</p>
+            <p className="support-link-copy">typing_questions の一覧を閲覧できます。</p>
+          </div>
+          <Link className="text-link" href="/questions">
+            問題一覧へ
           </Link>
         </div>
       </section>
@@ -64,7 +85,7 @@ export function HomeDashboard() {
         <select
           className="level-select"
           id="level-select"
-          onChange={(event) => selectEikenLevel(event.target.value as EikenLevel)}
+          onChange={(event) => onSelectEikenLevel(event.target.value as EikenLevel)}
           value={settings.eikenLevels[0]}
         >
           {EIKEN_LEVEL_OPTIONS.map((level) => (
@@ -80,7 +101,7 @@ export function HomeDashboard() {
             <label className="settings-chip" key={option.value}>
               <input
                 checked={settings.questionTypes.includes(option.value)}
-                onChange={() => toggleQuestionType(option.value)}
+                onChange={() => onToggleQuestionType(option.value)}
                 type="checkbox"
               />
               <span>{option.label}</span>
@@ -89,5 +110,18 @@ export function HomeDashboard() {
         </div>
       </section>
     </main>
+  );
+}
+
+export function HomeDashboard() {
+  const { settings, summary, selectEikenLevel, toggleQuestionType } = useHomeDashboard();
+
+  return (
+    <HomeDashboardView
+      onSelectEikenLevel={selectEikenLevel}
+      onToggleQuestionType={toggleQuestionType}
+      settings={settings}
+      summary={summary}
+    />
   );
 }
