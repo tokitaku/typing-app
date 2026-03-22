@@ -298,6 +298,13 @@ def test_get_questions_returns_422_for_invalid_question_type(client) -> None:
     assert response.status_code == 422  # 不正なマスタコード値を拒否するバリデーション仕様を検証（GET /questions）
 
 
+def test_get_questions_treats_blank_tag_query_as_no_filter(client) -> None:
+    response = client.get("/questions?tags=%20")
+
+    assert response.status_code == 200  # 空白だけの tags クエリは _parse_csv_query で除去され、フィルタなしとして扱われることを検証
+    assert len(response.json()["questions"]) > 0
+
+
 def test_delete_question_returns_not_found_for_unknown_id(client) -> None:
     response = client.delete("/questions/99999")
 
