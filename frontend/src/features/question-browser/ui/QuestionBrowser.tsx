@@ -38,6 +38,18 @@ function parseTagInput(value: string): string[] {
     .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index); // 入力値を tags query 向けの配列へ正規化する
 }
 
+function formatQuestionTypeLabel(type: Question["type"]): string {
+  if (type === "word") {
+    return "英単語"; // 既存一覧の種別ラベルを維持する
+  }
+
+  if (type === "sentence") {
+    return "英文章"; // 既存一覧の種別ラベルを維持する
+  }
+
+  return "未分類"; // 推定できない問題でも表を崩さずに表示する
+}
+
 function renderQuestionTable(questions: Question[]) {
   return (
     <div className="question-table-scroll">
@@ -56,7 +68,7 @@ function renderQuestionTable(questions: Question[]) {
           {questions.map((question) => (
             <tr key={question.id}>
               <td>{question.id}</td>
-              <td>{question.type === "word" ? "英単語" : "英文章"}</td>
+              <td>{formatQuestionTypeLabel(question.type)}</td>
               <td className="question-table-text">{question.english}</td>
               <td className="question-table-text">{question.japanese}</td>
               <td className="question-table-text">{question.tags.join(", ") || "-"}</td>

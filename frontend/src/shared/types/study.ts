@@ -3,7 +3,7 @@ export type StudyMode = "learn" | "review";
 
 export type Question = {
   id: number;
-  type: QuizType;
+  type?: QuizType;
   english: string;
   japanese: string;
   isActive: boolean;

@@ -127,9 +127,25 @@ describe("study result api", () => {
   });
 
   it("fetches questions with typed filters", async () => {
+    const apiQuestions = [
+      {
+        id: 1,
+        english: "apple",
+        japanese: "りんご",
+        isActive: true,
+        tags: ["word", "business"]
+      },
+      {
+        id: 2,
+        english: "We closed the deal yesterday.",
+        japanese: "私たちは昨日契約をまとめた。",
+        isActive: true,
+        tags: ["sentence", "business"]
+      }
+    ];
     const fetchMock = vi.fn(async () => ({
       ok: true,
-      json: async () => ({ questions: sampleQuestions })
+      json: async () => ({ questions: apiQuestions })
     }));
 
     vi.stubGlobal("fetch", fetchMock);
@@ -140,9 +156,20 @@ describe("study result api", () => {
         tags: ["business"],
         includeInactive: false
       })
-    ).resolves.toEqual({ questions: sampleQuestions });
+    ).resolves.toEqual({
+      questions: [
+        {
+          id: 2,
+          type: "sentence",
+          english: "We closed the deal yesterday.",
+          japanese: "私たちは昨日契約をまとめた。",
+          isActive: true,
+          tags: ["sentence", "business"]
+        }
+      ]
+    });
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?question_types=sentence&tags=business&include_inactive=false",
+      "http://localhost:8000/questions?tags=business&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });

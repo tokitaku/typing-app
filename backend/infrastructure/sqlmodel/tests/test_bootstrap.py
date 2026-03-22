@@ -88,6 +88,91 @@ def test_migrate_database_stamps_existing_schema_without_recreating_tables(tmp_p
     assert "alembic_version" in tables
 
 
+def test_migrate_database_upgrades_legacy_question_type_schema_before_stamping_head(tmp_path) -> None:
+    database_path = tmp_path / "legacy-question-type.db"
+    database_url = f"sqlite:///{database_path}"
+    connection = sqlite3.connect(database_path)
+    connection.execute(
+        """
+        CREATE TABLE question_types (
+            id INTEGER PRIMARY KEY,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE tags (
+            id INTEGER PRIMARY KEY,
+            code TEXT NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE study_results (
+            id INTEGER PRIMARY KEY,
+            mode TEXT NOT NULL,
+            total_questions INTEGER NOT NULL,
+            correct_rate INTEGER NOT NULL,
+            mistakes INTEGER NOT NULL,
+            average_time INTEGER NOT NULL,
+            created_at DATETIME NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE typing_questions (
+            id INTEGER PRIMARY KEY,
+            question_type_id INTEGER NOT NULL,
+            english_text TEXT NOT NULL,
+            japanese_text TEXT NOT NULL,
+            is_active BOOLEAN NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            FOREIGN KEY(question_type_id) REFERENCES question_types(id)
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE typing_question_tags (
+            question_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+            PRIMARY KEY (question_id, tag_id)
+        )
+        """
+    )
+    connection.commit()
+    connection.close()
+
+    migrate_database(database_url)
+
+    connection = sqlite3.connect(database_path)
+    tables = {
+        row[0]
+        for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"  # 更新後のテーブル一覧を取得する
+        ).fetchall()
+    }
+    typing_question_columns = {
+        row[1]
+        for row in connection.execute(
+            "PRAGMA table_info('typing_questions')"  # question_type_id 列の残留を確認する
+        ).fetchall()
+    }
+    version = connection.execute(
+        "SELECT version_num FROM alembic_version"  # stamp 済み revision を確認する
+    ).fetchone()
+    connection.close()
+
+    assert "question_types" not in tables
+    assert "question_type_id" not in typing_question_columns
+    assert version == ("20260322_0004",)
+
+
 def test_bootstrap_database_backfills_legacy_question_type_tags(tmp_path) -> None:
     database_path = tmp_path / "existing-with-data.db"
     database_url = f"sqlite:///{database_path}"
