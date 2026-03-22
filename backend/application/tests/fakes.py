@@ -1,4 +1,4 @@
-from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, StudyResult
 
 
 class FakeQuestionRepository:
@@ -9,7 +9,6 @@ class FakeQuestionRepository:
     def list_questions(
         self,
         *,
-        question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
@@ -17,11 +16,6 @@ class FakeQuestionRepository:
 
         if not include_inactive:
             filtered = [question for question in filtered if question.is_active]  # 有効問題だけに絞る
-
-        if question_type_codes:
-            filtered = [
-                question for question in filtered if question.question_type in question_type_codes
-            ]  # 問題種別で絞る
 
         if tag_codes:
             normalized_codes = {code.lower() for code in tag_codes}
@@ -34,7 +28,6 @@ class FakeQuestionRepository:
     def create(self, question: Question) -> Question:
         saved = Question(
             id=self._next_id,
-            question_type=question.question_type,
             english=question.english,
             japanese=question.japanese,
             is_active=question.is_active,
@@ -49,7 +42,6 @@ class FakeQuestionRepository:
             if q.id == question_id:
                 updated = Question(
                     id=q.id,
-                    question_type=updates.get("question_type", q.question_type),
                     english=updates.get("english", q.english),
                     japanese=updates.get("japanese", q.japanese),
                     is_active=updates.get("is_active", q.is_active),

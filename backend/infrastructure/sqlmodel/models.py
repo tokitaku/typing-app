@@ -9,24 +9,10 @@ class StudyModeRecord(str, Enum):
     REVIEW = "review"  # 復習モードを表す
 
 
-class QuestionTypeRecordCode(str, Enum):
-    WORD = "word"  # 単語問題を表す
-    SENTENCE = "sentence"  # 短文問題を表す
-
-
-class QuestionTypeRecord(SQLModel, table=True):
-    __tablename__ = "question_types"
-
-    id: int | None = Field(default=None, primary_key=True)
-    code: QuestionTypeRecordCode = Field(index=True)
-    name: str
-
-
 class TypingQuestionRecord(SQLModel, table=True):
     __tablename__ = "typing_questions"
 
     id: int | None = Field(default=None, primary_key=True)
-    question_type_id: int = Field(foreign_key="question_types.id", index=True)
     english_text: str = Field(index=True)
     japanese_text: str
     is_active: bool = Field(default=True, index=True)

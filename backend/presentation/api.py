@@ -83,7 +83,6 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
     @app.get("/questions", response_model=QuestionListResponse)
     def get_questions(
-        question_types: str | None = Query(default=None),
         tags: str | None = Query(default=None),
         include_inactive: bool = Query(default=True),
     ) -> QuestionListResponse:
@@ -91,7 +90,6 @@ def create_app(database_url: str | None = None) -> FastAPI:
             questions = list_questions(
                 question_repository,
                 ListQuestionsQuery(
-                    question_type_codes=_parse_csv_query(question_types),
                     tag_codes=_parse_csv_query(tags),
                     include_inactive=include_inactive,
                 ),

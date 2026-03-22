@@ -22,7 +22,6 @@ const sampleResult: StudyResult = {
 const sampleQuestions: Question[] = [
   {
     id: 1,
-    type: "word",
     english: "apple",
     japanese: "りんご",
     isActive: true,
@@ -126,7 +125,7 @@ describe("study result api", () => {
     );
   });
 
-  it("fetches questions with typed filters", async () => {
+  it("fetches questions with tag filters", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       json: async () => ({ questions: sampleQuestions })
@@ -136,13 +135,14 @@ describe("study result api", () => {
 
     await expect(
       fetchQuestionListResponse({
-        questionTypes: ["sentence"],
         tags: ["business"],
         includeInactive: false
       })
-    ).resolves.toEqual({ questions: sampleQuestions });
+    ).resolves.toEqual({
+      questions: sampleQuestions
+    });
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?question_types=sentence&tags=business&include_inactive=false",
+      "http://localhost:8000/questions?tags=business&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });

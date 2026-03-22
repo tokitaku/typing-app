@@ -1,6 +1,5 @@
-def test_post_question_creates_new_sentence_question(client) -> None:
+def test_post_question_creates_new_question(client) -> None:
     payload = {
-        "question_type": "sentence",
         "english": "I will call you after I get home.",
         "japanese": "家に着いたら電話します。",
         "tags": [" Speaking ", "speaking", "daily"],
@@ -10,19 +9,18 @@ def test_post_question_creates_new_sentence_question(client) -> None:
 
     assert response.status_code == 201
     body = response.json()
-    assert body["type"] == "sentence"
     assert body["english"] == payload["english"]
     assert body["japanese"] == payload["japanese"]
     assert body["isActive"] is True
     assert body["tags"] == ["speaking", "daily"]
     assert "eikenLevel" not in body
+    assert "type" not in body
 
 
 def test_get_questions_returns_registered_questions(client) -> None:
     created_response = client.post(
         "/questions",
         json={
-            "question_type": "word",
             "english": "notebook",
             "japanese": "ノート",
         },
@@ -37,7 +35,6 @@ def test_get_questions_returns_registered_questions(client) -> None:
     assert any(question["id"] == created_id for question in body["questions"])
     assert body["questions"][-1] == {
         "id": created_id,
-        "type": "word",
         "english": "notebook",
         "japanese": "ノート",
         "isActive": True,
@@ -49,7 +46,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     created_response = client.post(
         "/questions",
         json={
-            "question_type": "word",
             "english": "notebook",
             "japanese": "ノート",
         },
@@ -59,7 +55,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     response = client.patch(
         f"/questions/{question_id}",
         json={
-            "question_type": "sentence",
             "english": "I bought a new notebook yesterday.",
             "japanese": "昨日新しいノートを買いました。",
             "is_active": False,
@@ -70,7 +65,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     assert response.status_code == 200
     assert response.json() == {
         "id": question_id,
-        "type": "sentence",
         "english": "I bought a new notebook yesterday.",
         "japanese": "昨日新しいノートを買いました。",
         "isActive": False,
@@ -84,22 +78,10 @@ def test_patch_question_returns_not_found_for_unknown_id(client) -> None:
     assert response.status_code == 404
 
 
-def test_patch_question_rejects_invalid_master_code(client) -> None:
-    response = client.patch(
-        "/questions/1",
-        json={
-            "question_type": "unknown",  # 未定義の問題種別コードを送る
-        },
-    )
-
-    assert response.status_code == 422
-
-
 def test_post_question_rejects_whitespace_only_fields(client) -> None:
     response = client.post(
         "/questions",
         json={
-            "question_type": "word",
             "english": "   ",
             "japanese": "\t",
         },
@@ -112,7 +94,6 @@ def test_post_question_rejects_whitespace_only_tags(client) -> None:
     response = client.post(
         "/questions",
         json={
-            "question_type": "word",
             "english": "topic",
             "japanese": "話題",
             "tags": ["   "],
@@ -144,29 +125,10 @@ def test_delete_question_deactivates_existing_question(client) -> None:
     assert questions_response.json()["questions"][0]["isActive"] is False
 
 
-def test_get_questions_filters_by_question_type(client) -> None:
-    client.post(
-        "/questions",
-        json={
-            "question_type": "sentence",
-            "english": "She reads books every night.",
-            "japanese": "彼女は毎晩本を読む。",
-        },
-    )
-
-    response = client.get("/questions?question_types=sentence")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert len(body["questions"]) > 0
-    assert all(q["type"] == "sentence" for q in body["questions"])  # question_types フィルタの仕様通り指定された種別の問題のみが返却されることを検証
-
-
 def test_get_questions_filters_by_tags(client) -> None:
     client.post(
         "/questions",
         json={
-            "question_type": "sentence",
             "english": "The proposal needs stronger evidence.",
             "japanese": "その提案にはより強い根拠が必要だ。",
             "tags": ["Essay", "Writing"],
@@ -175,7 +137,6 @@ def test_get_questions_filters_by_tags(client) -> None:
     client.post(
         "/questions",
         json={
-            "question_type": "sentence",
             "english": "The city expanded the subway network.",
             "japanese": "その都市は地下鉄網を拡張した。",
             "tags": ["Infrastructure"],
@@ -194,7 +155,6 @@ def test_get_questions_excludes_inactive_when_flag_is_false(client) -> None:
     created = client.post(
         "/questions",
         json={
-            "question_type": "word",
             "english": "umbrella",
             "japanese": "傘",
         },
@@ -208,41 +168,6 @@ def test_get_questions_excludes_inactive_when_flag_is_false(client) -> None:
     body = response.json()
     assert all(q["isActive"] is True for q in body["questions"])  # include_inactive=false の仕様通り有効な問題のみが返却されることを検証
     assert all(q["id"] != question_id for q in body["questions"])
-
-
-def test_get_questions_combined_tag_and_type_filter(client) -> None:
-    client.post(
-        "/questions",
-        json={
-            "question_type": "word",
-            "english": "environment",
-            "japanese": "環境",
-            "tags": ["business"],
-        },
-    )
-    client.post(
-        "/questions",
-        json={
-            "question_type": "sentence",
-            "english": "We must protect the environment.",
-            "japanese": "私たちは環境を守らなければならない。",
-            "tags": ["business"],
-        },
-    )
-
-    response = client.get("/questions?tags=business&question_types=word")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert len(body["questions"]) > 0
-    assert all("business" in question["tags"] for question in body["questions"])  # 複合フィルタでもタグ条件で絞り込めることを検証
-    assert all(question["type"] == "word" for question in body["questions"])  # 複合フィルタでも種別条件を同時に満たすことを検証
-
-
-def test_get_questions_returns_422_for_invalid_question_type(client) -> None:
-    response = client.get("/questions?question_types=invalid_type")
-
-    assert response.status_code == 422  # 不正なマスタコード値を拒否するバリデーション仕様を検証（GET /questions）
 
 
 def test_get_questions_treats_blank_tag_query_as_no_filter(client) -> None:
