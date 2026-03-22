@@ -11,17 +11,17 @@ import {
 import type { Question } from "@/shared/types/study";
 
 const quizzes: Question[] = [
-  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true },
-  { id: 2, type: "word", eikenLevel: "5", english: "library", japanese: "図書館", isActive: true },
-  { id: 3, type: "word", eikenLevel: "4", english: "beautiful", japanese: "美しい", isActive: true },
-  { id: 4, type: "word", eikenLevel: "4", english: "schedule", japanese: "予定", isActive: true },
-  { id: 5, type: "word", eikenLevel: "3", english: "environment", japanese: "環境", isActive: true },
-  { id: 6, type: "sentence", eikenLevel: "5", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", isActive: true },
-  { id: 7, type: "sentence", eikenLevel: "4", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", isActive: true },
-  { id: 8, type: "sentence", eikenLevel: "3", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", isActive: true },
-  { id: 9, type: "word", eikenLevel: "5", english: "practice", japanese: "練習", isActive: true },
-  { id: 10, type: "word", eikenLevel: "4", english: "through", japanese: "通り抜けて", isActive: true },
-  { id: 11, type: "word", eikenLevel: "3", english: "confidence", japanese: "自信", isActive: true }
+  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
+  { id: 2, type: "word", eikenLevel: "5", english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
+  { id: 3, type: "word", eikenLevel: "4", english: "beautiful", japanese: "美しい", isActive: true, tags: ["word", "expression"] },
+  { id: 4, type: "word", eikenLevel: "4", english: "schedule", japanese: "予定", isActive: true, tags: ["word", "business"] },
+  { id: 5, type: "word", eikenLevel: "3", english: "environment", japanese: "環境", isActive: true, tags: ["word", "science"] },
+  { id: 6, type: "sentence", eikenLevel: "5", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", isActive: true, tags: ["sentence", "daily"] },
+  { id: 7, type: "sentence", eikenLevel: "4", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", isActive: true, tags: ["sentence", "business"] },
+  { id: 8, type: "sentence", eikenLevel: "3", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", isActive: true, tags: ["sentence", "daily"] },
+  { id: 9, type: "word", eikenLevel: "5", english: "practice", japanese: "練習", isActive: true, tags: ["word", "daily"] },
+  { id: 10, type: "word", eikenLevel: "4", english: "through", japanese: "通り抜けて", isActive: true, tags: ["word", "travel"] },
+  { id: 11, type: "word", eikenLevel: "3", english: "confidence", japanese: "自信", isActive: true, tags: ["word", "mindset"] }
 ];
 
 describe("study utilities", () => {
@@ -36,7 +36,7 @@ describe("study utilities", () => {
   });
 
   it("returns random ten questions in learn mode", () => {
-    const learnQuizzes = buildQuizSet(quizzes, "learn", [], ["5", "4", "3"], ["word", "sentence"]);
+    const learnQuizzes = buildQuizSet(quizzes, "learn", [], []);
 
     expect(learnQuizzes).toHaveLength(SESSION_QUESTION_COUNT);
     expect(new Set(learnQuizzes.map((quiz) => quiz.id)).size).toBe(SESSION_QUESTION_COUNT);
@@ -45,32 +45,28 @@ describe("study utilities", () => {
     ).toBe(true);
   });
 
-  it("filters learn quizzes by specified levels", () => {
-    const level1Only = buildQuizSet(quizzes, "learn", [], ["5"], ["word", "sentence"]);
+  it("filters learn quizzes by tags", () => {
+    const businessOnly = buildQuizSet(quizzes, "learn", [], ["business"]);
 
-    expect(level1Only.length).toBeGreaterThan(0);
-    expect(level1Only.every((quiz) => quiz.eikenLevel === "5")).toBe(true);
+    expect(businessOnly.length).toBeGreaterThan(0);
+    expect(businessOnly.every((quiz) => quiz.tags.includes("business"))).toBe(true);
   });
 
-  it("filters learn quizzes by question type", () => {
-    const sentenceOnly = buildQuizSet(quizzes, "learn", [], ["5", "4", "3"], ["sentence"]);
-
-    expect(sentenceOnly.length).toBeGreaterThan(0);
-    expect(sentenceOnly.every((quiz) => quiz.type === "sentence")).toBe(true);
-  });
-
-  it("filters learn quizzes by eiken level and question type together", () => {
-    const filtered = buildQuizSet(quizzes, "learn", [], ["4"], ["word"]);
+  it("filters learn quizzes when multiple tags are specified", () => {
+    const filtered = buildQuizSet(quizzes, "learn", [], ["business", "travel"]);
 
     expect(filtered.length).toBeGreaterThan(0);
-    expect(filtered.every((quiz) => quiz.eikenLevel === "4")).toBe(true);
-    expect(filtered.every((quiz) => quiz.type === "word")).toBe(true);
+    expect(
+      filtered.every((quiz) =>
+        quiz.tags.some((tag) => ["business", "travel"].includes(tag))
+      )
+    ).toBe(true);
   });
 
   it("does not apply learn filters in review mode", () => {
     const level5Id = quizzes.find((quiz) => quiz.eikenLevel === "5")!.id;
     const level3Id = quizzes.find((quiz) => quiz.eikenLevel === "3")!.id;
-    const reviewQuizzes = buildQuizSet(quizzes, "review", [level5Id, level3Id], ["5"], ["word"]);
+    const reviewQuizzes = buildQuizSet(quizzes, "review", [level5Id, level3Id], ["business"]);
 
     expect(reviewQuizzes).toHaveLength(2);
     const ids = reviewQuizzes.map((quiz) => quiz.id).sort((a, b) => a - b);

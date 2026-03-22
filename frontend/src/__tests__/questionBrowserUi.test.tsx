@@ -61,7 +61,8 @@ describe("question browser ui", () => {
             eikenLevel: "5",
             english: "apple",
             japanese: "りんご",
-            isActive: true
+            isActive: true,
+            tags: ["word"]
           },
           {
             id: 2,
@@ -69,7 +70,8 @@ describe("question browser ui", () => {
             eikenLevel: "pre2",
             english: "We must protect the environment.",
             japanese: "私たちは環境を守らなければならない。",
-            isActive: false
+            isActive: false,
+            tags: ["sentence", "environment"]
           }
         ]}
         status="loaded"

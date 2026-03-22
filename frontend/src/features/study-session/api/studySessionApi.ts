@@ -2,11 +2,10 @@ import {
   fetchQuestionListResponse,
   postStudyResult
 } from "@/shared/api/studyApiClient";
-import type { EikenLevel, Question, QuizType, StudyResult } from "@/shared/types/study";
+import type { Question, StudyResult } from "@/shared/types/study";
 
 export type FetchStudyQuestionsOptions = {
-  eikenLevels?: EikenLevel[];
-  questionTypes?: QuizType[];
+  tags?: string[];
 };
 
 export async function fetchStudyQuestions(

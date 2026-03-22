@@ -10,92 +10,39 @@ const MISTAKE_LOG_KEY = "typing-app::mistake_log";
 const STUDY_RESULT_KEY = "typing-app::study_result";
 const LATEST_RESULT_KEY = "typing-app::latest-result";
 const SETTINGS_KEY = "typing-app::settings";
-const AVAILABLE_EIKEN_LEVELS = ["5", "4", "3", "pre2", "2", "pre1", "1"] as const;
-const AVAILABLE_QUESTION_TYPES = ["word", "sentence"] as const;
-const LEGACY_LEVEL_TO_EIKEN_LEVEL: Record<number, (typeof AVAILABLE_EIKEN_LEVELS)[number]> = {
-  1: "5",
-  2: "4",
-  3: "3"
-};
 
 const DEFAULT_SETTINGS: Settings = {
-  eikenLevels: ["5"],
-  questionTypes: ["word", "sentence"]
+  tags: []
 };
 
-function normalizeEikenLevel(level: unknown): Settings["eikenLevels"][number] | null {
-  if (typeof level === "string") {
-    const normalizedLevel = level.trim();
-
-    return AVAILABLE_EIKEN_LEVELS.includes(
-      normalizedLevel as (typeof AVAILABLE_EIKEN_LEVELS)[number]
-    )
-      ? (normalizedLevel as (typeof AVAILABLE_EIKEN_LEVELS)[number])
-      : null;
-  }
-
-  if (typeof level === "number") {
-    return LEGACY_LEVEL_TO_EIKEN_LEVEL[level] ?? null;
-  }
-
-  return null;
-}
-
-function normalizeQuestionType(type: unknown): Settings["questionTypes"][number] | null {
-  if (typeof type !== "string") {
+function normalizeTag(tag: unknown): string | null {
+  if (typeof tag !== "string") {
     return null;
   }
 
-  const normalizedType = type.trim();
+  const normalizedTag = tag.trim().toLowerCase();
 
-  return AVAILABLE_QUESTION_TYPES.includes(
-    normalizedType as (typeof AVAILABLE_QUESTION_TYPES)[number]
-  )
-    ? (normalizedType as (typeof AVAILABLE_QUESTION_TYPES)[number])
-    : null;
+  return normalizedTag === "" ? null : normalizedTag;
 }
 
 function normalizeSettings(input: unknown): Settings {
-  const mergedSettings =
+  const source =
     typeof input === "object" && input !== null
-      ? { ...DEFAULT_SETTINGS, ...(input as Partial<Settings>) }
-      : DEFAULT_SETTINGS;
-  const eikenLevelsValue = (mergedSettings as Partial<Settings>).eikenLevels;
-  const legacyLevelsValue = (mergedSettings as { levels?: unknown[] }).levels;
-  const questionTypesValue = mergedSettings.questionTypes;
-  const sourceEikenLevels: unknown[] = Array.isArray(eikenLevelsValue)
-    ? [...eikenLevelsValue]
-    : Array.isArray(legacyLevelsValue)
-      ? [...legacyLevelsValue]
-      : [...DEFAULT_SETTINGS.eikenLevels];
-  const sourceQuestionTypes: unknown[] = Array.isArray(questionTypesValue)
-    ? [...questionTypesValue]
-    : [...DEFAULT_SETTINGS.questionTypes];
-  const normalizedEikenLevels = Array.from(
+      ? (input as Partial<Settings>)
+      : {};
+  const tagsValue = source.tags;
+  const sourceTags: unknown[] = Array.isArray(tagsValue)
+    ? [...tagsValue]
+    : [...DEFAULT_SETTINGS.tags];
+  const normalizedTags = Array.from(
     new Set(
-      sourceEikenLevels
-        .map((level) => normalizeEikenLevel(level))
-        .filter((level): level is Settings["eikenLevels"][number] => level !== null)
-    )
-  );
-  const normalizedQuestionTypes = Array.from(
-    new Set(
-      sourceQuestionTypes
-        .map((type) => normalizeQuestionType(type))
-        .filter((type): type is Settings["questionTypes"][number] => type !== null)
+      sourceTags.map((tag) => normalizeTag(tag)).filter((tag): tag is string => tag !== null)
     )
   );
 
   return {
     ...DEFAULT_SETTINGS,
-    eikenLevels:
-      normalizedEikenLevels.length > 0
-        ? normalizedEikenLevels
-        : [...DEFAULT_SETTINGS.eikenLevels],
-    questionTypes:
-      normalizedQuestionTypes.length > 0
-        ? normalizedQuestionTypes
-        : [...DEFAULT_SETTINGS.questionTypes]
+    tags: normalizedTags
   };
 }
 

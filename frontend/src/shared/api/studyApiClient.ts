@@ -17,6 +17,7 @@ function getApiBaseUrl(): string {
 export type FetchQuestionListOptions = {
   eikenLevels?: EikenLevel[];
   questionTypes?: QuizType[];
+  tags?: string[];
   includeInactive?: boolean;
 };
 
@@ -40,6 +41,10 @@ export async function fetchQuestionListResponse(
 
   if (options.questionTypes && options.questionTypes.length > 0) {
     searchParams.set("question_types", options.questionTypes.join(",")); // 問題種別フィルタを API 契約へ変換する
+  }
+
+  if (options.tags && options.tags.length > 0) {
+    searchParams.set("tags", options.tags.join(",")); // タグフィルタを API 契約へ変換する
   }
 
   if (options.includeInactive !== undefined) {

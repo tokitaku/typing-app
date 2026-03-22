@@ -3,18 +3,19 @@
 import { useEffect, useState } from "react";
 import {
   createHomeDashboardModel,
-  selectEikenLevel,
-  toggleQuestionType
+  toggleTag
 } from "@/features/home-dashboard/application/homeDashboard";
 import type { HomeDashboardDto } from "@/features/home-dashboard/application/homeDashboard";
-import { fetchTodayStudySummary } from "@/features/home-dashboard/api/homeDashboardApi";
+import {
+  fetchAvailableTags,
+  fetchTodayStudySummary
+} from "@/features/home-dashboard/api/homeDashboardApi";
 import {
   getReviewQueue,
   getSettings,
   getTodaySummary,
   saveSettings
 } from "@/features/home-dashboard/storage/homeDashboardStorage";
-import type { EikenLevel, QuizType } from "@/shared/types/study";
 
 function createFallbackDashboard(): HomeDashboardDto {
   return {
@@ -24,10 +25,8 @@ function createFallbackDashboard(): HomeDashboardDto {
       solvedProblems: 0,
       reviewBacklog: 0
     },
-    settings: {
-      eikenLevels: ["5"],
-      questionTypes: ["word", "sentence"]
-    }
+    settings: { tags: [] },
+    availableTags: []
   }; // 初期表示で空のダッシュボード状態を返す
 }
 
@@ -35,16 +34,26 @@ export function useHomeDashboard() {
   const [dashboard, setDashboard] = useState<HomeDashboardDto>(createFallbackDashboard);
 
   useEffect(() => {
+    const abortController = new AbortController();
     let isDisposed = false;
 
     const loadDashboard = async () => {
       const settings = getSettings();
       const reviewQueueCount = getReviewQueue().length;
       const localSummary = getTodaySummary();
+      let availableTags: string[] = [];
+
+      try {
+        availableTags = await fetchAvailableTags(abortController.signal);
+      } catch {
+        availableTags = [];
+      }
+
       const localDashboard = createHomeDashboardModel({
         settings,
         reviewQueueCount,
-        localSummary
+        localSummary,
+        availableTags
       });
 
       if (!isDisposed) {
@@ -52,7 +61,7 @@ export function useHomeDashboard() {
       }
 
       try {
-        const remoteSummary = await fetchTodayStudySummary();
+        const remoteSummary = await fetchTodayStudySummary(abortController.signal);
 
         if (isDisposed) {
           return;
@@ -63,6 +72,7 @@ export function useHomeDashboard() {
             settings,
             reviewQueueCount,
             localSummary,
+            availableTags,
             remoteSummary
           })
         );
@@ -76,25 +86,14 @@ export function useHomeDashboard() {
     void loadDashboard();
 
     return () => {
+      abortController.abort();
       isDisposed = true;
     };
   }, []);
 
-  const handleSelectEikenLevel = (eikenLevel: EikenLevel) => {
+  const handleToggleTag = (tag: string) => {
     setDashboard((current) => {
-      const nextSettings = selectEikenLevel(current.settings, eikenLevel);
-      saveSettings(nextSettings);
-
-      return {
-        ...current,
-        settings: nextSettings
-      };
-    });
-  };
-
-  const handleToggleQuestionType = (questionType: QuizType) => {
-    setDashboard((current) => {
-      const nextSettings = toggleQuestionType(current.settings, questionType);
+      const nextSettings = toggleTag(current.settings, tag);
       saveSettings(nextSettings);
 
       return {
@@ -107,7 +106,7 @@ export function useHomeDashboard() {
   return {
     summary: dashboard.summary,
     settings: dashboard.settings,
-    selectEikenLevel: handleSelectEikenLevel,
-    toggleQuestionType: handleToggleQuestionType
+    availableTags: dashboard.availableTags,
+    toggleTag: handleToggleTag
   };
 }

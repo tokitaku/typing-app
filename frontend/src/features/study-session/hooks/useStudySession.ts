@@ -92,8 +92,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
         const questions = await fetchStudyQuestions(
           mode === "learn"
             ? {
-                eikenLevels: settings.eikenLevels,
-                questionTypes: settings.questionTypes
+                tags: settings.tags
               }
             : {},
           abortController.signal

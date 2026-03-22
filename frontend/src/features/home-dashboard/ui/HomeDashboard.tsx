@@ -3,35 +3,19 @@
 import React from "react";
 import Link from "next/link";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
-import type { EikenLevel, QuizType } from "@/shared/types/study";
 import type { DailySummary, Settings } from "@/shared/types/study";
-
-const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [
-  { value: "5", label: "英検5級" },
-  { value: "4", label: "英検4級" },
-  { value: "3", label: "英検3級" },
-  { value: "pre2", label: "英検準2級" },
-  { value: "2", label: "英検2級" },
-  { value: "pre1", label: "英検準1級" },
-  { value: "1", label: "英検1級" }
-];
-const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
-  { value: "word", label: "英単語" },
-  { value: "sentence", label: "英文章" }
-];
-
 export type HomeDashboardViewProps = {
   settings: Settings;
+  availableTags: string[];
   summary: DailySummary;
-  onSelectEikenLevel: (eikenLevel: EikenLevel) => void;
-  onToggleQuestionType: (questionType: QuizType) => void;
+  onToggleTag: (tag: string) => void;
 };
 
 export function HomeDashboardView({
   settings,
+  availableTags,
   summary,
-  onSelectEikenLevel,
-  onToggleQuestionType
+  onToggleTag
 }: HomeDashboardViewProps) {
   return (
     <main className="page-shell">
@@ -79,47 +63,36 @@ export function HomeDashboardView({
       </section>
 
       <section className="settings-section">
-        <label className="settings-label" htmlFor="level-select">
-          出題英検級（通常学習）
-        </label>
-        <select
-          className="level-select"
-          id="level-select"
-          onChange={(event) => onSelectEikenLevel(event.target.value as EikenLevel)}
-          value={settings.eikenLevels[0]}
-        >
-          {EIKEN_LEVEL_OPTIONS.map((level) => (
-            <option key={level.value} value={level.value}>
-              {level.label}
-            </option>
-          ))}
-        </select>
-
-        <p className="settings-label settings-subtitle">出題タイプ</p>
-        <div className="settings-chip-group">
-          {QUESTION_TYPE_OPTIONS.map((option) => (
-            <label className="settings-chip" key={option.value}>
-              <input
-                checked={settings.questionTypes.includes(option.value)}
-                onChange={() => onToggleQuestionType(option.value)}
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
+        <p className="settings-label">出題タグ</p>
+        <p className="settings-caption">タグ未選択時はすべてのタグを対象に出題します。</p>
+        {availableTags.length > 0 ? (
+          <div className="settings-chip-group">
+            {availableTags.map((tag) => (
+              <label className="settings-chip" key={tag}>
+                <input
+                  checked={settings.tags.includes(tag)}
+                  onChange={() => onToggleTag(tag)}
+                  type="checkbox"
+                />
+                <span>{tag}</span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="settings-caption">利用可能なタグはまだありません。</p>
+        )}
       </section>
     </main>
   );
 }
 
 export function HomeDashboard() {
-  const { settings, summary, selectEikenLevel, toggleQuestionType } = useHomeDashboard();
+  const { settings, availableTags, summary, toggleTag } = useHomeDashboard();
 
   return (
     <HomeDashboardView
-      onSelectEikenLevel={selectEikenLevel}
-      onToggleQuestionType={toggleQuestionType}
+      availableTags={availableTags}
+      onToggleTag={toggleTag}
       settings={settings}
       summary={summary}
     />
