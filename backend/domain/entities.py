@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 
 
@@ -29,7 +30,7 @@ class StudyResult:
     correct_rate: int
     mistakes: int
     average_time: int
-    created_at: str
+    created_at: datetime
 
 
 @dataclass(frozen=True)

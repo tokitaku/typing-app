@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, time, timedelta, timezone
 
 from sqlalchemy import delete, func
 from sqlalchemy.exc import IntegrityError
@@ -215,6 +215,12 @@ class SqlModelStudyResultRepository:
     def __init__(self, database_url: str) -> None:
         self.database_url = database_url
 
+    def _normalize_created_at(self, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
+
+        return value.astimezone(timezone.utc)  # 永続化前に UTC へ正規化する
+
     def _build_study_result(self, record: StudyResultRecord) -> StudyResult:
         return StudyResult(
             mode=StudyMode(record.mode.value),
@@ -222,10 +228,11 @@ class SqlModelStudyResultRepository:
             correct_rate=record.correct_rate,
             mistakes=record.mistakes,
             average_time=record.average_time,
-            created_at=record.created_at,
+            created_at=self._normalize_created_at(record.created_at),
         )  # ORM レコードをドメインエンティティへ変換する
 
     def save(self, result: StudyResult) -> StudyResult:
+        normalized_created_at = self._normalize_created_at(result.created_at)
         with get_session(self.database_url) as session:
             record = StudyResultRecord(
                 mode=StudyModeRecord(result.mode.value),
@@ -233,7 +240,7 @@ class SqlModelStudyResultRepository:
                 correct_rate=result.correct_rate,
                 mistakes=result.mistakes,
                 average_time=result.average_time,
-                created_at=result.created_at,
+                created_at=normalized_created_at,
             )
             session.add(record)
             session.commit()
@@ -252,12 +259,19 @@ class SqlModelStudyResultRepository:
         return self._build_study_result(latest_result) if latest_result is not None else None  # 最新結果があれば返す
 
     def get_today_summary(self, target_date: str) -> DailyStudySummary:
+        parsed_date = date.fromisoformat(target_date)
+        start_of_day = datetime.combine(parsed_date, time.min, tzinfo=timezone.utc)
+        end_of_day = start_of_day + timedelta(days=1)
+
         with get_session(self.database_url) as session:
             sessions, solved_problems = session.exec(
                 select(
                     func.count(StudyResultRecord.id),
                     func.coalesce(func.sum(StudyResultRecord.total_questions), 0),
-                ).where(StudyResultRecord.created_at.startswith(target_date))
+                ).where(
+                    StudyResultRecord.created_at >= start_of_day,
+                    StudyResultRecord.created_at < end_of_day,
+                )
             ).one()
 
         return DailyStudySummary(

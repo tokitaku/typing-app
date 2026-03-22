@@ -57,4 +57,4 @@ class StudyResultRecord(SQLModel, table=True):
     correct_rate: int
     mistakes: int
     average_time: int
-    created_at: str
+    created_at: datetime

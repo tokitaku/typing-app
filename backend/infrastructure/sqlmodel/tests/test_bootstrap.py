@@ -116,7 +116,7 @@ def test_bootstrap_database_backfills_legacy_question_type_tags(tmp_path) -> Non
             correct_rate INTEGER NOT NULL,
             mistakes INTEGER NOT NULL,
             average_time INTEGER NOT NULL,
-            created_at TEXT NOT NULL
+            created_at DATETIME NOT NULL
         )
         """
     )
@@ -128,8 +128,8 @@ def test_bootstrap_database_backfills_legacy_question_type_tags(tmp_path) -> Non
             english_text TEXT NOT NULL,
             japanese_text TEXT NOT NULL,
             is_active BOOLEAN NOT NULL DEFAULT 1,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
             FOREIGN KEY(question_type_id) REFERENCES question_types(id)
         )
         """
