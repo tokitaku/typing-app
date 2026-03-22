@@ -331,10 +331,6 @@
         "properties": {
           "question_type": {
             "type": "string",
-            "enum": [
-              "word",
-              "sentence"
-            ],
             "title": "Question Type"
           },
           "english": {
@@ -387,10 +383,6 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "word",
-              "sentence"
-            ],
             "title": "Type"
           },
           "english": {
@@ -429,11 +421,7 @@
           "question_type": {
             "anyOf": [
               {
-                "type": "string",
-                "enum": [
-                  "word",
-                  "sentence"
-                ]
+                "type": "string"
               },
               {
                 "type": "null"
@@ -564,6 +552,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",
