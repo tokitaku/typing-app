@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import delete, func
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from backend.database import get_session
@@ -51,20 +52,28 @@ class SqlModelQuestionRepository:
             record = session.exec(select(TagRecord).where(TagRecord.code == tag)).first()
 
             if record is None:
-                record = TagRecord(code=tag)
-                session.add(record)
-                session.flush()  # 中間テーブル作成前に ID を確定させる
+                try:
+                    with session.begin_nested():
+                        record = TagRecord(code=tag)
+                        session.add(record)
+                        session.flush()  # unique 制約競合があれば savepoint 単位で巻き戻す
+                except IntegrityError:
+                    record = session.exec(select(TagRecord).where(TagRecord.code == tag)).first()
+
+                if record is None:
+                    raise ValueError(f"Failed to resolve tag code: {tag}")  # 取得不能な場合は不整合として扱う
 
             tag_ids.append(int(record.id))
 
         return tag_ids
 
     def _replace_question_tags(self, session, question_id: int, tags: tuple[str, ...]) -> None:
+        normalized_tags = normalize_tags(tags)
         session.exec(
             delete(TypingQuestionTagRecord).where(TypingQuestionTagRecord.question_id == question_id)
         )  # 既存タグ関連を一度外してから現在値へ全置換する
 
-        for tag_id in self._resolve_tag_ids(session, tags):
+        for tag_id in self._resolve_tag_ids(session, normalized_tags):
             session.add(TypingQuestionTagRecord(question_id=question_id, tag_id=tag_id))
 
     def _load_tags_by_question_id(self, session, question_ids: list[int]) -> dict[int, tuple[str, ...]]:

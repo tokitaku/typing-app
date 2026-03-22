@@ -6,6 +6,7 @@ from sqlmodel import select
 
 from backend.database import migrate_database
 from backend.domain.entities import Question, QuestionType
+from backend.domain.tag_rules import normalize_tags
 from backend.infrastructure.sqlmodel.models import (
     EikenLevelRecord,
     QuestionTypeRecord,
@@ -115,7 +116,7 @@ def seed_typing_questions(database_url: str, questions: Iterable[TypingQuestionS
                 english=str(question["english"]),
                 japanese=str(question["japanese"]),
                 is_active=bool(question.get("is_active", True)),
-                tags=tuple(str(tag) for tag in question.get("tags", [])),
+                tags=normalize_tags(question.get("tags", [])),
             )
         )
 
@@ -166,7 +167,7 @@ def migrate_legacy_words(database_url: str) -> None:
                 english=english,
                 japanese=japanese,
                 is_active=bool(is_active),
-                tags=("word",),
+                tags=normalize_tags(("word",)),
             )
         )
 

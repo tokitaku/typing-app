@@ -43,6 +43,11 @@ typing_question_tags_table = sa.table(
 )
 
 
+def _normalize_legacy_tag(code: str) -> str | None:
+    normalized_code = code.strip().lower()
+    return normalized_code or None  # 空白だけの legacy 値は backfill 対象から除外する
+
+
 def upgrade() -> None:
     op.create_table(
         "tags",
@@ -68,8 +73,10 @@ def upgrade() -> None:
         sa.select(question_types_table.c.id, question_types_table.c.code)
     ).fetchall()
     normalized_tags_by_type_id = {
-        int(question_type_id): str(code).lower()
+        int(question_type_id): normalized_code
         for question_type_id, code in question_type_rows
+        for normalized_code in [_normalize_legacy_tag(str(code))]
+        if normalized_code is not None
     }
 
     unique_tags = sorted(set(normalized_tags_by_type_id.values()))
