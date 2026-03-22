@@ -473,3 +473,182 @@ a {
     min-width: 640px;
   }
 }
+
+/* ---- Tag chips in question table ---- */
+
+.question-table-tags {
+  min-width: 160px;
+}
+
+.question-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.question-tag-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(24, 78, 59, 0.1);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- Edit button in table row ---- */
+
+.question-edit-button {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ---- Question create/edit form ---- */
+
+.question-form-card {
+  margin-top: 24px;
+}
+
+.question-form-title {
+  margin: 0 0 8px;
+  font-family: "Iowan Old Style", "Times New Roman", serif;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.2;
+}
+
+.question-form-field {
+  margin-top: 4px;
+}
+
+.question-form-input {
+  min-height: 48px;
+  margin-top: 0;
+}
+
+.question-form-error {
+  margin-top: 12px;
+  color: var(--wrong);
+  font-size: 0.95rem;
+}
+
+.question-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* ---- Tag input component ---- */
+
+.tag-input-container {
+  position: relative;
+  margin-top: 8px;
+}
+
+.tag-input-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid rgba(25, 35, 31, 0.18);
+  border-radius: 18px;
+  background: white;
+  cursor: text;
+}
+
+.tag-input-field:focus-within {
+  outline: 2px solid rgba(24, 78, 59, 0.25);
+  border-color: var(--primary);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(24, 78, 59, 0.12);
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  max-width: 260px;
+}
+
+.tag-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.tag-chip-remove:hover {
+  opacity: 1;
+  background: rgba(24, 78, 59, 0.2);
+}
+
+.tag-input-text {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.tag-input-text::placeholder {
+  color: var(--text-soft);
+  font-size: 0.88rem;
+}
+
+.tag-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-strong);
+  box-shadow: 0 8px 24px rgba(25, 35, 31, 0.1);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.tag-suggestion-item {
+  padding: 10px 16px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.tag-suggestion-item:hover {
+  background: rgba(24, 78, 59, 0.08);
+  color: var(--primary);
+}

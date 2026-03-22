@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  beginTagEdit,
-  cancelTagEdit,
+  closeQuestionBrowserForm,
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
-  getTagSuggestions,
-  normalizeTagInput,
+  openCreateQuestionBrowserForm,
+  openEditQuestionBrowserForm,
   resolveQuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { Question } from "@/shared/types/study";
@@ -13,11 +12,17 @@ import type { Question } from "@/shared/types/study";
 const sampleQuestions: Question[] = [
   {
     id: 1,
-    type: "word",
     english: "apple",
     japanese: "りんご",
     isActive: true,
     tags: ["word"]
+  },
+  {
+    id: 2,
+    english: "banana",
+    japanese: "バナナ",
+    isActive: true,
+    tags: ["fruit"]
   }
 ];
 
@@ -25,7 +30,6 @@ describe("question browser use cases", () => {
   it("creates default filters for initial browsing", () => {
     expect(createDefaultQuestionBrowserFilters()).toEqual({
       tags: [],
-      questionTypes: [],
       includeInactive: false
     });
   });
@@ -34,12 +38,10 @@ describe("question browser use cases", () => {
     expect(
       createQuestionBrowserQuery({
         tags: ["business", "daily"],
-        questionTypes: ["sentence"],
         includeInactive: true
       })
     ).toEqual({
       tags: ["business", "daily"],
-      questionTypes: ["sentence"],
       includeInactive: true
     });
   });
@@ -84,112 +86,51 @@ describe("question browser use cases", () => {
     ).toBe("loaded");
   });
 
-  describe("normalizeTagInput", () => {
-    it("trims whitespace and lowercases", () => {
-      expect(normalizeTagInput("  BUSINESS  ")).toBe("business");
-    });
-
-    it("returns empty string for blank input", () => {
-      expect(normalizeTagInput("   ")).toBe("");
-    });
-  });
-
-  describe("getTagSuggestions", () => {
-    const availableTags = ["business", "daily", "environment", "word"];
-
-    it("returns all unselected tags when input is empty", () => {
-      expect(getTagSuggestions(availableTags, ["word"], "")).toEqual([
-        "business",
-        "daily",
-        "environment"
-      ]); // 選択済みタグを除いた候補をすべて返す
-    });
-
-    it("filters by partial match on normalized input", () => {
-      expect(getTagSuggestions(availableTags, [], "env")).toEqual([
-        "environment"
-      ]);
-    });
-
-    it("excludes already selected tags from suggestions", () => {
-      const suggestions = getTagSuggestions(availableTags, ["business", "daily"], "");
-
-      expect(suggestions).not.toContain("business");
-      expect(suggestions).not.toContain("daily");
-    });
-
-    it("returns empty array when all tags are selected and input matches nothing", () => {
+  describe("form transitions", () => {
+    it("keeps the current edit form while submitting another create request", () => {
       expect(
-        getTagSuggestions(["word"], ["word"], "xyz")
-      ).toEqual([]);
-    });
-  });
-
-  describe("tag edit transitions", () => {
-    it("keeps the current draft while saving even if edit is requested again", () => {
-      expect(
-        beginTagEdit({
-          current: {
-            questionId: 1,
-            tagDraft: ["updated"],
-            tagInputValue: "",
-            isSaving: true,
-            saveError: null
-          },
-          question: sampleQuestions[0]
+        openCreateQuestionBrowserForm({
+          current: { mode: "edit", question: sampleQuestions[0] },
+          isSubmitting: true
         })
       ).toEqual({
-        questionId: 1,
-        tagDraft: ["updated"],
-        tagInputValue: "",
-        isSaving: true,
-        saveError: null
-      }); // 保存中は同じ行の再編集でドラフトを初期化しないことを検証
+        mode: "edit",
+        question: sampleQuestions[0]
+      }); // 保存中は新規作成へ遷移させず現在のドラフトを保持することを検証
     });
 
-    it("opens a fresh draft when not saving", () => {
+    it("keeps the current edit form while submitting another edit request", () => {
       expect(
-        beginTagEdit({
-          current: null,
-          question: sampleQuestions[0]
+        openEditQuestionBrowserForm({
+          current: { mode: "edit", question: sampleQuestions[0] },
+          isSubmitting: true,
+          question: sampleQuestions[1]
         })
       ).toEqual({
-        questionId: 1,
-        tagDraft: ["word"],
-        tagInputValue: "",
-        isSaving: false,
-        saveError: null
-      }); // 通常時は現在のタグ一覧を元に編集ドラフトを開始することを検証
+        mode: "edit",
+        question: sampleQuestions[0]
+      }); // 保存中は別問題の編集に切り替えないことを検証
     });
 
-    it("does not cancel while saving", () => {
+    it("does not close the form while submitting", () => {
       expect(
-        cancelTagEdit({
-          questionId: 1,
-          tagDraft: ["updated"],
-          tagInputValue: "",
-          isSaving: true,
-          saveError: null
+        closeQuestionBrowserForm({
+          current: { mode: "edit", question: sampleQuestions[0] },
+          isSubmitting: true
         })
       ).toEqual({
-        questionId: 1,
-        tagDraft: ["updated"],
-        tagInputValue: "",
-        isSaving: true,
-        saveError: null
-      }); // 保存中はキャンセル操作でも編集状態を維持することを検証
+        mode: "edit",
+        question: sampleQuestions[0]
+      }); // 保存中はフォームを閉じず入力状態を維持することを検証
     });
 
-    it("cancels when not saving", () => {
+    it("opens create mode when not submitting", () => {
       expect(
-        cancelTagEdit({
-          questionId: 1,
-          tagDraft: ["word"],
-          tagInputValue: "",
-          isSaving: false,
-          saveError: null
+        openCreateQuestionBrowserForm({
+          current: { mode: null },
+          isSubmitting: false
         })
-      ).toBeNull(); // 非保存中は編集状態を終了できることを検証
+      ).toEqual({ mode: "create" }); // 非保存中は新規作成フォームを開けることを検証
     });
   });
-});
+}

@@ -5,19 +5,11 @@ from pathlib import Path
 from alembic import command
 from alembic.config import Config
 from sqlmodel import Session, create_engine
-from sqlalchemy import inspect
 from sqlalchemy.engine import Engine
 
 
 DEFAULT_DATABASE_URL = "sqlite:///./backend/app.db"
 SQLITE_URL_PREFIXES = ("sqlite:///", "sqlite:////")
-MANAGED_TABLES = {
-    "question_types",
-    "tags",
-    "typing_questions",
-    "typing_question_tags",
-    "study_results",
-}
 
 
 def get_database_url(override: str | None = None) -> str:
@@ -58,11 +50,6 @@ def _build_alembic_config(database_url: str) -> Config:
 def migrate_database(database_url: str) -> None:
     ensure_sqlite_directory(database_url)
     config = _build_alembic_config(database_url)
-    existing_tables = set(inspect(get_engine(database_url)).get_table_names())
-
-    if "alembic_version" not in existing_tables and MANAGED_TABLES <= existing_tables:
-        command.stamp(config, "head")  # 旧 create_all で作られた既存 DB を現行 revision として登録する
-
     command.upgrade(config, "head")  # 起動時に最新 revision まで適用する
 
 

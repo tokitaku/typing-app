@@ -1,5 +1,4 @@
-from backend.application.dtos import StudyResultDto
-from backend.domain.entities import DailyStudySummary, Question, QuestionType
+from backend.domain.entities import DailyStudySummary, Question, StudyResult
 
 
 class FakeQuestionRepository:
@@ -10,7 +9,6 @@ class FakeQuestionRepository:
     def list_questions(
         self,
         *,
-        question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
@@ -18,11 +16,6 @@ class FakeQuestionRepository:
 
         if not include_inactive:
             filtered = [question for question in filtered if question.is_active]  # 有効問題だけに絞る
-
-        if question_type_codes:
-            filtered = [
-                question for question in filtered if question.question_type in question_type_codes
-            ]  # 問題種別で絞る
 
         if tag_codes:
             normalized_codes = {code.lower() for code in tag_codes}
@@ -35,7 +28,6 @@ class FakeQuestionRepository:
     def create(self, question: Question) -> Question:
         saved = Question(
             id=self._next_id,
-            question_type=question.question_type,
             english=question.english,
             japanese=question.japanese,
             is_active=question.is_active,
@@ -50,7 +42,6 @@ class FakeQuestionRepository:
             if q.id == question_id:
                 updated = Question(
                     id=q.id,
-                    question_type=updates.get("question_type", q.question_type),
                     english=updates.get("english", q.english),
                     japanese=updates.get("japanese", q.japanese),
                     is_active=updates.get("is_active", q.is_active),
@@ -66,23 +57,23 @@ class FakeQuestionRepository:
 
 class FakeStudyResultRepository:
     def __init__(self) -> None:
-        self.saved_results: list[StudyResultDto] = []
+        self.saved_results: list[StudyResult] = []
 
-    def save(self, result: StudyResultDto) -> StudyResultDto:
+    def save(self, result: StudyResult) -> StudyResult:
         self.saved_results.append(result)  # 保存された結果をそのまま記録する
         return result
 
-    def get_latest(self) -> StudyResultDto | None:
+    def get_latest(self) -> StudyResult | None:
         return self.saved_results[-1] if self.saved_results else None  # 最後の要素を最新として返す
 
     def get_today_summary(self, target_date: str) -> DailyStudySummary:
         solved_problems = sum(
             result.total_questions
             for result in self.saved_results
-            if result.created_at.startswith(target_date)
+            if result.created_at.date().isoformat() == target_date
         )
         sessions = sum(
-            1 for result in self.saved_results if result.created_at.startswith(target_date)
+            1 for result in self.saved_results if result.created_at.date().isoformat() == target_date
         )
         return DailyStudySummary(
             date=target_date,

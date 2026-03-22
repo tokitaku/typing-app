@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from backend.application.dtos import DailyStudySummaryDto, RecordStudyResultCommand, StudyResultDto
 from backend.application.usecases import get_latest_study_result, get_today_study_summary, record_study_result
 from backend.domain.entities import StudyMode
@@ -6,13 +8,14 @@ from backend.application.tests.fakes import FakeStudyResultRepository
 
 def test_study_result_use_cases_record_and_summarize_results() -> None:
     repository = FakeStudyResultRepository()
+    created_at = datetime(2026, 3, 21, 17, 0, tzinfo=timezone(timedelta(hours=9)))
     command = RecordStudyResultCommand(
         mode="learn",
         total_questions=10,
         correct_rate=90,
         mistakes=1,
         average_time=1200,
-        created_at="2026-03-21T08:00:00+00:00",
+        created_at=created_at,
     )
 
     saved = record_study_result(repository, command)
@@ -24,7 +27,7 @@ def test_study_result_use_cases_record_and_summarize_results() -> None:
         correct_rate=90,
         mistakes=1,
         average_time=1200,
-        created_at="2026-03-21T08:00:00+00:00",
+        created_at=datetime(2026, 3, 21, 8, 0, tzinfo=timezone.utc),
     )
     assert summary == DailyStudySummaryDto(
         date="2026-03-21",

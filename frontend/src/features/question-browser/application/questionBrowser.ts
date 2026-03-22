@@ -1,21 +1,17 @@
 import type { FetchQuestionListOptions } from "@/shared/api/studyApiClient";
-import type { Question, QuizType } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
 export type QuestionBrowserFilters = {
   tags: string[];
-  questionTypes: QuizType[];
   includeInactive: boolean;
 };
 
 export type QuestionBrowserStatus = "loading" | "error" | "loaded" | "empty";
 
-export type TagEditState = {
-  questionId: number;
-  tagDraft: string[];
-  tagInputValue: string;
-  isSaving: boolean;
-  saveError: string | null;
-};
+export type QuestionBrowserFormState =
+  | { mode: null }
+  | { mode: "create" }
+  | { mode: "edit"; question: Question };
 
 type ResolveQuestionBrowserStatusInput = {
   isLoading: boolean;
@@ -26,7 +22,6 @@ type ResolveQuestionBrowserStatusInput = {
 export function createDefaultQuestionBrowserFilters(): QuestionBrowserFilters {
   return {
     tags: [],
-    questionTypes: [],
     includeInactive: false
   }; // 一覧閲覧の初期状態では有効問題のみを対象にする
 }
@@ -36,7 +31,6 @@ export function createQuestionBrowserQuery(
 ): FetchQuestionListOptions {
   return {
     tags: filters.tags,
-    questionTypes: filters.questionTypes,
     includeInactive: filters.includeInactive
   }; // filter state を API query 契約へそのまま写像する
 }
@@ -61,54 +55,46 @@ export function resolveQuestionBrowserStatus({
   return "loaded";
 }
 
-export function normalizeTagInput(value: string): string {
-  return value.trim().toLowerCase(); // バックエンドの正規化ルールに合わせる
-}
-
-export function getTagSuggestions(
-  availableTags: string[],
-  currentTags: string[],
-  input: string
-): string[] {
-  const excluded = new Set(currentTags);
-  const candidates = availableTags.filter((tag) => !excluded.has(tag));
-  const normalized = normalizeTagInput(input);
-
-  if (!normalized) {
-    return candidates; // 入力がなければ未選択タグをすべて候補とする
+export function openCreateQuestionBrowserForm({
+  current,
+  isSubmitting
+}: {
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中はフォーム遷移させず現在のドラフトを維持する
   }
 
-  return candidates.filter((tag) => tag.includes(normalized)); // 前方一致ではなく部分一致で候補を絞る
+  return { mode: "create" };
 }
 
-export function beginTagEdit({
+export function openEditQuestionBrowserForm({
   current,
+  isSubmitting,
   question
 }: {
-  current: TagEditState | null;
-  question?: Question;
-}): TagEditState | null {
-  if (!question) {
-    return current;
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+  question: Question;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中は別問題の編集に切り替えない
   }
 
-  if (current?.isSaving) {
-    return current; // 保存中は編集中ドラフトを維持して再初期化を防ぐ
-  }
-
-  return {
-    questionId: question.id,
-    tagDraft: [...question.tags],
-    tagInputValue: "",
-    isSaving: false,
-    saveError: null
-  };
+  return { mode: "edit", question };
 }
 
-export function cancelTagEdit(current: TagEditState | null): TagEditState | null {
-  if (current?.isSaving) {
-    return current; // 保存中はキャンセルを受け付けず保存完了を待つ
+export function closeQuestionBrowserForm({
+  current,
+  isSubmitting
+}: {
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中はクローズも抑止して送信完了を待つ
   }
 
-  return null;
+  return { mode: null };
 }

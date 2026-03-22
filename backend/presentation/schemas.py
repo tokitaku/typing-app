@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -7,7 +7,6 @@ from backend.domain.tag_rules import normalize_tags
 
 
 class QuestionBase(BaseModel):
-    question_type: Literal["word", "sentence"]
     english: str = Field(min_length=1)
     japanese: str = Field(min_length=1)
     tags: list[str] = Field(default_factory=list)
@@ -33,7 +32,6 @@ class QuestionCreate(QuestionBase):
 
 
 class QuestionUpdate(BaseModel):
-    question_type: Literal["word", "sentence"] | None = None
     english: str | None = Field(default=None, min_length=1)
     japanese: str | None = Field(default=None, min_length=1)
     is_active: bool | None = None
@@ -63,7 +61,6 @@ class QuestionUpdate(BaseModel):
 
 class QuestionResponse(BaseModel):
     id: int
-    type: Literal["word", "sentence"]
     english: str
     japanese: str
     isActive: bool
@@ -74,19 +71,25 @@ class QuestionListResponse(BaseModel):
     questions: list[QuestionResponse]
 
 
+class TagListResponse(BaseModel):
+    tags: list[str]
+
+
 class StudyResultRequest(BaseModel):
     mode: Literal["learn", "review"]
     total_questions: int = Field(ge=1)
     correct_rate: int = Field(ge=0, le=100)
     mistakes: int = Field(ge=0)
     average_time: int = Field(ge=0)
-    created_at: str
+    created_at: datetime
 
     @field_validator("created_at")
     @classmethod
-    def validate_created_at(cls, value: str) -> str:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))  # ISO 形式のみ許可する
-        return value
+    def validate_created_at(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
+
+        return value.astimezone(timezone.utc)  # 内部では UTC に正規化して扱う
 
 
 class DailyStudySummaryResponse(BaseModel):

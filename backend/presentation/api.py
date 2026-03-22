@@ -18,6 +18,7 @@ from backend.application.usecases import (
     get_latest_study_result,
     get_today_study_summary,
     list_questions,
+    list_tags,
     record_study_result,
     update_question,
 )
@@ -34,6 +35,7 @@ from backend.presentation.schemas import (
     QuestionResponse,
     QuestionUpdate,
     StudyResultRequest,
+    TagListResponse,
 )
 
 DEFAULT_CORS_ORIGIN = "http://localhost:3000"
@@ -81,9 +83,13 @@ def create_app(database_url: str | None = None) -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok"}  # ヘルスチェック結果を返す
 
+    @app.get("/tags", response_model=TagListResponse)
+    def get_tags() -> TagListResponse:
+        tags = list_tags(question_repository)
+        return TagListResponse(tags=tags)  # 登録済みタグ一覧を返す
+
     @app.get("/questions", response_model=QuestionListResponse)
     def get_questions(
-        question_types: str | None = Query(default=None),
         tags: str | None = Query(default=None),
         include_inactive: bool = Query(default=True),
     ) -> QuestionListResponse:
@@ -91,7 +97,6 @@ def create_app(database_url: str | None = None) -> FastAPI:
             questions = list_questions(
                 question_repository,
                 ListQuestionsQuery(
-                    question_type_codes=_parse_csv_query(question_types),
                     tag_codes=_parse_csv_query(tags),
                     include_inactive=include_inactive,
                 ),

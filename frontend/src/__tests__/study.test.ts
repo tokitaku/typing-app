@@ -11,17 +11,17 @@ import {
 import type { Question } from "@/shared/types/study";
 
 const quizzes: Question[] = [
-  { id: 1, type: "word", english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
-  { id: 2, type: "word", english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
-  { id: 3, type: "word", english: "beautiful", japanese: "美しい", isActive: true, tags: ["word", "expression"] },
-  { id: 4, type: "word", english: "schedule", japanese: "予定", isActive: true, tags: ["word", "business"] },
-  { id: 5, type: "word", english: "environment", japanese: "環境", isActive: true, tags: ["word", "science"] },
-  { id: 6, type: "sentence", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", isActive: true, tags: ["sentence", "daily"] },
-  { id: 7, type: "sentence", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", isActive: true, tags: ["sentence", "business"] },
-  { id: 8, type: "sentence", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", isActive: true, tags: ["sentence", "daily"] },
-  { id: 9, type: "word", english: "practice", japanese: "練習", isActive: true, tags: ["word", "daily"] },
-  { id: 10, type: "word", english: "through", japanese: "通り抜けて", isActive: true, tags: ["word", "travel"] },
-  { id: 11, type: "word", english: "confidence", japanese: "自信", isActive: true, tags: ["word", "mindset"] }
+  { id: 1, english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
+  { id: 2, english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
+  { id: 3, english: "beautiful", japanese: "美しい", isActive: true, tags: ["word", "expression"] },
+  { id: 4, english: "schedule", japanese: "予定", isActive: true, tags: ["word", "business"] },
+  { id: 5, english: "environment", japanese: "環境", isActive: true, tags: ["word", "science"] },
+  { id: 6, english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", isActive: true, tags: ["sentence", "daily"] },
+  { id: 7, english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", isActive: true, tags: ["sentence", "business"] },
+  { id: 8, english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", isActive: true, tags: ["sentence", "daily"] },
+  { id: 9, english: "practice", japanese: "練習", isActive: true, tags: ["word", "daily"] },
+  { id: 10, english: "through", japanese: "通り抜けて", isActive: true, tags: ["word", "travel"] },
+  { id: 11, english: "confidence", japanese: "自信", isActive: true, tags: ["word", "mindset"] }
 ];
 
 describe("study utilities", () => {

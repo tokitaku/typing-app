@@ -9,24 +9,22 @@ import {
 const baseProps: QuestionBrowserViewProps = {
   filters: {
     tags: [],
-    questionTypes: [],
     includeInactive: false
   },
   questions: [],
-  availableTags: [],
   status: "loading",
   errorMessage: null,
-  tagEditState: null,
   onSetTags: vi.fn(),
-  onSetQuestionTypes: vi.fn(),
   onSetIncludeInactive: vi.fn(),
   onReload: vi.fn(),
-  onBeginEditTags: vi.fn(),
-  onAddTagToEdit: vi.fn(),
-  onRemoveTagFromEdit: vi.fn(),
-  onSetTagInputValue: vi.fn(),
-  onSaveTagEdit: vi.fn(),
-  onCancelTagEdit: vi.fn()
+  formState: { mode: null },
+  availableTags: [],
+  isFormSubmitting: false,
+  formSubmitError: null,
+  onOpenCreateForm: vi.fn(),
+  onOpenEditForm: vi.fn(),
+  onCloseForm: vi.fn(),
+  onSubmitForm: vi.fn()
 };
 
 describe("question browser ui", () => {
@@ -58,14 +56,13 @@ describe("question browser ui", () => {
     expect(html).toContain("条件に一致する問題がありません。");
   });
 
-  it("renders question rows and status badges", () => {
+  it("renders question rows with tag badges and edit buttons", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView
         {...baseProps}
         questions={[
           {
             id: 1,
-            type: "word",
             english: "apple",
             japanese: "りんご",
             isActive: true,
@@ -73,7 +70,6 @@ describe("question browser ui", () => {
           },
           {
             id: 2,
-            type: "sentence",
             english: "We must protect the environment.",
             japanese: "私たちは環境を守らなければならない。",
             isActive: false,
@@ -86,179 +82,102 @@ describe("question browser ui", () => {
 
     expect(html).toContain("typing_questions 一覧");
     expect(html).toContain("<th scope=\"col\">英語</th>");
+    expect(html).not.toContain("<th scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
-    expect(html).toContain("sentence, environment");
+    expect(html).toContain("question-tag-badge");  // タグバッジが表示されることを検証
+    expect(html).toContain("sentence");
+    expect(html).toContain("environment");
     expect(html).toContain("有効");
     expect(html).toContain("無効");
+    expect(html).toContain("編集");  // 編集ボタンが各行にあることを検証
   });
 
-  it("renders a tag edit button for each question row", () => {
+  it("renders create button in hero section", () => {
+    const html = renderToStaticMarkup(<QuestionBrowserView {...baseProps} />);
+
+    expect(html).toContain("新規作成");  // 新規作成ボタンがあることを検証
+  });
+
+  it("renders create form when formState mode is create", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView
         {...baseProps}
-        questions={[
-          {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
-            isActive: true,
-            tags: ["word"]
-          }
-        ]}
-        status="loaded"
+        formState={{ mode: "create" }}
       />
     );
 
-    expect(html).toContain("タグを編集");
-    expect(html).toContain("<th scope=\"col\">操作</th>");
-  });
-
-  it("renders inline tag editor when a question is being edited", () => {
-    const html = renderToStaticMarkup(
-      <QuestionBrowserView
-        {...baseProps}
-        availableTags={["word", "business", "daily"]}
-        questions={[
-          {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
-            isActive: true,
-            tags: ["word"]
-          }
-        ]}
-        status="loaded"
-        tagEditState={{
-          questionId: 1,
-          tagDraft: ["word"],
-          tagInputValue: "",
-          isSaving: false,
-          saveError: null
-        }}
-      />
-    );
-
-    expect(html).toContain("新しいタグを入力");
-    expect(html).toContain("追加");
-    expect(html).toContain("保存");
+    expect(html).toContain("新規問題を作成");  // フォームタイトルが表示されることを検証
+    expect(html).toContain("作成");
     expect(html).toContain("キャンセル");
-    expect(html).toContain("タグ「word」を削除");
   });
 
-  it("shows saving state in the tag editor", () => {
+  it("renders edit form pre-filled when formState mode is edit", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView
         {...baseProps}
-        questions={[
-          {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
+        formState={{
+          mode: "edit",
+          question: {
+            id: 5,
+            english: "notebook",
+            japanese: "ノート",
             isActive: true,
-            tags: []
+            tags: ["daily"]
           }
-        ]}
-        status="loaded"
-        tagEditState={{
-          questionId: 1,
-          tagDraft: [],
-          tagInputValue: "",
-          isSaving: true,
-          saveError: null
         }}
       />
     );
 
-    expect(html).toContain("保存中…");
+    expect(html).toContain("問題を編集");  // 編集フォームタイトルが表示されることを検証
+    expect(html).toContain("notebook");  // 既存の英語テキストが初期値として入っていることを検証
+    expect(html).toContain("ノート");
+    expect(html).toContain("更新");
+    expect(html).toContain("キャンセル");
   });
 
-  it("disables the same row edit trigger while saving tags", () => {
+  it("renders submit error in form", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView
         {...baseProps}
-        questions={[
-          {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
-            isActive: true,
-            tags: []
-          }
-        ]}
-        status="loaded"
-        tagEditState={{
-          questionId: 1,
-          tagDraft: [],
-          tagInputValue: "",
-          isSaving: true,
-          saveError: null
-        }}
+        formState={{ mode: "create" }}
+        formSubmitError="Failed to create question: 422"
       />
     );
 
-    expect(html).toContain("タグを編集");
-    expect(html).toContain("question-edit-tags-button\" disabled=\"\"");
+    expect(html).toContain("Failed to create question: 422");  // フォームエラーメッセージが表示されることを検証
   });
 
-  it("shows tag suggestions as datalist options", () => {
+  it("disables create and edit triggers while form submission is in progress", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView
         {...baseProps}
-        availableTags={["business", "daily", "word"]}
+        formState={{
+          mode: "edit",
+          question: {
+            id: 5,
+            english: "notebook",
+            japanese: "ノート",
+            isActive: true,
+            tags: ["daily"]
+          }
+        }}
+        isFormSubmitting
         questions={[
           {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
+            id: 5,
+            english: "notebook",
+            japanese: "ノート",
             isActive: true,
-            tags: ["word"]
+            tags: ["daily"]
           }
         ]}
         status="loaded"
-        tagEditState={{
-          questionId: 1,
-          tagDraft: ["word"],
-          tagInputValue: "b",
-          isSaving: false,
-          saveError: null
-        }}
       />
     );
 
-    expect(html).toContain("<option value=\"business\"");
+    expect(html).toContain("question-edit-button\" disabled=\"\"");
+    expect(html).toContain("question-browser-button\" disabled=\"\" type=\"button\">新規作成");
+    expect(html).toContain(">処理中...<");
   });
-
-  it("shows save error message when tag update fails", () => {
-    const html = renderToStaticMarkup(
-      <QuestionBrowserView
-        {...baseProps}
-        questions={[
-          {
-            id: 1,
-            type: "word",
-            english: "apple",
-            japanese: "りんご",
-            isActive: true,
-            tags: ["word"]
-          }
-        ]}
-        status="loaded"
-        tagEditState={{
-          questionId: 1,
-          tagDraft: ["word"],
-          tagInputValue: "",
-          isSaving: false,
-          saveError: "保存に失敗しました。再試行してください。"
-        }}
-      />
-    );
-
-    expect(html).toContain("保存に失敗しました。再試行してください。");
-  });
-});
+}

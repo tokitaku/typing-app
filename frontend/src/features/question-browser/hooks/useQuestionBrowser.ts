@@ -2,39 +2,45 @@
 
 import { useEffect, useState } from "react";
 import {
+  createQuestion,
+  fetchAvailableTags,
   fetchQuestions,
-  updateQuestionTags
+  updateQuestion
 } from "@/features/question-browser/api/questionBrowserApi";
 import {
-  beginTagEdit,
-  cancelTagEdit as cancelTagEditTransition,
+  buildCreateCommand,
+  buildUpdateCommand,
+  type QuestionFormValues
+} from "@/features/question-browser/application/questionForm";
+import {
+  closeQuestionBrowserForm,
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
-  normalizeTagInput,
+  openCreateQuestionBrowserForm,
+  openEditQuestionBrowserForm,
   resolveQuestionBrowserStatus,
-  type TagEditState,
   type QuestionBrowserFilters,
+  type QuestionBrowserFormState,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
-import type { Question, QuizType } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
 type UseQuestionBrowserResult = {
   filters: QuestionBrowserFilters;
   questions: Question[];
-  availableTags: string[];
   status: QuestionBrowserStatus;
   errorMessage: string | null;
-  tagEditState: TagEditState | null;
   setTags: (tags: string[]) => void;
-  setQuestionTypes: (questionTypes: QuizType[]) => void;
   setIncludeInactive: (includeInactive: boolean) => void;
   reload: () => void;
-  beginEditTags: (questionId: number) => void;
-  addTagToEdit: (tag: string) => void;
-  removeTagFromEdit: (tag: string) => void;
-  setTagInputValue: (value: string) => void;
-  saveTagEdit: () => void;
-  cancelTagEdit: () => void;
+  formState: QuestionBrowserFormState;
+  availableTags: string[];
+  isFormSubmitting: boolean;
+  formSubmitError: string | null;
+  openCreateForm: () => void;
+  openEditForm: (question: Question) => void;
+  closeForm: () => void;
+  submitForm: (values: QuestionFormValues) => Promise<void>;
 };
 
 export function useQuestionBrowser(
@@ -46,7 +52,10 @@ export function useQuestionBrowser(
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [tagEditState, setTagEditState] = useState<TagEditState | null>(null);
+  const [formState, setFormState] = useState<QuestionBrowserFormState>({ mode: null });
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [formSubmitError, setFormSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -87,104 +96,62 @@ export function useQuestionBrowser(
     };
   }, [filters, reloadKey]);
 
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    const loadTags = async () => {
+      try {
+        const tags = await fetchAvailableTags(abortController.signal);
+        setAvailableTags(tags);
+      } catch {
+        // タグ取得失敗は non-critical なため握りつぶす
+      }
+    };
+
+    void loadTags();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [reloadKey]);
+
   const status = resolveQuestionBrowserStatus({
     isLoading,
     hasError,
     questions
   });
 
-  const availableTags = Array.from(
-    new Set(questions.flatMap((question) => question.tags))
-  ).sort(); // ロード済み問題のタグ一覧を候補として導出する
+  async function submitForm(values: QuestionFormValues) {
+    if (formState.mode === null || isFormSubmitting) return;
 
-  const beginEditTags = (questionId: number) => {
-    const question = questions.find((question) => question.id === questionId);
+    setIsFormSubmitting(true);
+    setFormSubmitError(null);
 
-    setTagEditState((current) =>
-      beginTagEdit({
-        current,
-        question
-      })
-    ); // 編集開始時に現在のタグをドラフトへコピーする
-  };
+    try {
+      if (formState.mode === "create") {
+        await createQuestion(buildCreateCommand(values));
+      } else {
+        await updateQuestion(formState.question.id, buildUpdateCommand(values, formState.question));
+      }
 
-  const addTagToEdit = (tag: string) => {
-    const normalized = normalizeTagInput(tag);
-
-    if (!normalized) {
-      return; // 空白だけのタグは追加しない
+      setFormState({ mode: null });
+      setReloadKey((current) => current + 1); // 作成・更新後に一覧を再取得する
+    } catch (error) {
+      setFormSubmitError(
+        error instanceof Error ? error.message : "Failed to save question"
+      );
+    } finally {
+      setIsFormSubmitting(false);
     }
-
-    setTagEditState((current) => {
-      if (!current || current.tagDraft.includes(normalized)) {
-        return current; // 既に存在するタグは追加しない
-      }
-
-      return { ...current, tagDraft: [...current.tagDraft, normalized], tagInputValue: "", saveError: null };
-    });
-  };
-
-  const removeTagFromEdit = (tag: string) => {
-    setTagEditState((current) => {
-      if (!current) {
-        return null;
-      }
-
-      return { ...current, tagDraft: current.tagDraft.filter((t) => t !== tag) };
-    });
-  };
-
-  const setTagInputValue = (value: string) => {
-    setTagEditState((current) => {
-      if (!current) {
-        return null;
-      }
-
-      return { ...current, tagInputValue: value };
-    });
-  };
-
-  const saveTagEdit = () => {
-    if (!tagEditState || tagEditState.isSaving) {
-      return;
-    }
-
-    const { questionId, tagDraft } = tagEditState;
-
-    setTagEditState((current) => (current ? { ...current, isSaving: true } : null));
-
-    void updateQuestionTags(questionId, tagDraft)
-      .then((updatedQuestion) => {
-        setQuestions((current) =>
-          current.map((question) =>
-            question.id === updatedQuestion.id ? updatedQuestion : question
-          )
-        ); // 保存成功後に一覧を楽観的に更新する
-        setTagEditState(null);
-      })
-      .catch(() => {
-        setTagEditState((current) =>
-          current ? { ...current, isSaving: false, saveError: "保存に失敗しました。再試行してください。" } : null
-        ); // 保存失敗時は編集状態を維持してエラーメッセージを表示する
-      });
-  };
-
-  const cancelTagEdit = () => {
-    setTagEditState((current) => cancelTagEditTransition(current));
-  };
+  }
 
   return {
     filters,
     questions,
-    availableTags,
     status,
     errorMessage,
-    tagEditState,
     setTags: (tags) => {
       setFilters((current) => ({ ...current, tags }));
-    },
-    setQuestionTypes: (questionTypes) => {
-      setFilters((current) => ({ ...current, questionTypes }));
     },
     setIncludeInactive: (includeInactive) => {
       setFilters((current) => ({ ...current, includeInactive }));
@@ -192,11 +159,37 @@ export function useQuestionBrowser(
     reload: () => {
       setReloadKey((current) => current + 1);
     },
-    beginEditTags,
-    addTagToEdit,
-    removeTagFromEdit,
-    setTagInputValue,
-    saveTagEdit,
-    cancelTagEdit
+    formState,
+    availableTags,
+    isFormSubmitting,
+    formSubmitError,
+    openCreateForm: () => {
+      setFormSubmitError(null);
+      setFormState((current) =>
+        openCreateQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting
+        })
+      ); // 保存中は新規作成フォームへ遷移させない
+    },
+    openEditForm: (question: Question) => {
+      setFormSubmitError(null);
+      setFormState((current) =>
+        openEditQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting,
+          question
+        })
+      ); // 保存中は別問題の編集フォームへ切り替えない
+    },
+    closeForm: () => {
+      setFormState((current) =>
+        closeQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting
+        })
+      ); // 保存中はフォームを閉じず入力状態を保持する
+    },
+    submitForm
   };
 }

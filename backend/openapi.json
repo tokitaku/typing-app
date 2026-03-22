@@ -33,22 +33,6 @@
         "operationId": "get_questions_questions_get",
         "parameters": [
           {
-            "name": "question_types",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Question Types"
-            }
-          },
-          {
             "name": "tags",
             "in": "query",
             "required": false,
@@ -329,14 +313,6 @@
       },
       "QuestionCreate": {
         "properties": {
-          "question_type": {
-            "type": "string",
-            "enum": [
-              "word",
-              "sentence"
-            ],
-            "title": "Question Type"
-          },
           "english": {
             "type": "string",
             "minLength": 1,
@@ -357,7 +333,6 @@
         },
         "type": "object",
         "required": [
-          "question_type",
           "english",
           "japanese"
         ],
@@ -385,14 +360,6 @@
             "type": "integer",
             "title": "Id"
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "word",
-              "sentence"
-            ],
-            "title": "Type"
-          },
           "english": {
             "type": "string",
             "title": "English"
@@ -416,7 +383,6 @@
         "type": "object",
         "required": [
           "id",
-          "type",
           "english",
           "japanese",
           "isActive",
@@ -426,21 +392,6 @@
       },
       "QuestionUpdate": {
         "properties": {
-          "question_type": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "word",
-                  "sentence"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Question Type"
-          },
           "english": {
             "anyOf": [
               {
@@ -527,6 +478,7 @@
           },
           "created_at": {
             "type": "string",
+            "format": "date-time",
             "title": "Created At"
           }
         },
