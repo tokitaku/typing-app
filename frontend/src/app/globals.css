@@ -335,32 +335,73 @@ a {
   color: var(--muted-foreground);
 }
 
-.tag-chip-group {
+.tag-dropdown {
+  position: relative;
+  width: 240px;
+}
+
+.tag-dropdown-trigger {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.tag-select-chip {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 13px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fafafa;
+  font-size: 14px;
+  color: #737373;
   cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.tag-dropdown-trigger:hover {
+  border-color: #d4d4d4;
+}
+
+.tag-dropdown-text {
+  line-height: 1.43;
+}
+
+.tag-dropdown-chevron {
+  flex-shrink: 0;
+  color: #737373;
+  transition: transform 0.15s;
+}
+
+.tag-dropdown-chevron.open {
+  transform: rotate(180deg);
+}
+
+.tag-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
   background: var(--background);
-  transition: background 0.15s, border-color 0.15s;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10;
 }
 
-.tag-select-chip:has(input:checked) {
+.tag-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.tag-dropdown-item:hover {
   background: var(--muted);
-  border-color: var(--foreground);
 }
 
-.tag-select-chip input {
+.tag-dropdown-item input {
   width: 14px;
   height: 14px;
   margin: 0;

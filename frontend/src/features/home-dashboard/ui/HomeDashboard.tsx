@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
 import type { DailySummary, Settings } from "@/shared/types/study";
@@ -10,6 +10,74 @@ export type HomeDashboardViewProps = {
   summary: DailySummary;
   onToggleTag: (tag: string) => void;
 };
+
+function TagSelectDropdown({
+  availableTags,
+  selectedTags,
+  onToggleTag,
+}: {
+  availableTags: string[];
+  selectedTags: string[];
+  onToggleTag: (tag: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [open]);
+
+  const count = selectedTags.length;
+
+  return (
+    <div className="tag-dropdown" ref={ref}>
+      <button
+        className="tag-dropdown-trigger"
+        onClick={() => setOpen(!open)}
+        type="button"
+      >
+        <span className="tag-dropdown-text">
+          {count > 0 ? `${count}件選択中` : "タグを選択"}
+        </span>
+        <svg
+          className={`tag-dropdown-chevron${open ? " open" : ""}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div className="tag-dropdown-menu">
+          {availableTags.map((tag) => (
+            <label className="tag-dropdown-item" key={tag}>
+              <input
+                type="checkbox"
+                checked={selectedTags.includes(tag)}
+                onChange={() => onToggleTag(tag)}
+              />
+              <span>{tag}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function HomeDashboardView({
   settings,
@@ -38,18 +106,11 @@ export function HomeDashboardView({
               タグ未選択時はすべてのタグを対象に出題します。
             </p>
             {availableTags.length > 0 ? (
-              <div className="tag-chip-group">
-                {availableTags.map((tag) => (
-                  <label className="tag-select-chip" key={tag}>
-                    <input
-                      checked={settings.tags.includes(tag)}
-                      onChange={() => onToggleTag(tag)}
-                      type="checkbox"
-                    />
-                    <span>{tag}</span>
-                  </label>
-                ))}
-              </div>
+              <TagSelectDropdown
+                availableTags={availableTags}
+                selectedTags={settings.tags}
+                onToggleTag={onToggleTag}
+              />
             ) : (
               <p className="tag-selector-desc">利用可能なタグはまだありません。</p>
             )}
