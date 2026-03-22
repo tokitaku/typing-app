@@ -4,28 +4,11 @@
 
 ```mermaid
 erDiagram
-    EIKEN_LEVELS ||--o{ TYPING_QUESTIONS : has
-    QUESTION_TYPES ||--o{ TYPING_QUESTIONS : classifies
     TYPING_QUESTIONS ||--o{ TYPING_QUESTION_TAGS : has
     TAGS ||--o{ TYPING_QUESTION_TAGS : classifies
 
-    EIKEN_LEVELS {
-        int id PK
-        string code
-        string name
-        int sort_order
-    }
-
-    QUESTION_TYPES {
-        int id PK
-        string code
-        string name
-    }
-
     TYPING_QUESTIONS {
         int id PK
-        int eiken_level_id FK
-        int question_type_id FK
         string english_text
         string japanese_text
         boolean is_active
@@ -55,9 +38,10 @@ erDiagram
 ```
 
 補足:
-- `EIKEN_LEVELS` 1 件に対して `TYPING_QUESTIONS` が複数紐づきます。
-- `QUESTION_TYPES` 1 件に対して `TYPING_QUESTIONS` が複数紐づきます。
-- `typing_questions` は `eiken_levels` と `question_types` を参照します。
+- `typing_questions` は学習項目を表し、英語と日本語のテキストを保持します。
 - `tags` と `typing_question_tags` により、1 問題へ 0 件以上の自由タグを紐付けられます。
+- タグは学習者が自由に作成・付与でき、出題条件と教材分類の両方に利用されます。
+- `tags.code` は正規化されたタグ文字列（小文字、トリミング済み）を格納し、ユニーク制約が設定されています。
+- `typing_question_tags` は問題とタグの多対多関係を表現する結合テーブルです。
 - `study_results` は現状、他テーブルへの外部キーを持たない独立テーブルです。
 - 出題導線は独立した `quizzes` テーブルを持たず、`typing_questions` を `include_inactive=false` 条件で取得して利用します。
