@@ -147,4 +147,37 @@ describe("question browser ui", () => {
 
     expect(html).toContain("Failed to create question: 422");  // フォームエラーメッセージが表示されることを検証
   });
+
+  it("disables create and edit triggers while form submission is in progress", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        formState={{
+          mode: "edit",
+          question: {
+            id: 5,
+            english: "notebook",
+            japanese: "ノート",
+            isActive: true,
+            tags: ["daily"]
+          }
+        }}
+        isFormSubmitting
+        questions={[
+          {
+            id: 5,
+            english: "notebook",
+            japanese: "ノート",
+            isActive: true,
+            tags: ["daily"]
+          }
+        ]}
+        status="loaded"
+      />
+    );
+
+    expect(html).toContain("question-edit-button\" disabled=\"\"");
+    expect(html).toContain("question-browser-button\" disabled=\"\" type=\"button\">新規作成");
+    expect(html).toContain(">処理中...<");
+  });
 });

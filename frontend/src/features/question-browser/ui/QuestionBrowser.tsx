@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuestionBrowser } from "@/features/question-browser/hooks/useQuestionBrowser";
 import type {
   QuestionBrowserFilters,
+  QuestionBrowserFormState,
   QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { QuestionFormValues } from "@/features/question-browser/application/questionForm";
@@ -19,7 +20,7 @@ export type QuestionBrowserViewProps = {
   onSetTags: (tags: string[]) => void;
   onSetIncludeInactive: (includeInactive: boolean) => void;
   onReload: () => void;
-  formState: { mode: null } | { mode: "create" } | { mode: "edit"; question: Question };
+  formState: QuestionBrowserFormState;
   availableTags: string[];
   isFormSubmitting: boolean;
   formSubmitError: string | null;
@@ -38,6 +39,7 @@ function parseTagInput(value: string): string[] {
 
 function renderQuestionTable(
   questions: Question[],
+  isFormSubmitting: boolean,
   onOpenEditForm: (question: Question) => void
 ) {
   return (
@@ -86,6 +88,7 @@ function renderQuestionTable(
               <td>
                 <button
                   className="secondary-button question-browser-button question-edit-button"
+                  disabled={isFormSubmitting}
                   onClick={() => onOpenEditForm(question)}
                   type="button"
                 >
@@ -134,6 +137,7 @@ export function QuestionBrowserView({
           </button>
           <button
             className="primary-button question-browser-button"
+            disabled={isFormSubmitting}
             onClick={onOpenCreateForm}
             type="button"
           >
@@ -210,7 +214,7 @@ export function QuestionBrowserView({
               <h2>{questions.length} 件の問題</h2>
             </div>
           </div>
-          {renderQuestionTable(questions, onOpenEditForm)}
+          {renderQuestionTable(questions, isFormSubmitting, onOpenEditForm)}
         </section>
       ) : null}
     </main>
@@ -248,8 +252,8 @@ export function QuestionBrowser() {
       onOpenCreateForm={openCreateForm}
       onOpenEditForm={openEditForm}
       onReload={reload}
-      onSetTags={setTags}
       onSetIncludeInactive={setIncludeInactive}
+      onSetTags={setTags}
       onSubmitForm={submitForm}
       questions={questions}
       status={status}

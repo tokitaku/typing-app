@@ -13,18 +13,17 @@ import {
   type QuestionFormValues
 } from "@/features/question-browser/application/questionForm";
 import {
+  closeQuestionBrowserForm,
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
+  openCreateQuestionBrowserForm,
+  openEditQuestionBrowserForm,
   resolveQuestionBrowserStatus,
   type QuestionBrowserFilters,
+  type QuestionBrowserFormState,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { Question } from "@/shared/types/study";
-
-type FormState =
-  | { mode: null }
-  | { mode: "create" }
-  | { mode: "edit"; question: Question };
 
 type UseQuestionBrowserResult = {
   filters: QuestionBrowserFilters;
@@ -34,7 +33,7 @@ type UseQuestionBrowserResult = {
   setTags: (tags: string[]) => void;
   setIncludeInactive: (includeInactive: boolean) => void;
   reload: () => void;
-  formState: FormState;
+  formState: QuestionBrowserFormState;
   availableTags: string[];
   isFormSubmitting: boolean;
   formSubmitError: string | null;
@@ -53,7 +52,7 @@ export function useQuestionBrowser(
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [formState, setFormState] = useState<FormState>({ mode: null });
+  const [formState, setFormState] = useState<QuestionBrowserFormState>({ mode: null });
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [formSubmitError, setFormSubmitError] = useState<string | null>(null);
@@ -123,7 +122,7 @@ export function useQuestionBrowser(
   });
 
   async function submitForm(values: QuestionFormValues) {
-    if (formState.mode === null) return;
+    if (formState.mode === null || isFormSubmitting) return;
 
     setIsFormSubmitting(true);
     setFormSubmitError(null);
@@ -166,14 +165,30 @@ export function useQuestionBrowser(
     formSubmitError,
     openCreateForm: () => {
       setFormSubmitError(null);
-      setFormState({ mode: "create" }); // 新規作成フォームを開く
+      setFormState((current) =>
+        openCreateQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting
+        })
+      ); // 保存中は新規作成フォームへ遷移させない
     },
     openEditForm: (question: Question) => {
       setFormSubmitError(null);
-      setFormState({ mode: "edit", question }); // 選択した問題の編集フォームを開く
+      setFormState((current) =>
+        openEditQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting,
+          question
+        })
+      ); // 保存中は別問題の編集フォームへ切り替えない
     },
     closeForm: () => {
-      setFormState({ mode: null }); // フォームを閉じる
+      setFormState((current) =>
+        closeQuestionBrowserForm({
+          current,
+          isSubmitting: isFormSubmitting
+        })
+      ); // 保存中はフォームを閉じず入力状態を保持する
     },
     submitForm
   };

@@ -8,6 +8,11 @@ export type QuestionBrowserFilters = {
 
 export type QuestionBrowserStatus = "loading" | "error" | "loaded" | "empty";
 
+export type QuestionBrowserFormState =
+  | { mode: null }
+  | { mode: "create" }
+  | { mode: "edit"; question: Question };
+
 type ResolveQuestionBrowserStatusInput = {
   isLoading: boolean;
   hasError: boolean;
@@ -48,4 +53,48 @@ export function resolveQuestionBrowserStatus({
   }
 
   return "loaded";
+}
+
+export function openCreateQuestionBrowserForm({
+  current,
+  isSubmitting
+}: {
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中はフォーム遷移させず現在のドラフトを維持する
+  }
+
+  return { mode: "create" };
+}
+
+export function openEditQuestionBrowserForm({
+  current,
+  isSubmitting,
+  question
+}: {
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+  question: Question;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中は別問題の編集に切り替えない
+  }
+
+  return { mode: "edit", question };
+}
+
+export function closeQuestionBrowserForm({
+  current,
+  isSubmitting
+}: {
+  current: QuestionBrowserFormState;
+  isSubmitting: boolean;
+}): QuestionBrowserFormState {
+  if (isSubmitting) {
+    return current; // 保存中はクローズも抑止して送信完了を待つ
+  }
+
+  return { mode: null };
 }
