@@ -3,7 +3,6 @@ import sqlite3
 from sqlmodel import SQLModel, create_engine
 
 from backend.database import migrate_database
-from backend.domain.entities import QuestionType
 from backend.infrastructure.sqlmodel import models  # noqa: F401  # 旧 create_all スキーマを再現するため import する
 from backend.infrastructure.sqlmodel.bootstrap import bootstrap_database
 from backend.infrastructure.sqlmodel.repositories import SqlModelQuestionRepository
@@ -37,10 +36,7 @@ def test_bootstrap_database_migrates_legacy_words_into_questions(tmp_path) -> No
     bootstrap_database(database_url)
 
     repository = SqlModelQuestionRepository(database_url)
-    questions = repository.list_questions(
-        question_type_codes=[QuestionType.WORD],
-        include_inactive=True,
-    )
+    questions = repository.list_questions(include_inactive=True)
 
     assert any(
         question.english == "legacy-word" and question.japanese == "旧データ"
@@ -65,12 +61,12 @@ def test_migrate_database_applies_alembic_migrations(tmp_path) -> None:
 
     assert {
         "alembic_version",
-        "question_types",
         "tags",
         "typing_questions",
         "typing_question_tags",
         "study_results",
     } <= tables
+    assert "question_types" not in tables  # question_types テーブルは最終マイグレーションで除去されることを検証
 
 
 def test_migrate_database_stamps_existing_schema_without_recreating_tables(tmp_path) -> None:
@@ -156,7 +152,6 @@ def test_bootstrap_database_backfills_legacy_question_type_tags(tmp_path) -> Non
 
     repository = SqlModelQuestionRepository(database_url)
     questions = repository.list_questions(
-        question_type_codes=[QuestionType.WORD],
         tag_codes=["WORD"],
         include_inactive=True,
     )

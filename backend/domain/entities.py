@@ -8,15 +8,9 @@ class StudyMode(str, Enum):
     REVIEW = "review"  # 復習モードを表す
 
 
-class QuestionType(str, Enum):
-    WORD = "word"  # 単語問題を表す
-    SENTENCE = "sentence"  # 短文問題を表す
-
-
 @dataclass(frozen=True)
 class Question:
     id: int | None
-    question_type: QuestionType
     english: str
     japanese: str
     is_active: bool = True

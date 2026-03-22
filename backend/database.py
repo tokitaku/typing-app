@@ -12,7 +12,6 @@ from sqlalchemy.engine import Engine
 DEFAULT_DATABASE_URL = "sqlite:///./backend/app.db"
 SQLITE_URL_PREFIXES = ("sqlite:///", "sqlite:////")
 MANAGED_TABLES = {
-    "question_types",
     "tags",
     "typing_questions",
     "typing_question_tags",

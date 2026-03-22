@@ -7,7 +7,6 @@ from backend.domain.tag_rules import normalize_tags
 
 
 class QuestionBase(BaseModel):
-    question_type: Literal["word", "sentence"]
     english: str = Field(min_length=1)
     japanese: str = Field(min_length=1)
     tags: list[str] = Field(default_factory=list)
@@ -33,7 +32,6 @@ class QuestionCreate(QuestionBase):
 
 
 class QuestionUpdate(BaseModel):
-    question_type: Literal["word", "sentence"] | None = None
     english: str | None = Field(default=None, min_length=1)
     japanese: str | None = Field(default=None, min_length=1)
     is_active: bool | None = None
@@ -63,7 +61,6 @@ class QuestionUpdate(BaseModel):
 
 class QuestionResponse(BaseModel):
     id: int
-    type: Literal["word", "sentence"]
     english: str
     japanese: str
     isActive: bool
