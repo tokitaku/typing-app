@@ -9,7 +9,6 @@ import type { Question } from "@/shared/types/study";
 const sampleQuestions: Question[] = [
   {
     id: 1,
-    type: "word",
     english: "apple",
     japanese: "りんご",
     isActive: true,
@@ -21,7 +20,6 @@ describe("question browser use cases", () => {
   it("creates default filters for initial browsing", () => {
     expect(createDefaultQuestionBrowserFilters()).toEqual({
       tags: [],
-      questionTypes: [],
       includeInactive: false
     });
   });
@@ -30,12 +28,10 @@ describe("question browser use cases", () => {
     expect(
       createQuestionBrowserQuery({
         tags: ["business", "daily"],
-        questionTypes: ["sentence"],
         includeInactive: true
       })
     ).toEqual({
       tags: ["business", "daily"],
-      questionTypes: ["sentence"],
       includeInactive: true
     });
   });

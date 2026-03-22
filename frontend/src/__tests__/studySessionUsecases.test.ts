@@ -10,9 +10,9 @@ const settings: Settings = {
 };
 
 const quizzes: Question[] = [
-  { id: 1, type: "word", english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
-  { id: 2, type: "word", english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
-  { id: 3, type: "sentence", english: "I read books.", japanese: "私は本を読みます。", isActive: true, tags: ["sentence", "daily"] }
+  { id: 1, english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
+  { id: 2, english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
+  { id: 3, english: "I read books.", japanese: "私は本を読みます。", isActive: true, tags: ["sentence", "daily"] }
 ];
 
 describe("study session use cases", () => {

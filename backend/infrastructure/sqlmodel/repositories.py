@@ -5,12 +5,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from backend.database import get_session
-from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyMode, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
 from backend.domain.tag_rules import normalize_tags
 from backend.infrastructure.sqlmodel.models import (
     TagRecord,
-    QuestionTypeRecord,
-    QuestionTypeRecordCode,
     StudyModeRecord,
     StudyResultRecord,
     TypingQuestionRecord,
@@ -21,18 +19,6 @@ from backend.infrastructure.sqlmodel.models import (
 class SqlModelQuestionRepository:
     def __init__(self, database_url: str) -> None:
         self.database_url = database_url
-
-    def _resolve_question_type_id(self, session, question_type: QuestionType) -> int:
-        record = session.exec(
-            select(QuestionTypeRecord).where(
-                QuestionTypeRecord.code == QuestionTypeRecordCode(question_type.value)
-            )
-        ).first()  # 種別コードをマスタ ID に変換する
-
-        if record is None:
-            raise ValueError(f"Unknown question type code: {question_type.value}")  # 未知の種別は失敗させる
-
-        return int(record.id)
 
     def _resolve_tag_ids(self, session, tags: tuple[str, ...]) -> list[int]:
         tag_ids: list[int] = []
@@ -88,12 +74,10 @@ class SqlModelQuestionRepository:
     def _build_question(
         self,
         record: TypingQuestionRecord,
-        question_type_code: str,
         tags: tuple[str, ...],
     ) -> Question:
         return Question(
             id=int(record.id),
-            question_type=QuestionType(question_type_code),
             english=record.english_text,
             japanese=record.japanese_text,
             is_active=record.is_active,
@@ -103,25 +87,17 @@ class SqlModelQuestionRepository:
     def list_questions(
         self,
         *,
-        question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
         with get_session(self.database_url) as session:
             statement = (
-                select(TypingQuestionRecord, QuestionTypeRecord.code)
-                .join(QuestionTypeRecord, TypingQuestionRecord.question_type_id == QuestionTypeRecord.id)
+                select(TypingQuestionRecord)
                 .order_by(TypingQuestionRecord.id)
             )
 
             if not include_inactive:
                 statement = statement.where(TypingQuestionRecord.is_active.is_(True))  # 無効問題を除外する
-
-            if question_type_codes:
-                normalized_codes = [
-                    QuestionTypeRecordCode(question_type.value) for question_type in question_type_codes
-                ]
-                statement = statement.where(QuestionTypeRecord.code.in_(normalized_codes))  # 種別で絞る
 
             if tag_codes:
                 normalized_tag_codes = list(normalize_tags(tag_codes))
@@ -133,22 +109,20 @@ class SqlModelQuestionRepository:
                 statement = statement.where(TypingQuestionRecord.id.in_(tagged_question_ids))  # タグを 1 件以上持つ問題だけに絞る
 
             rows = session.exec(statement).all()
-            question_ids = [int(record.id) for record, _ in rows]
+            question_ids = [int(record.id) for record in rows]
             tags_by_question_id = self._load_tags_by_question_id(session, question_ids)
 
         return [
             self._build_question(
                 record,
-                question_type_code.value,
                 tags_by_question_id.get(int(record.id), ()),
             )
-            for record, question_type_code in rows
+            for record in rows
         ]  # レコード一覧をエンティティ一覧へ変換する
 
     def create(self, question: Question) -> Question:
         with get_session(self.database_url) as session:
             record = TypingQuestionRecord(
-                question_type_id=self._resolve_question_type_id(session, question.question_type),
                 english_text=question.english,
                 japanese_text=question.japanese,
                 is_active=question.is_active,
@@ -159,12 +133,10 @@ class SqlModelQuestionRepository:
             session.commit()
             session.refresh(record)
 
-            question_type = session.get(QuestionTypeRecord, record.question_type_id)
             tags_by_question_id = self._load_tags_by_question_id(session, [int(record.id)])
 
         return self._build_question(
             record,
-            question_type.code.value,
             tags_by_question_id.get(int(record.id), ()),
         )  # 保存済みエンティティを返す
 
@@ -174,12 +146,6 @@ class SqlModelQuestionRepository:
 
             if record is None:
                 return None  # 対象がなければ何もしない
-
-            if "question_type" in updates:
-                record.question_type_id = self._resolve_question_type_id(
-                    session,
-                    updates["question_type"],
-                )  # 問題種別変更を反映する
 
             if "english" in updates:
                 record.english_text = str(updates["english"])  # 英文変更を反映する
@@ -198,17 +164,23 @@ class SqlModelQuestionRepository:
             session.commit()
             session.refresh(record)
 
-            question_type = session.get(QuestionTypeRecord, record.question_type_id)
             tags_by_question_id = self._load_tags_by_question_id(session, [int(record.id)])
 
         return self._build_question(
             record,
-            question_type.code.value,
             tags_by_question_id.get(int(record.id), ()),
         )  # 更新済みエンティティを返す
 
     def deactivate(self, question_id: int) -> bool:
         return self.update(question_id, {"is_active": False}) is not None  # 論理削除として無効化する
+
+    def list_tags(self) -> list[str]:
+        with get_session(self.database_url) as session:
+            codes = session.exec(
+                select(TagRecord.code).order_by(TagRecord.code)
+            ).all()
+
+        return [str(code) for code in codes]  # タグコード一覧をアルファベット順で返す
 
 
 class SqlModelStudyResultRepository:

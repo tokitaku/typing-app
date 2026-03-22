@@ -22,7 +22,6 @@ const sampleResult: StudyResult = {
 const sampleQuestions: Question[] = [
   {
     id: 1,
-    type: "word",
     english: "apple",
     japanese: "りんご",
     isActive: true,
@@ -126,7 +125,7 @@ describe("study result api", () => {
     );
   });
 
-  it("fetches questions with typed filters", async () => {
+  it("fetches questions with tag filters", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       json: async () => ({ questions: sampleQuestions })
@@ -136,13 +135,14 @@ describe("study result api", () => {
 
     await expect(
       fetchQuestionListResponse({
-        questionTypes: ["sentence"],
         tags: ["business"],
         includeInactive: false
       })
-    ).resolves.toEqual({ questions: sampleQuestions });
+    ).resolves.toEqual({
+      questions: sampleQuestions
+    });
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?question_types=sentence&tags=business&include_inactive=false",
+      "http://localhost:8000/questions?tags=business&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });
@@ -161,6 +161,91 @@ describe("study result api", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:8000/questions",
       expect.objectContaining({ cache: "no-store" })
+    );
+  });
+});
+
+import {
+  createQuestionResponse,
+  fetchTagListResponse,
+  updateQuestionResponse
+} from "@/shared/api/studyApiClient";
+
+describe("question management api", () => {
+  it("fetches available tags from the backend", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ tags: ["business", "daily", "word"] })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchTagListResponse()).resolves.toEqual({
+      tags: ["business", "daily", "word"]
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/tags",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
+  it("posts a new question to the backend", async () => {
+    const created: Question = {
+      id: 42,
+      english: "I love programming.",
+      japanese: "私はプログラミングが好きです。",
+      isActive: true,
+      tags: ["daily", "hobby"]
+    };
+
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => created
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      createQuestionResponse({
+        english: "I love programming.",
+        japanese: "私はプログラミングが好きです。",
+        tags: ["daily", "hobby"]
+      })
+    ).resolves.toEqual(created);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+  });
+
+  it("patches an existing question on the backend", async () => {
+    const updated: Question = {
+      id: 5,
+      english: "notebook",
+      japanese: "ノート",
+      isActive: false,
+      tags: ["office"]
+    };
+
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => updated
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      updateQuestionResponse(5, { is_active: false, tags: ["office"] })
+    ).resolves.toEqual(updated);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions/5",
+      expect.objectContaining({
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" }
+      })
     );
   });
 });

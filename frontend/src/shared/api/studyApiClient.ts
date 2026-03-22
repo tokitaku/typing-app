@@ -1,9 +1,12 @@
 import type {
+  QuestionCreateRequestDto,
   QuestionListResponseDto,
-  StudySummaryResponseDto
+  QuestionUpdateRequestDto,
+  StudySummaryResponseDto,
+  TagListResponseDto
 } from "@/shared/api/studyApiTypes";
 import type {
-  QuizType,
+  Question,
   StudyResult
 } from "@/shared/types/study";
 
@@ -14,9 +17,12 @@ function getApiBaseUrl(): string {
 }
 
 export type FetchQuestionListOptions = {
-  questionTypes?: QuizType[];
   tags?: string[];
   includeInactive?: boolean;
+};
+
+export type QuestionListResponse = {
+  questions: Question[];
 };
 
 async function readJsonResponse<T>(response: Response, errorMessage: string): Promise<T> {
@@ -30,12 +36,8 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
 export async function fetchQuestionListResponse(
   options: FetchQuestionListOptions = {},
   signal?: AbortSignal
-): Promise<QuestionListResponseDto> {
+): Promise<QuestionListResponse> {
   const searchParams = new URLSearchParams();
-
-  if (options.questionTypes && options.questionTypes.length > 0) {
-    searchParams.set("question_types", options.questionTypes.join(",")); // 問題種別フィルタを API 契約へ変換する
-  }
 
   if (options.tags && options.tags.length > 0) {
     searchParams.set("tags", options.tags.join(",")); // タグフィルタを API 契約へ変換する
@@ -54,7 +56,11 @@ export async function fetchQuestionListResponse(
     }
   );
 
-  return readJsonResponse<QuestionListResponseDto>(response, "Failed to fetch questions");
+  const payload = await readJsonResponse<QuestionListResponseDto>(response, "Failed to fetch questions");
+
+  return {
+    questions: payload.questions
+  };
 }
 
 export async function postStudyResult(result: StudyResult): Promise<StudyResult> {
@@ -96,4 +102,38 @@ export async function fetchTodayStudySummaryResponse(
     response,
     "Failed to fetch today summary"
   );
+}
+
+export async function fetchTagListResponse(signal?: AbortSignal): Promise<TagListResponseDto> {
+  const response = await fetch(`${getApiBaseUrl()}/tags`, {
+    cache: "no-store",
+    signal
+  });
+
+  return readJsonResponse<TagListResponseDto>(response, "Failed to fetch tags");  // タグ候補一覧を取得する
+}
+
+export async function createQuestionResponse(
+  data: QuestionCreateRequestDto
+): Promise<Question> {
+  const response = await fetch(`${getApiBaseUrl()}/questions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  return readJsonResponse<Question>(response, "Failed to create question");  // 新規問題を作成する
+}
+
+export async function updateQuestionResponse(
+  id: number,
+  data: QuestionUpdateRequestDto
+): Promise<Question> {
+  const response = await fetch(`${getApiBaseUrl()}/questions/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  return readJsonResponse<Question>(response, "Failed to update question");  // 既存問題を更新する
 }

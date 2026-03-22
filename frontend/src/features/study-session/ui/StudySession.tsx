@@ -103,7 +103,6 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
       <section className="problem-card">
         <div className="problem-meta">
-          <span>{currentQuiz.type === "word" ? "単語" : "短文"}</span>
           <span>{currentQuiz.tags.join(", ") || "tagless"}</span>
         </div>
         <p className="japanese-text">{currentQuiz.japanese}</p>
