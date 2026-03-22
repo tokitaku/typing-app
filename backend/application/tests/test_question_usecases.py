@@ -7,7 +7,7 @@ from backend.application.dtos import (
 )
 from backend.application.usecases import create_question, list_questions, list_quizzes, update_question
 from backend.domain.entities import Question, QuestionType
-from backend.tests.support.fakes import FakeQuestionRepository
+from backend.application.tests.fakes import FakeQuestionRepository
 
 
 def test_list_quizzes_use_case_excludes_inactive_questions() -> None:
@@ -116,4 +116,3 @@ def test_update_question_use_case_returns_none_for_unknown_id() -> None:
     result = update_question(repository, 999, UpdateQuestionCommand(english="ghost"))
 
     assert result is None  # エラー処理の仕様通り、存在しない ID に対しては None を返すことを検証
-

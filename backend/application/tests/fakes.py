@@ -88,4 +88,3 @@ class FakeStudyResultRepository:
             sessions=sessions,
             solved_problems=solved_problems,
         )  # 当日分だけを集計して返す
-

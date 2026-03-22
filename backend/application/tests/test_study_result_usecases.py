@@ -1,7 +1,7 @@
 from backend.application.dtos import DailyStudySummaryDto, RecordStudyResultCommand, StudyResultDto
 from backend.application.usecases import get_latest_study_result, get_today_study_summary, record_study_result
 from backend.domain.entities import StudyMode
-from backend.tests.support.fakes import FakeStudyResultRepository
+from backend.application.tests.fakes import FakeStudyResultRepository
 
 
 def test_study_result_use_cases_record_and_summarize_results() -> None:
@@ -39,4 +39,3 @@ def test_get_latest_study_result_returns_none_when_empty() -> None:
     result = get_latest_study_result(repository)
 
     assert result is None  # 空データ時の仕様通り、学習履歴が存在しない場合は None を返すことを検証
-
