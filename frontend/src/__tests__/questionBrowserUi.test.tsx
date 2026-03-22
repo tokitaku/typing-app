@@ -176,6 +176,35 @@ describe("question browser ui", () => {
     expect(html).toContain("保存中…");
   });
 
+  it("disables the same row edit trigger while saving tags", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: []
+          }
+        ]}
+        status="loaded"
+        tagEditState={{
+          questionId: 1,
+          tagDraft: [],
+          tagInputValue: "",
+          isSaving: true,
+          saveError: null
+        }}
+      />
+    );
+
+    expect(html).toContain("タグを編集");
+    expect(html).toContain("question-edit-tags-button\" disabled=\"\"");
+  });
+
   it("shows tag suggestions as datalist options", () => {
     const html = renderToStaticMarkup(
       <QuestionBrowserView

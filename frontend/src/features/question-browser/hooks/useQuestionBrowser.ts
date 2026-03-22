@@ -6,22 +6,17 @@ import {
   updateQuestionTags
 } from "@/features/question-browser/api/questionBrowserApi";
 import {
+  beginTagEdit,
+  cancelTagEdit as cancelTagEditTransition,
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
   normalizeTagInput,
   resolveQuestionBrowserStatus,
+  type TagEditState,
   type QuestionBrowserFilters,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { Question, QuizType } from "@/shared/types/study";
-
-export type TagEditState = {
-  questionId: number;
-  tagDraft: string[];
-  tagInputValue: string;
-  isSaving: boolean;
-  saveError: string | null;
-};
 
 type UseQuestionBrowserResult = {
   filters: QuestionBrowserFilters;
@@ -105,17 +100,12 @@ export function useQuestionBrowser(
   const beginEditTags = (questionId: number) => {
     const question = questions.find((question) => question.id === questionId);
 
-    if (!question) {
-      return;
-    }
-
-    setTagEditState({
-      questionId,
-      tagDraft: [...question.tags],
-      tagInputValue: "",
-      isSaving: false,
-      saveError: null
-    }); // 編集開始時に現在のタグをドラフトへコピーする
+    setTagEditState((current) =>
+      beginTagEdit({
+        current,
+        question
+      })
+    ); // 編集開始時に現在のタグをドラフトへコピーする
   };
 
   const addTagToEdit = (tag: string) => {
@@ -155,7 +145,7 @@ export function useQuestionBrowser(
   };
 
   const saveTagEdit = () => {
-    if (!tagEditState) {
+    if (!tagEditState || tagEditState.isSaving) {
       return;
     }
 
@@ -180,7 +170,7 @@ export function useQuestionBrowser(
   };
 
   const cancelTagEdit = () => {
-    setTagEditState(null);
+    setTagEditState((current) => cancelTagEditTransition(current));
   };
 
   return {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  beginTagEdit,
+  cancelTagEdit,
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
   getTagSuggestions,
@@ -120,6 +122,74 @@ describe("question browser use cases", () => {
       expect(
         getTagSuggestions(["word"], ["word"], "xyz")
       ).toEqual([]);
+    });
+  });
+
+  describe("tag edit transitions", () => {
+    it("keeps the current draft while saving even if edit is requested again", () => {
+      expect(
+        beginTagEdit({
+          current: {
+            questionId: 1,
+            tagDraft: ["updated"],
+            tagInputValue: "",
+            isSaving: true,
+            saveError: null
+          },
+          question: sampleQuestions[0]
+        })
+      ).toEqual({
+        questionId: 1,
+        tagDraft: ["updated"],
+        tagInputValue: "",
+        isSaving: true,
+        saveError: null
+      }); // 保存中は同じ行の再編集でドラフトを初期化しないことを検証
+    });
+
+    it("opens a fresh draft when not saving", () => {
+      expect(
+        beginTagEdit({
+          current: null,
+          question: sampleQuestions[0]
+        })
+      ).toEqual({
+        questionId: 1,
+        tagDraft: ["word"],
+        tagInputValue: "",
+        isSaving: false,
+        saveError: null
+      }); // 通常時は現在のタグ一覧を元に編集ドラフトを開始することを検証
+    });
+
+    it("does not cancel while saving", () => {
+      expect(
+        cancelTagEdit({
+          questionId: 1,
+          tagDraft: ["updated"],
+          tagInputValue: "",
+          isSaving: true,
+          saveError: null
+        })
+      ).toEqual({
+        questionId: 1,
+        tagDraft: ["updated"],
+        tagInputValue: "",
+        isSaving: true,
+        saveError: null
+      }); // 保存中はキャンセル操作でも編集状態を維持することを検証
+    });
+
+    it("cancels when not saving", () => {
+      expect(
+        cancelTagEdit({
+          questionId: 1,
+          tagDraft: ["word"],
+          tagInputValue: "",
+          isSaving: false,
+          saveError: null
+        })
+      ).toBeNull(); // 非保存中は編集状態を終了できることを検証
     });
   });
 });

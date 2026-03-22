@@ -9,6 +9,14 @@ export type QuestionBrowserFilters = {
 
 export type QuestionBrowserStatus = "loading" | "error" | "loaded" | "empty";
 
+export type TagEditState = {
+  questionId: number;
+  tagDraft: string[];
+  tagInputValue: string;
+  isSaving: boolean;
+  saveError: string | null;
+};
+
 type ResolveQuestionBrowserStatusInput = {
   isLoading: boolean;
   hasError: boolean;
@@ -71,4 +79,36 @@ export function getTagSuggestions(
   }
 
   return candidates.filter((tag) => tag.includes(normalized)); // 前方一致ではなく部分一致で候補を絞る
+}
+
+export function beginTagEdit({
+  current,
+  question
+}: {
+  current: TagEditState | null;
+  question?: Question;
+}): TagEditState | null {
+  if (!question) {
+    return current;
+  }
+
+  if (current?.isSaving) {
+    return current; // 保存中は編集中ドラフトを維持して再初期化を防ぐ
+  }
+
+  return {
+    questionId: question.id,
+    tagDraft: [...question.tags],
+    tagInputValue: "",
+    isSaving: false,
+    saveError: null
+  };
+}
+
+export function cancelTagEdit(current: TagEditState | null): TagEditState | null {
+  if (current?.isSaving) {
+    return current; // 保存中はキャンセルを受け付けず保存完了を待つ
+  }
+
+  return null;
 }

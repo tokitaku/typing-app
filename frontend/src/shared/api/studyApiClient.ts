@@ -3,6 +3,7 @@ import type {
   StudySummaryResponseDto
 } from "@/shared/api/studyApiTypes";
 import type {
+  Question,
   QuizType,
   StudyResult
 } from "@/shared/types/study";

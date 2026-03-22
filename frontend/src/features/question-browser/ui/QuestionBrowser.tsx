@@ -2,10 +2,11 @@
 
 import React from "react";
 import Link from "next/link";
-import { useQuestionBrowser, type TagEditState } from "@/features/question-browser/hooks/useQuestionBrowser";
+import { useQuestionBrowser } from "@/features/question-browser/hooks/useQuestionBrowser";
 import {
   getTagSuggestions,
   normalizeTagInput,
+  type TagEditState,
   type QuestionBrowserFilters,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
@@ -208,7 +209,7 @@ function renderQuestionTable(
                     className="text-link question-edit-tags-button"
                     disabled={
                       tagEditState !== null &&
-                      tagEditState.questionId !== question.id
+                      (tagEditState.questionId !== question.id || tagEditState.isSaving)
                     }
                     onClick={() => onBeginEditTags(question.id)}
                     type="button"
