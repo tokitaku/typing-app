@@ -11,8 +11,6 @@ from backend.domain.entities import DailyStudySummary, Question, QuestionType, S
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.domain.tag_rules import normalize_tags
 
-DEFAULT_INTERNAL_EIKEN_LEVEL_CODE = "3"
-
 
 def _parse_question_types(codes: list[str] | None) -> list[QuestionType] | None:
     if not codes:
@@ -72,7 +70,6 @@ def create_question(repository: QuestionRepository, command: CreateQuestionComma
     saved_question = repository.create(
         Question(
             id=None,
-            eiken_level_code=DEFAULT_INTERNAL_EIKEN_LEVEL_CODE,
             question_type=QuestionType(command.question_type),
             english=command.english,
             japanese=command.japanese,

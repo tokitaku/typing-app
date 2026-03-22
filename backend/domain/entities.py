@@ -15,7 +15,6 @@ class QuestionType(str, Enum):
 @dataclass(frozen=True)
 class Question:
     id: int | None
-    eiken_level_code: str
     question_type: QuestionType
     english: str
     japanese: str

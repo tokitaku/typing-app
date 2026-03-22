@@ -10,8 +10,8 @@ from backend.application.tests.fakes import FakeQuestionRepository
 def test_list_questions_use_case_includes_inactive_by_default() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, eiken_level_code="5", question_type=QuestionType.WORD, english="cat", japanese="猫", is_active=True),
-            Question(id=2, eiken_level_code="5", question_type=QuestionType.WORD, english="dog", japanese="犬", is_active=False),
+            Question(id=1, question_type=QuestionType.WORD, english="cat", japanese="猫", is_active=True),
+            Question(id=2, question_type=QuestionType.WORD, english="dog", japanese="犬", is_active=False),
         ]
     )
 
@@ -23,9 +23,9 @@ def test_list_questions_use_case_includes_inactive_by_default() -> None:
 def test_list_questions_use_case_with_type_filter() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, eiken_level_code="3", question_type=QuestionType.WORD, english="forest", japanese="森", is_active=True),
-            Question(id=2, eiken_level_code="3", question_type=QuestionType.SENTENCE, english="The forest is quiet.", japanese="森は静かだ。", is_active=True),
-            Question(id=3, eiken_level_code="2", question_type=QuestionType.WORD, english="acquire", japanese="習得する", is_active=True),
+            Question(id=1, question_type=QuestionType.WORD, english="forest", japanese="森", is_active=True),
+            Question(id=2, question_type=QuestionType.SENTENCE, english="The forest is quiet.", japanese="森は静かだ。", is_active=True),
+            Question(id=3, question_type=QuestionType.WORD, english="acquire", japanese="習得する", is_active=True),
         ]
     )
 
@@ -44,7 +44,6 @@ def test_list_questions_use_case_with_tag_filter() -> None:
         [
             Question(
                 id=1,
-                eiken_level_code="pre2",
                 question_type=QuestionType.WORD,
                 english="debate",
                 japanese="討論",
@@ -53,7 +52,6 @@ def test_list_questions_use_case_with_tag_filter() -> None:
             ),
             Question(
                 id=2,
-                eiken_level_code="pre2",
                 question_type=QuestionType.SENTENCE,
                 english="We discussed climate policy.",
                 japanese="私たちは気候政策を議論した。",
@@ -110,7 +108,7 @@ def test_create_question_use_case_normalizes_tags() -> None:
 def test_update_question_use_case_updates_fields() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=10, eiken_level_code="4", question_type=QuestionType.WORD, english="river", japanese="川", is_active=True),
+            Question(id=10, question_type=QuestionType.WORD, english="river", japanese="川", is_active=True),
         ]
     )
 
@@ -131,7 +129,6 @@ def test_update_question_use_case_replaces_tags() -> None:
         [
             Question(
                 id=10,
-                eiken_level_code="4",
                 question_type=QuestionType.WORD,
                 english="river",
                 japanese="川",

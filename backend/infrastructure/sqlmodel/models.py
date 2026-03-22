@@ -14,15 +14,6 @@ class QuestionTypeRecordCode(str, Enum):
     SENTENCE = "sentence"  # 短文問題を表す
 
 
-class EikenLevelRecord(SQLModel, table=True):
-    __tablename__ = "eiken_levels"
-
-    id: int | None = Field(default=None, primary_key=True)
-    code: str = Field(index=True)
-    name: str
-    sort_order: int = Field(index=True)
-
-
 class QuestionTypeRecord(SQLModel, table=True):
     __tablename__ = "question_types"
 
@@ -35,7 +26,6 @@ class TypingQuestionRecord(SQLModel, table=True):
     __tablename__ = "typing_questions"
 
     id: int | None = Field(default=None, primary_key=True)
-    eiken_level_id: int = Field(foreign_key="eiken_levels.id", index=True)
     question_type_id: int = Field(foreign_key="question_types.id", index=True)
     english_text: str = Field(index=True)
     japanese_text: str

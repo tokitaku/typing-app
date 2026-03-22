@@ -8,7 +8,6 @@ from backend.database import get_session
 from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyMode, StudyResult
 from backend.domain.tag_rules import normalize_tags
 from backend.infrastructure.sqlmodel.models import (
-    EikenLevelRecord,
     TagRecord,
     QuestionTypeRecord,
     QuestionTypeRecordCode,
@@ -22,16 +21,6 @@ from backend.infrastructure.sqlmodel.models import (
 class SqlModelQuestionRepository:
     def __init__(self, database_url: str) -> None:
         self.database_url = database_url
-
-    def _resolve_eiken_level_id(self, session, code: str) -> int:
-        record = session.exec(
-            select(EikenLevelRecord).where(EikenLevelRecord.code == code)
-        ).first()  # 英検級コードをマスタ ID に変換する
-
-        if record is None:
-            raise ValueError(f"Unknown eiken level code: {code}")  # 未知の英検級は失敗させる
-
-        return int(record.id)
 
     def _resolve_question_type_id(self, session, question_type: QuestionType) -> int:
         record = session.exec(
@@ -99,13 +88,11 @@ class SqlModelQuestionRepository:
     def _build_question(
         self,
         record: TypingQuestionRecord,
-        eiken_level_code: str,
         question_type_code: str,
         tags: tuple[str, ...],
     ) -> Question:
         return Question(
             id=int(record.id),
-            eiken_level_code=eiken_level_code,
             question_type=QuestionType(question_type_code),
             english=record.english_text,
             japanese=record.japanese_text,
@@ -116,24 +103,19 @@ class SqlModelQuestionRepository:
     def list_questions(
         self,
         *,
-        eiken_level_codes: list[str] | None = None,
         question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
         with get_session(self.database_url) as session:
             statement = (
-                select(TypingQuestionRecord, EikenLevelRecord.code, QuestionTypeRecord.code)
-                .join(EikenLevelRecord, TypingQuestionRecord.eiken_level_id == EikenLevelRecord.id)
+                select(TypingQuestionRecord, QuestionTypeRecord.code)
                 .join(QuestionTypeRecord, TypingQuestionRecord.question_type_id == QuestionTypeRecord.id)
                 .order_by(TypingQuestionRecord.id)
             )
 
             if not include_inactive:
                 statement = statement.where(TypingQuestionRecord.is_active.is_(True))  # 無効問題を除外する
-
-            if eiken_level_codes:
-                statement = statement.where(EikenLevelRecord.code.in_(eiken_level_codes))  # 英検級で絞る
 
             if question_type_codes:
                 normalized_codes = [
@@ -151,23 +133,21 @@ class SqlModelQuestionRepository:
                 statement = statement.where(TypingQuestionRecord.id.in_(tagged_question_ids))  # タグを 1 件以上持つ問題だけに絞る
 
             rows = session.exec(statement).all()
-            question_ids = [int(record.id) for record, _, _ in rows]
+            question_ids = [int(record.id) for record, _ in rows]
             tags_by_question_id = self._load_tags_by_question_id(session, question_ids)
 
         return [
             self._build_question(
                 record,
-                eiken_level_code,
                 question_type_code.value,
                 tags_by_question_id.get(int(record.id), ()),
             )
-            for record, eiken_level_code, question_type_code in rows
+            for record, question_type_code in rows
         ]  # レコード一覧をエンティティ一覧へ変換する
 
     def create(self, question: Question) -> Question:
         with get_session(self.database_url) as session:
             record = TypingQuestionRecord(
-                eiken_level_id=self._resolve_eiken_level_id(session, question.eiken_level_code),
                 question_type_id=self._resolve_question_type_id(session, question.question_type),
                 english_text=question.english,
                 japanese_text=question.japanese,
@@ -179,13 +159,11 @@ class SqlModelQuestionRepository:
             session.commit()
             session.refresh(record)
 
-            eiken_level = session.get(EikenLevelRecord, record.eiken_level_id)
             question_type = session.get(QuestionTypeRecord, record.question_type_id)
             tags_by_question_id = self._load_tags_by_question_id(session, [int(record.id)])
 
         return self._build_question(
             record,
-            eiken_level.code,
             question_type.code.value,
             tags_by_question_id.get(int(record.id), ()),
         )  # 保存済みエンティティを返す
@@ -196,12 +174,6 @@ class SqlModelQuestionRepository:
 
             if record is None:
                 return None  # 対象がなければ何もしない
-
-            if "eiken_level_code" in updates:
-                record.eiken_level_id = self._resolve_eiken_level_id(
-                    session,
-                    str(updates["eiken_level_code"]),
-                )  # 英検級変更を反映する
 
             if "question_type" in updates:
                 record.question_type_id = self._resolve_question_type_id(
@@ -226,13 +198,11 @@ class SqlModelQuestionRepository:
             session.commit()
             session.refresh(record)
 
-            eiken_level = session.get(EikenLevelRecord, record.eiken_level_id)
             question_type = session.get(QuestionTypeRecord, record.question_type_id)
             tags_by_question_id = self._load_tags_by_question_id(session, [int(record.id)])
 
         return self._build_question(
             record,
-            eiken_level.code,
             question_type.code.value,
             tags_by_question_id.get(int(record.id), ()),
         )  # 更新済みエンティティを返す
