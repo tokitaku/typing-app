@@ -1,13 +1,15 @@
 import sqlite3
 
-from fastapi.testclient import TestClient
 from sqlmodel import SQLModel, create_engine
 
-from backend.main import create_app
+from backend.database import migrate_database
+from backend.domain.entities import QuestionType
 from backend.infrastructure.sqlmodel import models  # noqa: F401  # 旧 create_all スキーマを再現するため import する
+from backend.infrastructure.sqlmodel.bootstrap import bootstrap_database
+from backend.infrastructure.sqlmodel.repositories import SqlModelQuestionRepository
 
 
-def test_create_app_migrates_legacy_words_into_questions(tmp_path) -> None:
+def test_bootstrap_database_migrates_legacy_words_into_questions(tmp_path) -> None:
     database_path = tmp_path / "legacy.db"
     connection = sqlite3.connect(database_path)
     connection.execute(
@@ -32,23 +34,26 @@ def test_create_app_migrates_legacy_words_into_questions(tmp_path) -> None:
 
     database_url = f"sqlite:///{database_path}"
 
-    with TestClient(create_app(database_url)) as migrated_client:
-        response = migrated_client.get("/quizzes?question_types=word")
+    bootstrap_database(database_url)
 
-    assert response.status_code == 200
-    body = response.json()
+    repository = SqlModelQuestionRepository(database_url)
+    questions = repository.list_questions(
+        eiken_level_codes=["4"],
+        question_type_codes=[QuestionType.WORD],
+        include_inactive=True,
+    )
+
     assert any(
-        quiz["english"] == "legacy-word" and quiz["eikenLevel"] == "4"
-        for quiz in body["quizzes"]
+        question.english == "legacy-word" and question.japanese == "旧データ"
+        for question in questions
     )
 
 
-def test_create_app_applies_alembic_migrations(tmp_path) -> None:
+def test_migrate_database_applies_alembic_migrations(tmp_path) -> None:
     database_path = tmp_path / "migrated.db"
     database_url = f"sqlite:///{database_path}"
 
-    with TestClient(create_app(database_url)):
-        pass  # アプリ起動時の lifespan で migration 実行だけを確認する
+    migrate_database(database_url)
 
     connection = sqlite3.connect(database_path)
     tables = {
@@ -68,13 +73,12 @@ def test_create_app_applies_alembic_migrations(tmp_path) -> None:
     } <= tables
 
 
-def test_create_app_stamps_existing_schema_without_recreating_tables(tmp_path) -> None:
+def test_migrate_database_stamps_existing_schema_without_recreating_tables(tmp_path) -> None:
     database_path = tmp_path / "existing.db"
     database_url = f"sqlite:///{database_path}"
     SQLModel.metadata.create_all(create_engine(database_url))  # 旧実装の create_all だけ済んだ DB を再現する
 
-    with TestClient(create_app(database_url)):
-        pass  # Alembic 導入後も既存 DB で起動できることを確認する
+    migrate_database(database_url)
 
     connection = sqlite3.connect(database_path)
     tables = {

@@ -16,7 +16,7 @@ test-frontend:
 	cd frontend && npm test
 
 test-backend:
-	uv run --project backend pytest backend/tests
+	uv run --project backend pytest backend
 
 migrate-backend:
 	uv run --project backend alembic -c backend/alembic.ini upgrade head

@@ -1,6 +1,8 @@
+from fastapi.testclient import TestClient
 import pytest
 
-from backend.main import create_app
+from backend.presentation import api
+from backend.presentation.api import create_app
 
 
 def test_health_returns_ok(client) -> None:
@@ -8,6 +10,24 @@ def test_health_returns_ok(client) -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_create_app_bootstraps_database_on_startup(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    database_url = f"sqlite:///{tmp_path / 'startup.db'}"
+    bootstrapped_urls: list[str] = []
+
+    def fake_bootstrap_database(received_database_url: str) -> None:
+        bootstrapped_urls.append(received_database_url)  # lifespan が解決済み DB URL を受け取ることを記録する
+
+    monkeypatch.setattr(api, "bootstrap_database", fake_bootstrap_database)
+
+    with TestClient(create_app(database_url)):
+        pass  # 起動と終了だけ行い、lifespan から bootstrap が呼ばれることを確認する
+
+    assert bootstrapped_urls == [database_url]
 
 
 def test_create_app_allows_default_cors_origin_when_env_is_unset(monkeypatch: pytest.MonkeyPatch) -> None:
