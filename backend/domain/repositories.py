@@ -22,6 +22,9 @@ class QuestionRepository(Protocol):
     def deactivate(self, question_id: int) -> bool:
         ...
 
+    def list_tags(self) -> list[str]:
+        ...
+
 
 class StudyResultRepository(Protocol):
     def save(self, result: StudyResult) -> StudyResult:

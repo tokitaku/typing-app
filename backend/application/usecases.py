@@ -110,6 +110,10 @@ def deactivate_question(repository: QuestionRepository, question_id: int) -> boo
     return repository.deactivate(question_id)  # 論理削除を委譲する
 
 
+def list_tags(repository: QuestionRepository) -> list[str]:
+    return repository.list_tags()  # 登録済みタグコードをアルファベット順・重複なしで返す
+
+
 def record_study_result(
     repository: StudyResultRepository,
     command: RecordStudyResultCommand,

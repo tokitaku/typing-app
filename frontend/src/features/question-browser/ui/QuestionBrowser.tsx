@@ -7,6 +7,8 @@ import type {
   QuestionBrowserFilters,
   QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
+import type { QuestionFormValues } from "@/features/question-browser/application/questionForm";
+import { QuestionForm } from "@/features/question-browser/ui/QuestionForm";
 import type { Question, QuizType } from "@/shared/types/study";
 
 const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
@@ -23,6 +25,14 @@ export type QuestionBrowserViewProps = {
   onSetQuestionTypes: (questionTypes: QuizType[]) => void;
   onSetIncludeInactive: (includeInactive: boolean) => void;
   onReload: () => void;
+  formState: { mode: null } | { mode: "create" } | { mode: "edit"; question: Question };
+  availableTags: string[];
+  isFormSubmitting: boolean;
+  formSubmitError: string | null;
+  onOpenCreateForm: () => void;
+  onOpenEditForm: (question: Question) => void;
+  onCloseForm: () => void;
+  onSubmitForm: (values: QuestionFormValues) => void;
 };
 
 function toggleSelection<T extends string>(values: T[], value: T): T[] {
@@ -38,7 +48,10 @@ function parseTagInput(value: string): string[] {
     .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index); // 入力値を tags query 向けの配列へ正規化する
 }
 
-function renderQuestionTable(questions: Question[]) {
+function renderQuestionTable(
+  questions: Question[],
+  onOpenEditForm: (question: Question) => void
+) {
   return (
     <div className="question-table-scroll">
       <table className="question-table">
@@ -50,6 +63,7 @@ function renderQuestionTable(questions: Question[]) {
             <th scope="col">日本語</th>
             <th scope="col">タグ</th>
             <th scope="col">状態</th>
+            <th scope="col">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +73,19 @@ function renderQuestionTable(questions: Question[]) {
               <td>{question.type === "word" ? "英単語" : "英文章"}</td>
               <td className="question-table-text">{question.english}</td>
               <td className="question-table-text">{question.japanese}</td>
-              <td className="question-table-text">{question.tags.join(", ") || "-"}</td>
+              <td className="question-table-tags">
+                {question.tags.length > 0 ? (
+                  <div className="question-tag-list">
+                    {question.tags.map((tag) => (
+                      <span className="question-tag-badge" key={tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  "-"
+                )}
+              </td>
               <td>
                 <span
                   className={
@@ -70,6 +96,15 @@ function renderQuestionTable(questions: Question[]) {
                 >
                   {question.isActive ? "有効" : "無効"}
                 </span>
+              </td>
+              <td>
+                <button
+                  className="secondary-button question-browser-button question-edit-button"
+                  onClick={() => onOpenEditForm(question)}
+                  type="button"
+                >
+                  編集
+                </button>
               </td>
             </tr>
           ))}
@@ -87,7 +122,15 @@ export function QuestionBrowserView({
   onSetTags,
   onSetQuestionTypes,
   onSetIncludeInactive,
-  onReload
+  onReload,
+  formState,
+  availableTags,
+  isFormSubmitting,
+  formSubmitError,
+  onOpenCreateForm,
+  onOpenEditForm,
+  onCloseForm,
+  onSubmitForm
 }: QuestionBrowserViewProps) {
   return (
     <main className="page-shell">
@@ -104,8 +147,27 @@ export function QuestionBrowserView({
           <button className="primary-button question-browser-button" onClick={onReload} type="button">
             再読み込み
           </button>
+          <button
+            className="primary-button question-browser-button"
+            onClick={onOpenCreateForm}
+            type="button"
+          >
+            新規作成
+          </button>
         </div>
       </section>
+
+      {formState.mode !== null ? (
+        <QuestionForm
+          availableTags={availableTags}
+          isSubmitting={isFormSubmitting}
+          mode={formState.mode}
+          onCancel={onCloseForm}
+          onSubmit={onSubmitForm}
+          question={formState.mode === "edit" ? formState.question : undefined}
+          submitError={formSubmitError}
+        />
+      ) : null}
 
       <section className="settings-section question-filter-section">
         <label className="settings-label" htmlFor="question-tags">
@@ -179,7 +241,7 @@ export function QuestionBrowserView({
               <h2>{questions.length} 件の問題</h2>
             </div>
           </div>
-          {renderQuestionTable(questions)}
+          {renderQuestionTable(questions, onOpenEditForm)}
         </section>
       ) : null}
     </main>
@@ -195,17 +257,33 @@ export function QuestionBrowser() {
     setTags,
     setQuestionTypes,
     setIncludeInactive,
-    reload
+    reload,
+    formState,
+    availableTags,
+    isFormSubmitting,
+    formSubmitError,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    submitForm
   } = useQuestionBrowser();
 
   return (
     <QuestionBrowserView
+      availableTags={availableTags}
       errorMessage={errorMessage}
       filters={filters}
+      formState={formState}
+      formSubmitError={formSubmitError}
+      isFormSubmitting={isFormSubmitting}
+      onCloseForm={closeForm}
+      onOpenCreateForm={openCreateForm}
+      onOpenEditForm={openEditForm}
       onReload={reload}
       onSetTags={setTags}
       onSetIncludeInactive={setIncludeInactive}
       onSetQuestionTypes={setQuestionTypes}
+      onSubmitForm={submitForm}
       questions={questions}
       status={status}
     />

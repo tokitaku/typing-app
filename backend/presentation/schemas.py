@@ -74,6 +74,10 @@ class QuestionListResponse(BaseModel):
     questions: list[QuestionResponse]
 
 
+class TagListResponse(BaseModel):
+    tags: list[str]
+
+
 class StudyResultRequest(BaseModel):
     mode: Literal["learn", "review"]
     total_questions: int = Field(ge=1)

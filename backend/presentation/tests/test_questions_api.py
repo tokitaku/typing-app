@@ -256,3 +256,61 @@ def test_delete_question_returns_not_found_for_unknown_id(client) -> None:
     response = client.delete("/questions/99999")
 
     assert response.status_code == 404  # 存在しないリソースへの操作を拒否するエラーハンドリング仕様を検証
+
+
+def test_get_tags_returns_seeded_tags_initially(client) -> None:
+    response = client.get("/tags")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "sentence" in body["tags"]  # 初期投入された問題種別タグが含まれることを検証
+    assert "word" in body["tags"]
+
+
+def test_get_tags_returns_tags_from_created_questions(client) -> None:
+    client.post(
+        "/questions",
+        json={
+            "question_type": "word",
+            "english": "notebook",
+            "japanese": "ノート",
+            "tags": ["daily", "writing"],
+        },
+    )
+    client.post(
+        "/questions",
+        json={
+            "question_type": "sentence",
+            "english": "I love programming.",
+            "japanese": "私はプログラミングが好きです。",
+            "tags": ["daily", "hobby"],
+        },
+    )
+
+    response = client.get("/tags")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "daily" in body["tags"]  # 作成した問題のタグが一覧に含まれることを検証
+    assert "writing" in body["tags"]
+    assert "hobby" in body["tags"]
+    assert body["tags"] == sorted(body["tags"])  # タグがアルファベット順で返されることを検証
+
+
+def test_get_tags_returns_normalized_tags(client) -> None:
+    client.post(
+        "/questions",
+        json={
+            "question_type": "word",
+            "english": "apple",
+            "japanese": "リンゴ",
+            "tags": [" Business ", "WRITING"],
+        },
+    )
+
+    response = client.get("/tags")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "business" in body["tags"]  # 大文字・前後スペースは正規化されて保存されることを検証
+    assert "writing" in body["tags"]
