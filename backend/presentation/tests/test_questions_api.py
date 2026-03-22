@@ -4,6 +4,7 @@ def test_post_question_creates_new_sentence_question(client) -> None:
         "question_type": "sentence",
         "english": "I will call you after I get home.",
         "japanese": "家に着いたら電話します。",
+        "tags": [" Speaking ", "speaking", "daily"],
     }
 
     response = client.post("/questions", json=payload)
@@ -15,6 +16,7 @@ def test_post_question_creates_new_sentence_question(client) -> None:
     assert body["english"] == payload["english"]
     assert body["japanese"] == payload["japanese"]
     assert body["isActive"] is True
+    assert body["tags"] == ["speaking", "daily"]
 
 
 def test_get_questions_returns_registered_questions(client) -> None:
@@ -42,6 +44,7 @@ def test_get_questions_returns_registered_questions(client) -> None:
         "english": "notebook",
         "japanese": "ノート",
         "isActive": True,
+        "tags": [],
     }
 
 
@@ -65,6 +68,7 @@ def test_patch_question_updates_existing_question(client) -> None:
             "english": "I bought a new notebook yesterday.",
             "japanese": "昨日新しいノートを買いました。",
             "is_active": False,
+            "tags": [" Diary ", "daily", "daily"],
         },
     )
 
@@ -76,6 +80,7 @@ def test_patch_question_updates_existing_question(client) -> None:
         "english": "I bought a new notebook yesterday.",
         "japanese": "昨日新しいノートを買いました。",
         "isActive": False,
+        "tags": ["diary", "daily"],
     }
 
 
@@ -118,6 +123,21 @@ def test_post_question_rejects_whitespace_only_fields(client) -> None:
             "question_type": "word",
             "english": "   ",
             "japanese": "\t",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_post_question_rejects_whitespace_only_tags(client) -> None:
+    response = client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "3",
+            "question_type": "word",
+            "english": "topic",
+            "japanese": "話題",
+            "tags": ["   "],
         },
     )
 
@@ -192,6 +212,36 @@ def test_get_questions_filters_by_question_type(client) -> None:
     assert all(q["type"] == "sentence" for q in body["questions"])  # question_types フィルタの仕様通り指定された種別の問題のみが返却されることを検証
 
 
+def test_get_questions_filters_by_tags(client) -> None:
+    client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "pre1",
+            "question_type": "sentence",
+            "english": "The proposal needs stronger evidence.",
+            "japanese": "その提案にはより強い根拠が必要だ。",
+            "tags": ["Essay", "Writing"],
+        },
+    )
+    client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "pre1",
+            "question_type": "sentence",
+            "english": "The city expanded the subway network.",
+            "japanese": "その都市は地下鉄網を拡張した。",
+            "tags": ["Infrastructure"],
+        },
+    )
+
+    response = client.get("/questions?tags=writing")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["questions"]) > 0
+    assert all("writing" in q["tags"] for q in body["questions"])  # タグフィルタは一致するタグを持つ問題だけを返すことを検証
+
+
 def test_get_questions_excludes_inactive_when_flag_is_false(client) -> None:
     created = client.post(
         "/questions",
@@ -246,6 +296,13 @@ def test_get_questions_returns_422_for_invalid_question_type(client) -> None:
     response = client.get("/questions?question_types=invalid_type")
 
     assert response.status_code == 422  # 不正なマスタコード値を拒否するバリデーション仕様を検証（GET /questions）
+
+
+def test_get_questions_treats_blank_tag_query_as_no_filter(client) -> None:
+    response = client.get("/questions?tags=%20")
+
+    assert response.status_code == 200  # 空白だけの tags クエリは _parse_csv_query で除去され、フィルタなしとして扱われることを検証
+    assert len(response.json()["questions"]) > 0
 
 
 def test_delete_question_returns_not_found_for_unknown_id(client) -> None:

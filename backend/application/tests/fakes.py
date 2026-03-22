@@ -12,6 +12,7 @@ class FakeQuestionRepository:
         *,
         eiken_level_codes: list[str] | None = None,
         question_type_codes: list[QuestionType] | None = None,
+        tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
         filtered = self.questions
@@ -29,6 +30,12 @@ class FakeQuestionRepository:
                 question for question in filtered if question.question_type in question_type_codes
             ]  # 問題種別で絞る
 
+        if tag_codes:
+            normalized_codes = {code.lower() for code in tag_codes}
+            filtered = [
+                question for question in filtered if normalized_codes.intersection(question.tags)
+            ]  # タグ一致が 1 件以上ある問題だけを残す
+
         return filtered
 
     def create(self, question: Question) -> Question:
@@ -39,6 +46,7 @@ class FakeQuestionRepository:
             english=question.english,
             japanese=question.japanese,
             is_active=question.is_active,
+            tags=question.tags,
         )
         self._next_id += 1
         self.questions.append(saved)
@@ -54,6 +62,7 @@ class FakeQuestionRepository:
                     english=updates.get("english", q.english),
                     japanese=updates.get("japanese", q.japanese),
                     is_active=updates.get("is_active", q.is_active),
+                    tags=updates.get("tags", q.tags),
                 )
                 self.questions[i] = updated
                 return updated  # リポジトリの実装と同じ戻り値の契約を再現するため更新後のエンティティを返す

@@ -89,6 +89,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     def get_quizzes(
         eiken_levels: str | None = Query(default=None),
         question_types: str | None = Query(default=None),
+        tags: str | None = Query(default=None),
     ) -> QuizListResponse:
         try:
             quizzes = list_quizzes(
@@ -96,6 +97,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
                 ListQuizzesQuery(
                     eiken_level_codes=_parse_csv_query(eiken_levels),
                     question_type_codes=_parse_csv_query(question_types),
+                    tag_codes=_parse_csv_query(tags),
                 ),
             )
         except ValueError as error:
@@ -107,6 +109,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
     def get_questions(
         eiken_levels: str | None = Query(default=None),
         question_types: str | None = Query(default=None),
+        tags: str | None = Query(default=None),
         include_inactive: bool = Query(default=True),
     ) -> QuestionListResponse:
         try:
@@ -115,6 +118,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
                 ListQuestionsQuery(
                     eiken_level_codes=_parse_csv_query(eiken_levels),
                     question_type_codes=_parse_csv_query(question_types),
+                    tag_codes=_parse_csv_query(tags),
                     include_inactive=include_inactive,
                 ),
             )

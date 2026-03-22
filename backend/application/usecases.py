@@ -11,6 +11,7 @@ from backend.application.dtos import (
 )
 from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyMode, StudyResult
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
+from backend.domain.tag_rules import normalize_tags
 
 
 def _parse_question_types(codes: list[str] | None) -> list[QuestionType] | None:
@@ -20,6 +21,14 @@ def _parse_question_types(codes: list[str] | None) -> list[QuestionType] | None:
     return [QuestionType(code) for code in codes]  # 文字列入力を enum へ変換する
 
 
+def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
+    if not codes:
+        return None  # 未指定時はフィルタなしとして扱う
+
+    normalized_codes = list(normalize_tags(codes))
+    return normalized_codes if normalized_codes else None  # 空配列相当ならフィルタなしとして扱う
+
+
 def _to_quiz_dto(question: Question) -> QuizDto:
     return QuizDto(
         id=int(question.id),
@@ -27,6 +36,7 @@ def _to_quiz_dto(question: Question) -> QuizDto:
         eikenLevel=question.eiken_level_code,
         english=question.english,
         japanese=question.japanese,
+        tags=list(question.tags),
     )  # 出題用 DTO へ詰め替える
 
 
@@ -38,6 +48,7 @@ def _to_question_dto(question: Question) -> QuestionDto:
         english=question.english,
         japanese=question.japanese,
         isActive=question.is_active,
+        tags=list(question.tags),
     )  # 管理用 DTO へ詰め替える
 
 
@@ -64,6 +75,7 @@ def list_quizzes(repository: QuestionRepository, query: ListQuizzesQuery) -> lis
     questions = repository.list_questions(
         eiken_level_codes=query.eiken_level_codes,
         question_type_codes=_parse_question_types(query.question_type_codes),
+        tag_codes=_parse_tag_codes(query.tag_codes),
         include_inactive=False,
     )
     return [_to_quiz_dto(question) for question in questions]  # 出題画面向け DTO 一覧を返す
@@ -73,6 +85,7 @@ def list_questions(repository: QuestionRepository, query: ListQuestionsQuery) ->
     questions = repository.list_questions(
         eiken_level_codes=query.eiken_level_codes,
         question_type_codes=_parse_question_types(query.question_type_codes),
+        tag_codes=_parse_tag_codes(query.tag_codes),
         include_inactive=query.include_inactive,
     )
     return [_to_question_dto(question) for question in questions]  # 管理画面向け DTO 一覧を返す
@@ -87,6 +100,7 @@ def create_question(repository: QuestionRepository, command: CreateQuestionComma
             english=command.english,
             japanese=command.japanese,
             is_active=True,
+            tags=normalize_tags(command.tags),
         )
     )
     return _to_question_dto(saved_question)  # 保存結果を DTO にして返す
@@ -113,6 +127,9 @@ def update_question(
 
     if command.is_active is not None:
         updates["is_active"] = command.is_active  # 有効フラグ変更を詰める
+
+    if command.tags is not None:
+        updates["tags"] = normalize_tags(command.tags)  # タグ一覧を正規化して全置換する
 
     saved_question = repository.update(question_id, updates)
     return _to_question_dto(saved_question) if saved_question is not None else None  # 対象があれば DTO を返す

@@ -63,6 +63,22 @@
               ],
               "title": "Question Types"
             }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tags"
+            }
           }
         ],
         "responses": {
@@ -124,6 +140,22 @@
                 }
               ],
               "title": "Question Types"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tags"
             }
           },
           {
@@ -413,6 +445,13 @@
             "type": "string",
             "minLength": 1,
             "title": "Japanese"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
           }
         },
         "type": "object",
@@ -469,6 +508,13 @@
           "isActive": {
             "type": "boolean",
             "title": "Isactive"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
           }
         },
         "type": "object",
@@ -478,7 +524,8 @@
           "eikenLevel",
           "english",
           "japanese",
-          "isActive"
+          "isActive",
+          "tags"
         ],
         "title": "QuestionResponse"
       },
@@ -545,6 +592,20 @@
               }
             ],
             "title": "Is Active"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
           }
         },
         "type": "object",
@@ -591,6 +652,13 @@
           "japanese": {
             "type": "string",
             "title": "Japanese"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
           }
         },
         "type": "object",
@@ -599,7 +667,8 @@
           "type",
           "eikenLevel",
           "english",
-          "japanese"
+          "japanese",
+          "tags"
         ],
         "title": "QuizResponse"
       },
