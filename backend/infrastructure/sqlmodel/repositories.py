@@ -174,6 +174,14 @@ class SqlModelQuestionRepository:
     def deactivate(self, question_id: int) -> bool:
         return self.update(question_id, {"is_active": False}) is not None  # 論理削除として無効化する
 
+    def list_tags(self) -> list[str]:
+        with get_session(self.database_url) as session:
+            codes = session.exec(
+                select(TagRecord.code).order_by(TagRecord.code)
+            ).all()
+
+        return [str(code) for code in codes]  # タグコード一覧をアルファベット順で返す
+
 
 class SqlModelStudyResultRepository:
     def __init__(self, database_url: str) -> None:

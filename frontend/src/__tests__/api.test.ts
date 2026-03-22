@@ -164,3 +164,88 @@ describe("study result api", () => {
     );
   });
 });
+
+import {
+  createQuestionResponse,
+  fetchTagListResponse,
+  updateQuestionResponse
+} from "@/shared/api/studyApiClient";
+
+describe("question management api", () => {
+  it("fetches available tags from the backend", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ tags: ["business", "daily", "word"] })
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchTagListResponse()).resolves.toEqual({
+      tags: ["business", "daily", "word"]
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/tags",
+      expect.objectContaining({ cache: "no-store" })
+    );
+  });
+
+  it("posts a new question to the backend", async () => {
+    const created: Question = {
+      id: 42,
+      english: "I love programming.",
+      japanese: "私はプログラミングが好きです。",
+      isActive: true,
+      tags: ["daily", "hobby"]
+    };
+
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => created
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      createQuestionResponse({
+        english: "I love programming.",
+        japanese: "私はプログラミングが好きです。",
+        tags: ["daily", "hobby"]
+      })
+    ).resolves.toEqual(created);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+  });
+
+  it("patches an existing question on the backend", async () => {
+    const updated: Question = {
+      id: 5,
+      english: "notebook",
+      japanese: "ノート",
+      isActive: false,
+      tags: ["office"]
+    };
+
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => updated
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      updateQuestionResponse(5, { is_active: false, tags: ["office"] })
+    ).resolves.toEqual(updated);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions/5",
+      expect.objectContaining({
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+  });
+});
