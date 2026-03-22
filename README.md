@@ -46,6 +46,42 @@ DB ボリュームも削除する場合:
 docker compose down -v
 ```
 
+### `git worktree` で並列開発する場合
+
+`.env` は必須ではありません。単一 worktree の既定値はそのまま `3000` / `8000` を使います。
+
+既定の worktree を起動する場合:
+
+```bash
+docker compose -p typing-app-a up --build
+```
+
+- フロントエンド: `http://localhost:3000`
+- バックエンド: `http://localhost:8000`
+
+2 本目の worktree を別ポートで起動する場合:
+
+```bash
+FRONTEND_PORT=3001 BACKEND_PORT=8001 NEXT_PUBLIC_API_BASE_URL=http://localhost:8001 BACKEND_CORS_ORIGINS=http://localhost:3001 docker compose -p typing-app-b up --build
+```
+
+- フロントエンド: `http://localhost:3001`
+- バックエンド: `http://localhost:8001`
+
+停止する場合:
+
+```bash
+docker compose -p typing-app-a down
+FRONTEND_PORT=3001 BACKEND_PORT=8001 NEXT_PUBLIC_API_BASE_URL=http://localhost:8001 BACKEND_CORS_ORIGINS=http://localhost:3001 docker compose -p typing-app-b down
+```
+
+利用できる環境変数:
+
+- `FRONTEND_PORT`: ホスト側のフロントエンド公開ポート。既定値は `3000`
+- `BACKEND_PORT`: ホスト側のバックエンド公開ポート。既定値は `8000`
+- `NEXT_PUBLIC_API_BASE_URL`: フロントエンドが参照する API の URL。未指定時は `http://localhost:${BACKEND_PORT}` を使う
+- `BACKEND_CORS_ORIGINS`: バックエンドが許可する origin。カンマ区切りで複数指定でき、未指定時は `http://localhost:${FRONTEND_PORT}` を使う
+
 ## よく使うコマンド
 
 ```bash

@@ -3,16 +3,19 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile.dev
-    command: npm run dev
+    command: >-
+      /bin/sh -c 'export NEXT_PUBLIC_API_BASE_URL="$${NEXT_PUBLIC_API_BASE_URL:-http://localhost:$${BACKEND_PORT:-8000}}";
+      npm run dev'
     working_dir: /app/frontend
     depends_on:
       backend:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+      BACKEND_PORT: ${BACKEND_PORT:-8000}
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-}
       WATCHPACK_POLLING: "true"
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules
@@ -21,9 +24,13 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile.dev
-    command: uv run --project backend uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir /app
+    command: >-
+      /bin/sh -c 'export BACKEND_CORS_ORIGINS="$${BACKEND_CORS_ORIGINS:-http://localhost:$${FRONTEND_PORT:-3000}}";
+      uv run --project backend uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir /app'
     environment:
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-}
       DATABASE_URL: sqlite:////data/app.db
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}
       WATCHFILES_FORCE_POLLING: "true"
     healthcheck:
       test:
@@ -36,7 +43,7 @@ services:
       retries: 12
       start_period: 5s
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ./backend:/app/backend
       - sqlite_data:/data

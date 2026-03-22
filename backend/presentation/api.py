@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import NoReturn
@@ -39,6 +40,8 @@ from backend.presentation.schemas import (
     StudyResultRequest,
 )
 
+DEFAULT_CORS_ORIGIN = "http://localhost:3000"
+
 
 def _parse_csv_query(value: str | None) -> list[str] | None:
     if value is None:
@@ -46,6 +49,12 @@ def _parse_csv_query(value: str | None) -> list[str] | None:
 
     parsed_values = [item.strip() for item in value.split(",") if item.strip()]
     return parsed_values if parsed_values else None  # 空配列ならフィルタなし扱いにする
+
+
+def _resolve_cors_origins(value: str | None = None) -> list[str]:
+    configured_value = value if value is not None else os.getenv("BACKEND_CORS_ORIGINS")
+    parsed_origins = _parse_csv_query(configured_value)
+    return parsed_origins or [DEFAULT_CORS_ORIGIN]  # 空文字や未指定時は既定の localhost を許可する
 
 
 def _handle_invalid_master_code(error: ValueError) -> NoReturn:
@@ -66,7 +75,7 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=_resolve_cors_origins(),
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "DELETE"],
         allow_headers=["*"],
