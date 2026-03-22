@@ -4,14 +4,14 @@ from backend.application.dtos import (
     UpdateQuestionCommand,
 )
 from backend.application.usecases import create_question, list_questions, update_question
-from backend.domain.entities import Question, QuestionType
+from backend.domain.entities import Question
 from backend.application.tests.fakes import FakeQuestionRepository
 
 def test_list_questions_use_case_includes_inactive_by_default() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, question_type=QuestionType.WORD, english="cat", japanese="猫", is_active=True),
-            Question(id=2, question_type=QuestionType.WORD, english="dog", japanese="犬", is_active=False),
+            Question(id=1, english="cat", japanese="猫", is_active=True),
+            Question(id=2, english="dog", japanese="犬", is_active=False),
         ]
     )
 
@@ -20,31 +20,11 @@ def test_list_questions_use_case_includes_inactive_by_default() -> None:
     assert len(result) == 2  # include_inactive=True の仕様通り、無効問題も含めて返却されることを検証
 
 
-def test_list_questions_use_case_with_type_filter() -> None:
-    repository = FakeQuestionRepository(
-        [
-            Question(id=1, question_type=QuestionType.WORD, english="forest", japanese="森", is_active=True),
-            Question(id=2, question_type=QuestionType.SENTENCE, english="The forest is quiet.", japanese="森は静かだ。", is_active=True),
-            Question(id=3, question_type=QuestionType.WORD, english="acquire", japanese="習得する", is_active=True),
-        ]
-    )
-
-    result = list_questions(
-        repository,
-        ListQuestionsQuery(question_type_codes=["word"]),
-    )
-
-    assert len(result) == 2
-    assert all(question.type == "word" for question in result)  # 種別フィルタだけで公開 DTO を絞り込めることを検証
-    assert all(not hasattr(question, "eikenLevel") for question in result)  # 公開 DTO に英検級が露出しないことを検証
-
-
 def test_list_questions_use_case_with_tag_filter() -> None:
     repository = FakeQuestionRepository(
         [
             Question(
                 id=1,
-                question_type=QuestionType.WORD,
                 english="debate",
                 japanese="討論",
                 is_active=True,
@@ -52,7 +32,6 @@ def test_list_questions_use_case_with_tag_filter() -> None:
             ),
             Question(
                 id=2,
-                question_type=QuestionType.SENTENCE,
                 english="We discussed climate policy.",
                 japanese="私たちは気候政策を議論した。",
                 is_active=True,
@@ -77,13 +56,11 @@ def test_create_question_use_case() -> None:
     result = create_question(
         repository,
         CreateQuestionCommand(
-            question_type="sentence",
             english="I have been studying English for three years.",
             japanese="私は3年間英語を勉強し続けている。",
         ),
     )
 
-    assert result.type == "sentence"
     assert result.english == "I have been studying English for three years."
     assert result.isActive is True  # ビジネスルールとして新規作成時は必ず有効状態で保存されることを検証
     assert not hasattr(result, "eikenLevel")  # 公開 DTO から英検級が除去されることを検証
@@ -95,7 +72,6 @@ def test_create_question_use_case_normalizes_tags() -> None:
     result = create_question(
         repository,
         CreateQuestionCommand(
-            question_type="word",
             english="Perspective",
             japanese="視点",
             tags=[" Essay ", "essay", "EIKEN "],
@@ -108,7 +84,7 @@ def test_create_question_use_case_normalizes_tags() -> None:
 def test_update_question_use_case_updates_fields() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=10, question_type=QuestionType.WORD, english="river", japanese="川", is_active=True),
+            Question(id=10, english="river", japanese="川", is_active=True),
         ]
     )
 
@@ -129,7 +105,6 @@ def test_update_question_use_case_replaces_tags() -> None:
         [
             Question(
                 id=10,
-                question_type=QuestionType.WORD,
                 english="river",
                 japanese="川",
                 is_active=True,

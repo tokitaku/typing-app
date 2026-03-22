@@ -22,7 +22,6 @@ const sampleResult: StudyResult = {
 const sampleQuestions: Question[] = [
   {
     id: 1,
-    type: "word",
     english: "apple",
     japanese: "りんご",
     isActive: true,
@@ -126,7 +125,7 @@ describe("study result api", () => {
     );
   });
 
-  it("fetches questions with typed filters", async () => {
+  it("fetches questions with tag filters", async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       json: async () => ({ questions: sampleQuestions })
@@ -136,13 +135,14 @@ describe("study result api", () => {
 
     await expect(
       fetchQuestionListResponse({
-        questionTypes: ["sentence"],
         tags: ["business"],
         includeInactive: false
       })
-    ).resolves.toEqual({ questions: sampleQuestions });
+    ).resolves.toEqual({
+      questions: sampleQuestions
+    });
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?question_types=sentence&tags=business&include_inactive=false",
+      "http://localhost:8000/questions?tags=business&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });
@@ -192,7 +192,6 @@ describe("question management api", () => {
   it("posts a new question to the backend", async () => {
     const created: Question = {
       id: 42,
-      type: "sentence",
       english: "I love programming.",
       japanese: "私はプログラミングが好きです。",
       isActive: true,
@@ -208,7 +207,6 @@ describe("question management api", () => {
 
     await expect(
       createQuestionResponse({
-        question_type: "sentence",
         english: "I love programming.",
         japanese: "私はプログラミングが好きです。",
         tags: ["daily", "hobby"]
@@ -226,7 +224,6 @@ describe("question management api", () => {
   it("patches an existing question on the backend", async () => {
     const updated: Question = {
       id: 5,
-      type: "word",
       english: "notebook",
       japanese: "ノート",
       isActive: false,

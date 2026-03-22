@@ -19,7 +19,7 @@ import {
   type QuestionBrowserFilters,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
-import type { Question, QuizType } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
 type FormState =
   | { mode: null }
@@ -32,7 +32,6 @@ type UseQuestionBrowserResult = {
   status: QuestionBrowserStatus;
   errorMessage: string | null;
   setTags: (tags: string[]) => void;
-  setQuestionTypes: (questionTypes: QuizType[]) => void;
   setIncludeInactive: (includeInactive: boolean) => void;
   reload: () => void;
   formState: FormState;
@@ -154,9 +153,6 @@ export function useQuestionBrowser(
     errorMessage,
     setTags: (tags) => {
       setFilters((current) => ({ ...current, tags }));
-    },
-    setQuestionTypes: (questionTypes) => {
-      setFilters((current) => ({ ...current, questionTypes }));
     },
     setIncludeInactive: (includeInactive) => {
       setFilters((current) => ({ ...current, includeInactive }));

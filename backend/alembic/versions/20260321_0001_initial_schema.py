@@ -47,7 +47,7 @@ def upgrade() -> None:
         sa.Column("correct_rate", sa.Integer(), nullable=False),
         sa.Column("mistakes", sa.Integer(), nullable=False),
         sa.Column("average_time", sa.Integer(), nullable=False),
-        sa.Column("created_at", sa.String(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )  # 学習結果テーブルを作成する
 

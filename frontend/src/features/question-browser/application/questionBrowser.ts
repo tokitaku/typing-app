@@ -1,9 +1,8 @@
 import type { FetchQuestionListOptions } from "@/shared/api/studyApiClient";
-import type { Question, QuizType } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
 export type QuestionBrowserFilters = {
   tags: string[];
-  questionTypes: QuizType[];
   includeInactive: boolean;
 };
 
@@ -18,7 +17,6 @@ type ResolveQuestionBrowserStatusInput = {
 export function createDefaultQuestionBrowserFilters(): QuestionBrowserFilters {
   return {
     tags: [],
-    questionTypes: [],
     includeInactive: false
   }; // 一覧閲覧の初期状態では有効問題のみを対象にする
 }
@@ -28,7 +26,6 @@ export function createQuestionBrowserQuery(
 ): FetchQuestionListOptions {
   return {
     tags: filters.tags,
-    questionTypes: filters.questionTypes,
     includeInactive: filters.includeInactive
   }; // filter state を API query 契約へそのまま写像する
 }

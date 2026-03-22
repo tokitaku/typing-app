@@ -8,12 +8,7 @@ import {
   type QuestionFormValues
 } from "@/features/question-browser/application/questionForm";
 import { TagInput } from "@/features/question-browser/ui/TagInput";
-import type { Question, QuizType } from "@/shared/types/study";
-
-const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
-  { value: "word", label: "英単語" },
-  { value: "sentence", label: "英文章" }
-];
+import type { Question } from "@/shared/types/study";
 
 export type QuestionFormProps = {
   mode: QuestionFormMode;
@@ -52,23 +47,6 @@ export function QuestionForm({
     <section className="question-form-card settings-section">
       <form onSubmit={handleSubmit}>
         <h2 className="question-form-title">{titleText}</h2>
-
-        <div className="question-form-field">
-          <p className="settings-label settings-subtitle">問題種別</p>
-          <div className="settings-chip-group">
-            {QUESTION_TYPE_OPTIONS.map((option) => (
-              <label className="settings-chip" key={option.value}>
-                <input
-                  checked={values.questionType === option.value}
-                  onChange={() => setValues((current) => ({ ...current, questionType: option.value }))}
-                  type="radio"
-                  name="question-type"
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
 
         <div className="question-form-field">
           <label className="settings-label settings-subtitle" htmlFor="question-english">

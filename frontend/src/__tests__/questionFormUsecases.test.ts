@@ -13,7 +13,6 @@ import type { Question } from "@/shared/types/study";
 
 const sampleQuestion: Question = {
   id: 1,
-  type: "word",
   english: "apple",
   japanese: "りんご",
   isActive: true,
@@ -22,9 +21,8 @@ const sampleQuestion: Question = {
 
 describe("question form use cases", () => {
   describe("createDefaultQuestionFormValues", () => {
-    it("returns empty form values with word as default type", () => {
+    it("returns empty form values", () => {
       expect(createDefaultQuestionFormValues()).toEqual({
-        questionType: "word",
         english: "",
         japanese: "",
         tags: []
@@ -35,7 +33,6 @@ describe("question form use cases", () => {
   describe("createFormValuesFromQuestion", () => {
     it("maps a question to form values", () => {
       expect(createFormValuesFromQuestion(sampleQuestion)).toEqual({
-        questionType: "word",
         english: "apple",
         japanese: "りんご",
         tags: ["word", "daily"]
@@ -143,13 +140,11 @@ describe("question form use cases", () => {
     it("converts form values to create request", () => {
       expect(
         buildCreateCommand({
-          questionType: "sentence",
           english: "I love programming.",
           japanese: "私はプログラミングが好きです。",
           tags: ["daily", "hobby"]
         })
       ).toEqual({
-        question_type: "sentence",
         english: "I love programming.",
         japanese: "私はプログラミングが好きです。",
         tags: ["daily", "hobby"]
@@ -161,7 +156,6 @@ describe("question form use cases", () => {
     it("includes only changed fields", () => {
       const updated = buildUpdateCommand(
         {
-          questionType: "word",
           english: "pineapple",  // 変更あり
           japanese: "りんご",
           tags: ["word", "daily"]
@@ -175,7 +169,6 @@ describe("question form use cases", () => {
     it("includes tags when they change", () => {
       const updated = buildUpdateCommand(
         {
-          questionType: "word",
           english: "apple",
           japanese: "りんご",
           tags: ["word"]  // daily を削除
@@ -195,7 +188,6 @@ describe("question form use cases", () => {
     it("includes all changed fields", () => {
       const updated = buildUpdateCommand(
         {
-          questionType: "sentence",
           english: "I ate an apple.",
           japanese: "私はりんごを食べた。",
           tags: ["sentence"]
@@ -204,7 +196,6 @@ describe("question form use cases", () => {
       );
 
       expect(updated).toEqual({
-        question_type: "sentence",
         english: "I ate an apple.",
         japanese: "私はりんごを食べた。",
         tags: ["sentence"]

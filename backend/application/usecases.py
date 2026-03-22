@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from backend.application.dtos import (
     CreateQuestionCommand,
     DailyStudySummaryDto,
@@ -7,16 +9,16 @@ from backend.application.dtos import (
     StudyResultDto,
     UpdateQuestionCommand,
 )
-from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyMode, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.domain.tag_rules import normalize_tags
 
 
-def _parse_question_types(codes: list[str] | None) -> list[QuestionType] | None:
-    if not codes:
-        return None  # 未指定時はフィルタなしとして扱う
+def _normalize_created_at(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
 
-    return [QuestionType(code) for code in codes]  # 文字列入力を enum へ変換する
+    return value.astimezone(timezone.utc)  # 内部では UTC に正規化して扱う
 
 
 def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
@@ -30,7 +32,6 @@ def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
 def _to_question_dto(question: Question) -> QuestionDto:
     return QuestionDto(
         id=int(question.id),
-        type=question.question_type.value,
         english=question.english,
         japanese=question.japanese,
         isActive=question.is_active,
@@ -59,7 +60,6 @@ def _to_summary_dto(summary: DailyStudySummary) -> DailyStudySummaryDto:
 
 def list_questions(repository: QuestionRepository, query: ListQuestionsQuery) -> list[QuestionDto]:
     questions = repository.list_questions(
-        question_type_codes=_parse_question_types(query.question_type_codes),
         tag_codes=_parse_tag_codes(query.tag_codes),
         include_inactive=query.include_inactive,
     )
@@ -70,7 +70,6 @@ def create_question(repository: QuestionRepository, command: CreateQuestionComma
     saved_question = repository.create(
         Question(
             id=None,
-            question_type=QuestionType(command.question_type),
             english=command.english,
             japanese=command.japanese,
             is_active=True,
@@ -86,9 +85,6 @@ def update_question(
     command: UpdateQuestionCommand,
 ) -> QuestionDto | None:
     updates: dict[str, object] = {}
-
-    if command.question_type is not None:
-        updates["question_type"] = QuestionType(command.question_type)  # 種別を enum へ正規化する
 
     if command.english is not None:
         updates["english"] = command.english  # 英文の変更を詰める
@@ -118,6 +114,7 @@ def record_study_result(
     repository: StudyResultRepository,
     command: RecordStudyResultCommand,
 ) -> StudyResultDto:
+    normalized_created_at = _normalize_created_at(command.created_at)
     saved_result = repository.save(
         StudyResult(
             mode=StudyMode(command.mode),
@@ -125,7 +122,7 @@ def record_study_result(
             correct_rate=command.correct_rate,
             mistakes=command.mistakes,
             average_time=command.average_time,
-            created_at=command.created_at,
+            created_at=normalized_created_at,
         )
     )
     return _to_study_result_dto(saved_result)  # 保存結果を返す

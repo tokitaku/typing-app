@@ -6,7 +6,6 @@ import type {
   TagListResponseDto
 } from "@/shared/api/studyApiTypes";
 import type {
-  QuizType,
   Question,
   StudyResult
 } from "@/shared/types/study";
@@ -18,9 +17,12 @@ function getApiBaseUrl(): string {
 }
 
 export type FetchQuestionListOptions = {
-  questionTypes?: QuizType[];
   tags?: string[];
   includeInactive?: boolean;
+};
+
+export type QuestionListResponse = {
+  questions: Question[];
 };
 
 async function readJsonResponse<T>(response: Response, errorMessage: string): Promise<T> {
@@ -34,12 +36,8 @@ async function readJsonResponse<T>(response: Response, errorMessage: string): Pr
 export async function fetchQuestionListResponse(
   options: FetchQuestionListOptions = {},
   signal?: AbortSignal
-): Promise<QuestionListResponseDto> {
+): Promise<QuestionListResponse> {
   const searchParams = new URLSearchParams();
-
-  if (options.questionTypes && options.questionTypes.length > 0) {
-    searchParams.set("question_types", options.questionTypes.join(",")); // 問題種別フィルタを API 契約へ変換する
-  }
 
   if (options.tags && options.tags.length > 0) {
     searchParams.set("tags", options.tags.join(",")); // タグフィルタを API 契約へ変換する
@@ -58,7 +56,11 @@ export async function fetchQuestionListResponse(
     }
   );
 
-  return readJsonResponse<QuestionListResponseDto>(response, "Failed to fetch questions");
+  const payload = await readJsonResponse<QuestionListResponseDto>(response, "Failed to fetch questions");
+
+  return {
+    questions: payload.questions
+  };
 }
 
 export async function postStudyResult(result: StudyResult): Promise<StudyResult> {

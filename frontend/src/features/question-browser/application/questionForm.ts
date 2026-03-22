@@ -1,8 +1,7 @@
 import type { QuestionCreateRequestDto, QuestionUpdateRequestDto } from "@/shared/api/studyApiTypes";
-import type { Question, QuizType } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
 export type QuestionFormValues = {
-  questionType: QuizType;
   english: string;
   japanese: string;
   tags: string[];
@@ -12,7 +11,6 @@ export type QuestionFormMode = "create" | "edit";
 
 export function createDefaultQuestionFormValues(): QuestionFormValues {
   return {
-    questionType: "word",
     english: "",
     japanese: "",
     tags: []
@@ -21,7 +19,6 @@ export function createDefaultQuestionFormValues(): QuestionFormValues {
 
 export function createFormValuesFromQuestion(question: Question): QuestionFormValues {
   return {
-    questionType: question.type,
     english: question.english,
     japanese: question.japanese,
     tags: [...question.tags]
@@ -66,7 +63,6 @@ export function filterTagSuggestions(
 
 export function buildCreateCommand(values: QuestionFormValues): QuestionCreateRequestDto {
   return {
-    question_type: values.questionType,
     english: values.english,
     japanese: values.japanese,
     tags: values.tags
@@ -78,10 +74,6 @@ export function buildUpdateCommand(
   original: Question
 ): QuestionUpdateRequestDto {
   const updates: QuestionUpdateRequestDto = {};
-
-  if (values.questionType !== original.type) {
-    updates.question_type = values.questionType;
-  }
 
   if (values.english !== original.english) {
     updates.english = values.english;

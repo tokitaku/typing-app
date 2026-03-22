@@ -1,13 +1,12 @@
 from typing import Protocol
 
-from backend.domain.entities import DailyStudySummary, Question, QuestionType, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, StudyResult
 
 
 class QuestionRepository(Protocol):
     def list_questions(
         self,
         *,
-        question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
