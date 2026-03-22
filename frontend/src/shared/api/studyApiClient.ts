@@ -97,3 +97,16 @@ export async function fetchTodayStudySummaryResponse(
     "Failed to fetch today summary"
   );
 }
+
+export async function patchQuestion(
+  questionId: number,
+  payload: { tags?: string[] }
+): Promise<Question> {
+  const response = await fetch(`${getApiBaseUrl()}/questions/${questionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }); // タグ更新などの部分変更を PATCH エンドポイントへ委譲する
+
+  return readJsonResponse<Question>(response, "Failed to update question");
+}

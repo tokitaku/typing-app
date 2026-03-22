@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   createDefaultQuestionBrowserFilters,
   createQuestionBrowserQuery,
+  getTagSuggestions,
+  normalizeTagInput,
   resolveQuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { Question } from "@/shared/types/study";
@@ -78,5 +80,46 @@ describe("question browser use cases", () => {
         questions: sampleQuestions
       })
     ).toBe("loaded");
+  });
+
+  describe("normalizeTagInput", () => {
+    it("trims whitespace and lowercases", () => {
+      expect(normalizeTagInput("  BUSINESS  ")).toBe("business");
+    });
+
+    it("returns empty string for blank input", () => {
+      expect(normalizeTagInput("   ")).toBe("");
+    });
+  });
+
+  describe("getTagSuggestions", () => {
+    const availableTags = ["business", "daily", "environment", "word"];
+
+    it("returns all unselected tags when input is empty", () => {
+      expect(getTagSuggestions(availableTags, ["word"], "")).toEqual([
+        "business",
+        "daily",
+        "environment"
+      ]); // 選択済みタグを除いた候補をすべて返す
+    });
+
+    it("filters by partial match on normalized input", () => {
+      expect(getTagSuggestions(availableTags, [], "env")).toEqual([
+        "environment"
+      ]);
+    });
+
+    it("excludes already selected tags from suggestions", () => {
+      const suggestions = getTagSuggestions(availableTags, ["business", "daily"], "");
+
+      expect(suggestions).not.toContain("business");
+      expect(suggestions).not.toContain("daily");
+    });
+
+    it("returns empty array when all tags are selected and input matches nothing", () => {
+      expect(
+        getTagSuggestions(["word"], ["word"], "xyz")
+      ).toEqual([]);
+    });
   });
 });

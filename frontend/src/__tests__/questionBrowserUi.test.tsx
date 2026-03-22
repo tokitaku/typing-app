@@ -13,12 +13,20 @@ const baseProps: QuestionBrowserViewProps = {
     includeInactive: false
   },
   questions: [],
+  availableTags: [],
   status: "loading",
   errorMessage: null,
+  tagEditState: null,
   onSetTags: vi.fn(),
   onSetQuestionTypes: vi.fn(),
   onSetIncludeInactive: vi.fn(),
-  onReload: vi.fn()
+  onReload: vi.fn(),
+  onBeginEditTags: vi.fn(),
+  onAddTagToEdit: vi.fn(),
+  onRemoveTagFromEdit: vi.fn(),
+  onSetTagInputValue: vi.fn(),
+  onSaveTagEdit: vi.fn(),
+  onCancelTagEdit: vi.fn()
 };
 
 describe("question browser ui", () => {
@@ -83,5 +91,145 @@ describe("question browser ui", () => {
     expect(html).toContain("sentence, environment");
     expect(html).toContain("有効");
     expect(html).toContain("無効");
+  });
+
+  it("renders a tag edit button for each question row", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+      />
+    );
+
+    expect(html).toContain("タグを編集");
+    expect(html).toContain("<th scope=\"col\">操作</th>");
+  });
+
+  it("renders inline tag editor when a question is being edited", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        availableTags={["word", "business", "daily"]}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+        tagEditState={{
+          questionId: 1,
+          tagDraft: ["word"],
+          tagInputValue: "",
+          isSaving: false,
+          saveError: null
+        }}
+      />
+    );
+
+    expect(html).toContain("新しいタグを入力");
+    expect(html).toContain("追加");
+    expect(html).toContain("保存");
+    expect(html).toContain("キャンセル");
+    expect(html).toContain("タグ「word」を削除");
+  });
+
+  it("shows saving state in the tag editor", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: []
+          }
+        ]}
+        status="loaded"
+        tagEditState={{
+          questionId: 1,
+          tagDraft: [],
+          tagInputValue: "",
+          isSaving: true,
+          saveError: null
+        }}
+      />
+    );
+
+    expect(html).toContain("保存中…");
+  });
+
+  it("shows tag suggestions as datalist options", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        availableTags={["business", "daily", "word"]}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+        tagEditState={{
+          questionId: 1,
+          tagDraft: ["word"],
+          tagInputValue: "b",
+          isSaving: false,
+          saveError: null
+        }}
+      />
+    );
+
+    expect(html).toContain("<option value=\"business\"");
+  });
+
+  it("shows save error message when tag update fails", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            type: "word",
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+        tagEditState={{
+          questionId: 1,
+          tagDraft: ["word"],
+          tagInputValue: "",
+          isSaving: false,
+          saveError: "保存に失敗しました。再試行してください。"
+        }}
+      />
+    );
+
+    expect(html).toContain("保存に失敗しました。再試行してください。");
   });
 });

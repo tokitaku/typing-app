@@ -2,10 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
-import { useQuestionBrowser } from "@/features/question-browser/hooks/useQuestionBrowser";
-import type {
-  QuestionBrowserFilters,
-  QuestionBrowserStatus
+import { useQuestionBrowser, type TagEditState } from "@/features/question-browser/hooks/useQuestionBrowser";
+import {
+  getTagSuggestions,
+  normalizeTagInput,
+  type QuestionBrowserFilters,
+  type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
 import type { Question, QuizType } from "@/shared/types/study";
 
@@ -17,12 +19,20 @@ const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
 export type QuestionBrowserViewProps = {
   filters: QuestionBrowserFilters;
   questions: Question[];
+  availableTags: string[];
   status: QuestionBrowserStatus;
   errorMessage: string | null;
+  tagEditState: TagEditState | null;
   onSetTags: (tags: string[]) => void;
   onSetQuestionTypes: (questionTypes: QuizType[]) => void;
   onSetIncludeInactive: (includeInactive: boolean) => void;
   onReload: () => void;
+  onBeginEditTags: (questionId: number) => void;
+  onAddTagToEdit: (tag: string) => void;
+  onRemoveTagFromEdit: (tag: string) => void;
+  onSetTagInputValue: (value: string) => void;
+  onSaveTagEdit: () => void;
+  onCancelTagEdit: () => void;
 };
 
 function toggleSelection<T extends string>(values: T[], value: T): T[] {
@@ -38,7 +48,127 @@ function parseTagInput(value: string): string[] {
     .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index); // 入力値を tags query 向けの配列へ正規化する
 }
 
-function renderQuestionTable(questions: Question[]) {
+const TAG_EDIT_DATALIST_ID = "tag-edit-suggestions";
+
+function TagEditor({
+  tagEditState,
+  availableTags,
+  onAddTagToEdit,
+  onRemoveTagFromEdit,
+  onSetTagInputValue,
+  onSaveTagEdit,
+  onCancelTagEdit
+}: {
+  tagEditState: TagEditState;
+  availableTags: string[];
+  onAddTagToEdit: (tag: string) => void;
+  onRemoveTagFromEdit: (tag: string) => void;
+  onSetTagInputValue: (value: string) => void;
+  onSaveTagEdit: () => void;
+  onCancelTagEdit: () => void;
+}) {
+  const suggestions = getTagSuggestions(
+    availableTags,
+    tagEditState.tagDraft,
+    tagEditState.tagInputValue
+  );
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const normalized = normalizeTagInput(tagEditState.tagInputValue);
+
+      if (normalized) {
+        onAddTagToEdit(normalized);
+      }
+    }
+  };
+
+  return (
+    <div className="tag-editor">
+      <div className="tag-editor-chips">
+        {tagEditState.tagDraft.length === 0 ? (
+          <span className="tag-editor-empty">タグなし</span>
+        ) : (
+          tagEditState.tagDraft.map((tag) => (
+            <span className="tag-chip" key={tag}>
+              {tag}
+              <button
+                aria-label={`タグ「${tag}」を削除`}
+                className="tag-chip-remove"
+                disabled={tagEditState.isSaving}
+                onClick={() => onRemoveTagFromEdit(tag)}
+                type="button"
+              >
+                ×
+              </button>
+            </span>
+          ))
+        )}
+      </div>
+      <div className="tag-editor-input-row">
+        <datalist id={TAG_EDIT_DATALIST_ID}>
+          {suggestions.map((suggestion) => (
+            <option key={suggestion} value={suggestion} />
+          ))}
+        </datalist>
+        <input
+          className="typing-input tag-editor-input"
+          disabled={tagEditState.isSaving}
+          list={TAG_EDIT_DATALIST_ID}
+          onChange={(event) => onSetTagInputValue(event.target.value)}
+          onKeyDown={handleInputKeyDown}
+          placeholder="新しいタグを入力"
+          type="text"
+          value={tagEditState.tagInputValue}
+        />
+        <button
+          className="secondary-button tag-editor-add-button"
+          disabled={
+            tagEditState.isSaving || !normalizeTagInput(tagEditState.tagInputValue)
+          }
+          onClick={() => onAddTagToEdit(normalizeTagInput(tagEditState.tagInputValue))}
+          type="button"
+        >
+          追加
+        </button>
+      </div>
+      <div className="tag-editor-actions">
+        <button
+          className="primary-button tag-editor-save-button"
+          disabled={tagEditState.isSaving}
+          onClick={onSaveTagEdit}
+          type="button"
+        >
+          {tagEditState.isSaving ? "保存中…" : "保存"}
+        </button>
+        <button
+          className="secondary-button"
+          disabled={tagEditState.isSaving}
+          onClick={onCancelTagEdit}
+          type="button"
+        >
+          キャンセル
+        </button>
+        {tagEditState.saveError ? (
+          <p className="tag-editor-error">{tagEditState.saveError}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function renderQuestionTable(
+  questions: Question[],
+  availableTags: string[],
+  tagEditState: TagEditState | null,
+  onBeginEditTags: (questionId: number) => void,
+  onAddTagToEdit: (tag: string) => void,
+  onRemoveTagFromEdit: (tag: string) => void,
+  onSetTagInputValue: (value: string) => void,
+  onSaveTagEdit: () => void,
+  onCancelTagEdit: () => void
+) {
   return (
     <div className="question-table-scroll">
       <table className="question-table">
@@ -50,28 +180,59 @@ function renderQuestionTable(questions: Question[]) {
             <th scope="col">日本語</th>
             <th scope="col">タグ</th>
             <th scope="col">状態</th>
+            <th scope="col">操作</th>
           </tr>
         </thead>
         <tbody>
           {questions.map((question) => (
-            <tr key={question.id}>
-              <td>{question.id}</td>
-              <td>{question.type === "word" ? "英単語" : "英文章"}</td>
-              <td className="question-table-text">{question.english}</td>
-              <td className="question-table-text">{question.japanese}</td>
-              <td className="question-table-text">{question.tags.join(", ") || "-"}</td>
-              <td>
-                <span
-                  className={
-                    question.isActive
-                      ? "question-status-badge is-active"
-                      : "question-status-badge is-inactive"
-                  }
-                >
-                  {question.isActive ? "有効" : "無効"}
-                </span>
-              </td>
-            </tr>
+            <React.Fragment key={question.id}>
+              <tr>
+                <td>{question.id}</td>
+                <td>{question.type === "word" ? "英単語" : "英文章"}</td>
+                <td className="question-table-text">{question.english}</td>
+                <td className="question-table-text">{question.japanese}</td>
+                <td className="question-table-text">{question.tags.join(", ") || "-"}</td>
+                <td>
+                  <span
+                    className={
+                      question.isActive
+                        ? "question-status-badge is-active"
+                        : "question-status-badge is-inactive"
+                    }
+                  >
+                    {question.isActive ? "有効" : "無効"}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="text-link question-edit-tags-button"
+                    disabled={
+                      tagEditState !== null &&
+                      tagEditState.questionId !== question.id
+                    }
+                    onClick={() => onBeginEditTags(question.id)}
+                    type="button"
+                  >
+                    タグを編集
+                  </button>
+                </td>
+              </tr>
+              {tagEditState?.questionId === question.id ? (
+                <tr className="tag-editor-row">
+                  <td className="tag-editor-cell" colSpan={7}>
+                    <TagEditor
+                      availableTags={availableTags}
+                      onAddTagToEdit={onAddTagToEdit}
+                      onCancelTagEdit={onCancelTagEdit}
+                      onRemoveTagFromEdit={onRemoveTagFromEdit}
+                      onSaveTagEdit={onSaveTagEdit}
+                      onSetTagInputValue={onSetTagInputValue}
+                      tagEditState={tagEditState}
+                    />
+                  </td>
+                </tr>
+              ) : null}
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -82,12 +243,20 @@ function renderQuestionTable(questions: Question[]) {
 export function QuestionBrowserView({
   filters,
   questions,
+  availableTags,
   status,
   errorMessage,
+  tagEditState,
   onSetTags,
   onSetQuestionTypes,
   onSetIncludeInactive,
-  onReload
+  onReload,
+  onBeginEditTags,
+  onAddTagToEdit,
+  onRemoveTagFromEdit,
+  onSetTagInputValue,
+  onSaveTagEdit,
+  onCancelTagEdit
 }: QuestionBrowserViewProps) {
   return (
     <main className="page-shell">
@@ -179,7 +348,17 @@ export function QuestionBrowserView({
               <h2>{questions.length} 件の問題</h2>
             </div>
           </div>
-          {renderQuestionTable(questions)}
+          {renderQuestionTable(
+            questions,
+            availableTags,
+            tagEditState,
+            onBeginEditTags,
+            onAddTagToEdit,
+            onRemoveTagFromEdit,
+            onSetTagInputValue,
+            onSaveTagEdit,
+            onCancelTagEdit
+          )}
         </section>
       ) : null}
     </main>
@@ -190,24 +369,40 @@ export function QuestionBrowser() {
   const {
     filters,
     questions,
+    availableTags,
     status,
     errorMessage,
+    tagEditState,
     setTags,
     setQuestionTypes,
     setIncludeInactive,
-    reload
+    reload,
+    beginEditTags,
+    addTagToEdit,
+    removeTagFromEdit,
+    setTagInputValue,
+    saveTagEdit,
+    cancelTagEdit
   } = useQuestionBrowser();
 
   return (
     <QuestionBrowserView
+      availableTags={availableTags}
       errorMessage={errorMessage}
       filters={filters}
+      onAddTagToEdit={addTagToEdit}
+      onBeginEditTags={beginEditTags}
+      onCancelTagEdit={cancelTagEdit}
       onReload={reload}
-      onSetTags={setTags}
+      onRemoveTagFromEdit={removeTagFromEdit}
+      onSaveTagEdit={saveTagEdit}
       onSetIncludeInactive={setIncludeInactive}
+      onSetTagInputValue={setTagInputValue}
+      onSetTags={setTags}
       onSetQuestionTypes={setQuestionTypes}
       questions={questions}
       status={status}
+      tagEditState={tagEditState}
     />
   );
 }

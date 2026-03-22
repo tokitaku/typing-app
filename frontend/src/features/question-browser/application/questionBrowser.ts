@@ -52,3 +52,23 @@ export function resolveQuestionBrowserStatus({
 
   return "loaded";
 }
+
+export function normalizeTagInput(value: string): string {
+  return value.trim().toLowerCase(); // バックエンドの正規化ルールに合わせる
+}
+
+export function getTagSuggestions(
+  availableTags: string[],
+  currentTags: string[],
+  input: string
+): string[] {
+  const excluded = new Set(currentTags);
+  const candidates = availableTags.filter((tag) => !excluded.has(tag));
+  const normalized = normalizeTagInput(input);
+
+  if (!normalized) {
+    return candidates; // 入力がなければ未選択タグをすべて候補とする
+  }
+
+  return candidates.filter((tag) => tag.includes(normalized)); // 前方一致ではなく部分一致で候補を絞る
+}

@@ -163,4 +163,31 @@ describe("study result api", () => {
       expect.objectContaining({ cache: "no-store" })
     );
   });
+
+  it("patches a question with updated tags via the backend", async () => {
+    const updatedQuestion = {
+      ...sampleQuestions[0],
+      tags: ["business", "daily"]
+    };
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => updatedQuestion
+    }));
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { patchQuestion } = await import("@/shared/api/studyApiClient");
+
+    await expect(
+      patchQuestion(1, { tags: ["business", "daily"] })
+    ).resolves.toEqual(updatedQuestion);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/questions/1",
+      expect.objectContaining({
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tags: ["business", "daily"] })
+      })
+    );
+  });
 });
