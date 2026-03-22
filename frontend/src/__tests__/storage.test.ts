@@ -29,20 +29,33 @@ afterEach(() => {
 });
 
 describe("storage settings", () => {
-  it("normalizes malformed saved settings before returning them", () => {
+  it("normalizes malformed saved tag settings before returning them", () => {
     const { storage } = setupWindow();
 
     storage.set(
       SETTINGS_KEY,
       JSON.stringify({
-        eikenLevels: ["3", "pre2", "0", null],
-        questionTypes: ["sentence", "word", "other", "word"]
+        tags: [" speaking ", "daily", "", "daily", 1]
       })
     );
 
     expect(getSettings()).toEqual({
-      eikenLevels: ["3", "pre2"],
-      questionTypes: ["sentence", "word"]
+      tags: ["speaking", "daily"]
+    });
+  });
+
+  it("returns default settings when tags are not saved", () => {
+    const { storage } = setupWindow();
+
+    storage.set(
+      SETTINGS_KEY,
+      JSON.stringify({
+        questionTypes: ["sentence", "word", "sentence"]
+      })
+    );
+
+    expect(getSettings()).toEqual({
+      tags: []
     });
   });
 
@@ -50,14 +63,12 @@ describe("storage settings", () => {
     const { localStorageMock, storage } = setupWindow();
 
     saveSettings({
-      eikenLevels: ["pre2", "pre2", "2", "invalid"],
-      questionTypes: ["word", "word", "sentence", "invalid"]
+      tags: [" Writing ", "writing", "daily", ""]
     } as Settings);
 
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
     expect(JSON.parse(storage.get(SETTINGS_KEY) ?? "null")).toEqual({
-      eikenLevels: ["pre2", "2"],
-      questionTypes: ["word", "sentence"]
+      tags: ["writing", "daily"]
     });
   });
 });

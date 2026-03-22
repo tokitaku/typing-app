@@ -51,8 +51,7 @@ export function startStudySession({
     questions,
     mode,
     reviewQueue,
-    settings.eikenLevels,
-    settings.questionTypes,
+    settings.tags,
     sessionQuestionCount
   );
 

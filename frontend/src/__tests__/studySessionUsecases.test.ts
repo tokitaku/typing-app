@@ -6,14 +6,13 @@ import {
 import type { Question, QuizProgress, Settings } from "@/shared/types/study";
 
 const settings: Settings = {
-  eikenLevels: ["5", "4"],
-  questionTypes: ["word", "sentence"]
+  tags: ["word", "sentence"]
 };
 
 const quizzes: Question[] = [
-  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true },
-  { id: 2, type: "word", eikenLevel: "4", english: "library", japanese: "図書館", isActive: true },
-  { id: 3, type: "sentence", eikenLevel: "3", english: "I read books.", japanese: "私は本を読みます。", isActive: true }
+  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true, tags: ["word", "daily"] },
+  { id: 2, type: "word", eikenLevel: "4", english: "library", japanese: "図書館", isActive: true, tags: ["word", "school"] },
+  { id: 3, type: "sentence", eikenLevel: "3", english: "I read books.", japanese: "私は本を読みます。", isActive: true, tags: ["sentence", "daily"] }
 ];
 
 describe("study session use cases", () => {
@@ -26,8 +25,8 @@ describe("study session use cases", () => {
       sessionQuestionCount: 10
     });
 
-    expect(result.quizSet.length).toBe(2);
-    expect(result.quizSet.every((quiz) => settings.eikenLevels.includes(quiz.eikenLevel))).toBe(true);
+    expect(result.quizSet.length).toBe(3);
+    expect(result.quizSet.every((quiz) => quiz.tags.some((tag) => settings.tags.includes(tag)))).toBe(true);
     expect(result.isEmptyQuizSet).toBe(false);
   });
 
@@ -36,10 +35,7 @@ describe("study session use cases", () => {
       questions: quizzes,
       mode: "learn",
       reviewQueue: [],
-      settings: {
-        eikenLevels: ["1"],
-        questionTypes: ["word"]
-      },
+      settings: { tags: ["unknown"] },
       sessionQuestionCount: 10
     });
 

@@ -9,6 +9,7 @@ export type Question = {
   english: string;
   japanese: string;
   isActive: boolean;
+  tags: string[];
 };
 
 export type QuizProgress = {
@@ -42,6 +43,5 @@ export type DailySummary = {
 };
 
 export type Settings = {
-  eikenLevels: EikenLevel[];
-  questionTypes: QuizType[];
+  tags: string[];
 };

@@ -13,7 +13,8 @@ const sampleQuestions: Question[] = [
     eikenLevel: "5",
     english: "apple",
     japanese: "りんご",
-    isActive: true
+    isActive: true,
+    tags: ["word"]
   }
 ];
 

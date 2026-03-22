@@ -26,7 +26,8 @@ const sampleQuestions: Question[] = [
     eikenLevel: "5",
     english: "apple",
     japanese: "りんご",
-    isActive: true
+    isActive: true,
+    tags: ["word", "daily"]
   }
 ];
 
@@ -60,12 +61,11 @@ describe("study result api", () => {
 
     await expect(
       fetchStudyQuestions({
-        eikenLevels: ["3", "pre2"],
-        questionTypes: ["word"]
+        tags: ["business", "daily"]
       })
     ).resolves.toEqual(sampleQuestions);
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?eiken_levels=3%2Cpre2&question_types=word&include_inactive=false",
+      "http://localhost:8000/questions?tags=business%2Cdaily&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });
@@ -138,12 +138,12 @@ describe("study result api", () => {
     await expect(
       fetchQuestionListResponse({
         eikenLevels: ["3", "pre2"],
-        questionTypes: ["word"],
+        tags: ["business"],
         includeInactive: false
       })
     ).resolves.toEqual({ questions: sampleQuestions });
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/questions?eiken_levels=3%2Cpre2&question_types=word&include_inactive=false",
+      "http://localhost:8000/questions?eiken_levels=3%2Cpre2&tags=business&include_inactive=false",
       expect.objectContaining({ cache: "no-store" })
     );
   });

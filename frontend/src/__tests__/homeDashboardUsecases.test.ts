@@ -1,14 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   createHomeDashboardModel,
-  selectEikenLevel,
-  toggleQuestionType
+  toggleTag
 } from "@/features/home-dashboard/application/homeDashboard";
 import type { DailySummary, Settings } from "@/shared/types/study";
 
 const settings: Settings = {
-  eikenLevels: ["5"],
-  questionTypes: ["word", "sentence"]
+  tags: ["word", "sentence"]
 };
 
 const localSummary: DailySummary = {
@@ -40,23 +38,15 @@ describe("home dashboard use cases", () => {
     });
   });
 
-  it("replaces the selected eiken level", () => {
-    expect(selectEikenLevel(settings, "pre2")).toEqual({
-      eikenLevels: ["pre2"],
-      questionTypes: ["word", "sentence"]
+  it("toggles tags and allows clearing all tags", () => {
+    expect(toggleTag(settings, "word")).toEqual({
+      tags: ["sentence"]
     });
-  });
-
-  it("does not allow removing the last question type", () => {
-    const wordOnly: Settings = {
-      eikenLevels: ["5"],
-      questionTypes: ["word"]
-    };
-
-    expect(toggleQuestionType(settings, "word")).toEqual({
-      eikenLevels: ["5"],
-      questionTypes: ["sentence"]
+    expect(toggleTag({ tags: ["word"] }, "word")).toEqual({
+      tags: []
     });
-    expect(toggleQuestionType(wordOnly, "word")).toEqual(wordOnly);
+    expect(toggleTag(settings, "business")).toEqual({
+      tags: ["word", "sentence", "business"]
+    });
   });
 });
