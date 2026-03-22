@@ -14,7 +14,9 @@ SQLITE_URL_PREFIXES = ("sqlite:///", "sqlite:////")
 MANAGED_TABLES = {
     "eiken_levels",
     "question_types",
+    "tags",
     "typing_questions",
+    "typing_question_tags",
     "study_results",
 }
 

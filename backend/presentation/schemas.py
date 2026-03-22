@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.domain.tag_rules import normalize_tags
+
 
 class QuizResponse(BaseModel):
     id: int
@@ -10,6 +12,7 @@ class QuizResponse(BaseModel):
     eikenLevel: str
     english: str
     japanese: str
+    tags: list[str]
 
 
 class QuizListResponse(BaseModel):
@@ -21,6 +24,7 @@ class QuestionBase(BaseModel):
     question_type: Literal["word", "sentence"]
     english: str = Field(min_length=1)
     japanese: str = Field(min_length=1)
+    tags: list[str] = Field(default_factory=list)
 
     @field_validator("eiken_level_code", "english", "japanese")
     @classmethod
@@ -31,6 +35,11 @@ class QuestionBase(BaseModel):
             raise ValueError("must not be blank")  # 空文字は拒否する
 
         return normalized_value
+
+    @field_validator("tags")
+    @classmethod
+    def validate_tags(cls, value: list[str]) -> list[str]:
+        return list(normalize_tags(value))  # 業務ルールに沿ってタグを正規化しつつ重複を排除する
 
 
 class QuestionCreate(QuestionBase):
@@ -43,6 +52,7 @@ class QuestionUpdate(BaseModel):
     english: str | None = Field(default=None, min_length=1)
     japanese: str | None = Field(default=None, min_length=1)
     is_active: bool | None = None
+    tags: list[str] | None = None
 
     @field_validator("eiken_level_code", "english", "japanese")
     @classmethod
@@ -57,6 +67,14 @@ class QuestionUpdate(BaseModel):
 
         return normalized_value
 
+    @field_validator("tags")
+    @classmethod
+    def validate_optional_tags(cls, value: list[str] | None) -> list[str] | None:
+        if value is None:
+            return None  # 未指定時は既存値維持のためそのまま通す
+
+        return list(normalize_tags(value))  # 指定された場合だけタグ一覧を正規化する
+
 
 class QuestionResponse(BaseModel):
     id: int
@@ -65,6 +83,7 @@ class QuestionResponse(BaseModel):
     english: str
     japanese: str
     isActive: bool
+    tags: list[str]
 
 
 class QuestionListResponse(BaseModel):

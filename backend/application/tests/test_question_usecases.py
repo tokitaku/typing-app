@@ -72,6 +72,40 @@ def test_list_questions_use_case_with_eiken_and_type_filter() -> None:
     assert result[0].type == "word"  # 複合フィルタの仕様通り、両条件を満たす問題のみが抽出されることを検証
 
 
+def test_list_questions_use_case_with_tag_filter() -> None:
+    repository = FakeQuestionRepository(
+        [
+            Question(
+                id=1,
+                eiken_level_code="pre2",
+                question_type=QuestionType.WORD,
+                english="debate",
+                japanese="討論",
+                is_active=True,
+                tags=("eiken", "writing"),
+            ),
+            Question(
+                id=2,
+                eiken_level_code="pre2",
+                question_type=QuestionType.SENTENCE,
+                english="We discussed climate policy.",
+                japanese="私たちは気候政策を議論した。",
+                is_active=True,
+                tags=("environment",),
+            ),
+        ]
+    )
+
+    result = list_questions(
+        repository,
+        ListQuestionsQuery(tag_codes=["WRITING"]),
+    )
+
+    assert len(result) == 1
+    assert result[0].english == "debate"
+    assert result[0].tags == ["eiken", "writing"]  # タグ条件は正規化された値で照合し、レスポンスにもタグ一覧を含めることを検証
+
+
 def test_create_question_use_case() -> None:
     repository = FakeQuestionRepository([])
 
@@ -91,6 +125,23 @@ def test_create_question_use_case() -> None:
     assert result.isActive is True  # ビジネスルールとして新規作成時は必ず有効状態で保存されることを検証
 
 
+def test_create_question_use_case_normalizes_tags() -> None:
+    repository = FakeQuestionRepository([])
+
+    result = create_question(
+        repository,
+        CreateQuestionCommand(
+            eiken_level_code="pre1",
+            question_type="word",
+            english="Perspective",
+            japanese="視点",
+            tags=[" Essay ", "essay", "EIKEN "],
+        ),
+    )
+
+    assert result.tags == ["essay", "eiken"]  # 前後空白除去と大小文字の揺れ吸収、重複排除が保存前に行われることを検証
+
+
 def test_update_question_use_case_updates_fields() -> None:
     repository = FakeQuestionRepository(
         [
@@ -108,6 +159,31 @@ def test_update_question_use_case_updates_fields() -> None:
     assert result.english == "sea"
     assert result.japanese == "海"
     assert result.eikenLevel == "4"  # 部分更新の仕様通り、指定されていないフィールドは既存値を保持することを検証
+
+
+def test_update_question_use_case_replaces_tags() -> None:
+    repository = FakeQuestionRepository(
+        [
+            Question(
+                id=10,
+                eiken_level_code="4",
+                question_type=QuestionType.WORD,
+                english="river",
+                japanese="川",
+                is_active=True,
+                tags=("nature",),
+            ),
+        ]
+    )
+
+    result = update_question(
+        repository,
+        10,
+        UpdateQuestionCommand(tags=[" Business ", "business", "news"]),
+    )
+
+    assert result is not None
+    assert result.tags == ["business", "news"]  # 更新時もタグの正規化と重複排除を行い、全置換することを検証
 
 
 def test_update_question_use_case_returns_none_for_unknown_id() -> None:

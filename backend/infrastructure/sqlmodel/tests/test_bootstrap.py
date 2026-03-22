@@ -68,7 +68,9 @@ def test_migrate_database_applies_alembic_migrations(tmp_path) -> None:
         "alembic_version",
         "eiken_levels",
         "question_types",
+        "tags",
         "typing_questions",
+        "typing_question_tags",
         "study_results",
     } <= tables
 
@@ -90,3 +92,94 @@ def test_migrate_database_stamps_existing_schema_without_recreating_tables(tmp_p
     connection.close()
 
     assert "alembic_version" in tables
+
+
+def test_bootstrap_database_backfills_legacy_question_type_tags(tmp_path) -> None:
+    database_path = tmp_path / "existing-with-data.db"
+    database_url = f"sqlite:///{database_path}"
+    connection = sqlite3.connect(database_path)
+    connection.execute("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL)")
+    connection.execute("INSERT INTO alembic_version (version_num) VALUES ('20260321_0001')")
+    connection.execute(
+        """
+        CREATE TABLE eiken_levels (
+            id INTEGER PRIMARY KEY,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL,
+            sort_order INTEGER NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE question_types (
+            id INTEGER PRIMARY KEY,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE study_results (
+            id INTEGER PRIMARY KEY,
+            mode TEXT NOT NULL,
+            total_questions INTEGER NOT NULL,
+            correct_rate INTEGER NOT NULL,
+            mistakes INTEGER NOT NULL,
+            average_time INTEGER NOT NULL,
+            created_at TEXT NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE typing_questions (
+            id INTEGER PRIMARY KEY,
+            eiken_level_id INTEGER NOT NULL,
+            question_type_id INTEGER NOT NULL,
+            english_text TEXT NOT NULL,
+            japanese_text TEXT NOT NULL,
+            is_active BOOLEAN NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY(eiken_level_id) REFERENCES eiken_levels(id),
+            FOREIGN KEY(question_type_id) REFERENCES question_types(id)
+        )
+        """
+    )
+    connection.execute(
+        """
+        INSERT INTO eiken_levels (id, code, name, sort_order)
+        VALUES (1, '5', '英検5級', 1)
+        """
+    )
+    connection.execute(
+        """
+        INSERT INTO question_types (id, code, name)
+        VALUES (1, 'WORD', '英単語')
+        """
+    )
+    connection.execute(
+        """
+        INSERT INTO typing_questions (
+            id, eiken_level_id, question_type_id, english_text, japanese_text, is_active, created_at, updated_at
+        ) VALUES (
+            1, 1, 1, 'legacy-seeded', '旧投入', 1, '2026-03-22T00:00:00+00:00', '2026-03-22T00:00:00+00:00'
+        )
+        """
+    )
+    connection.commit()
+    connection.close()
+
+    migrate_database(database_url)
+
+    repository = SqlModelQuestionRepository(database_url)
+    questions = repository.list_questions(
+        eiken_level_codes=["5"],
+        question_type_codes=[QuestionType.WORD],
+        tag_codes=["WORD"],
+        include_inactive=True,
+    )
+
+    assert any(question.english == "legacy-seeded" for question in questions)  # 既存 question_type データが移行時にタグへ backfill されることを検証

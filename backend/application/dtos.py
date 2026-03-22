@@ -1,16 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
 class ListQuizzesQuery:
     eiken_level_codes: list[str] | None = None
     question_type_codes: list[str] | None = None
+    tag_codes: list[str] | None = None
 
 
 @dataclass(frozen=True)
 class ListQuestionsQuery:
     eiken_level_codes: list[str] | None = None
     question_type_codes: list[str] | None = None
+    tag_codes: list[str] | None = None
     include_inactive: bool = True
 
 
@@ -20,6 +22,7 @@ class CreateQuestionCommand:
     question_type: str
     english: str
     japanese: str
+    tags: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -29,6 +32,7 @@ class UpdateQuestionCommand:
     english: str | None = None
     japanese: str | None = None
     is_active: bool | None = None
+    tags: list[str] | None = None
 
 
 @dataclass(frozen=True)
@@ -48,6 +52,7 @@ class QuizDto:
     eikenLevel: str
     english: str
     japanese: str
+    tags: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -58,6 +63,7 @@ class QuestionDto:
     english: str
     japanese: str
     isActive: bool
+    tags: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

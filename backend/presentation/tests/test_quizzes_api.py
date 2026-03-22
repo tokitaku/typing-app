@@ -33,6 +33,36 @@ def test_quizzes_can_filter_sentence_only(client) -> None:
     assert all("eikenLevel" in quiz for quiz in body["quizzes"])
 
 
+def test_quizzes_can_filter_by_tag(client) -> None:
+    client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "1",
+            "question_type": "sentence",
+            "english": "The committee reached a consensus.",
+            "japanese": "委員会は合意に達した。",
+            "tags": ["Debate", "Formal"],
+        },
+    )
+    client.post(
+        "/questions",
+        json={
+            "eiken_level_code": "1",
+            "question_type": "sentence",
+            "english": "The device consumes little power.",
+            "japanese": "その装置は消費電力が少ない。",
+            "tags": ["Technology"],
+        },
+    )
+
+    response = client.get("/quizzes?tags=formal")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["quizzes"]) > 0
+    assert all("formal" in quiz["tags"] for quiz in body["quizzes"])  # 出題 API でもタグフィルタとタグ返却が有効であることを検証
+
+
 def test_quizzes_uses_active_questions_only(client) -> None:
     client.delete("/questions/1")
 

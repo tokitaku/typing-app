@@ -35,6 +35,7 @@ class TypingQuestionSeedRequired(TypedDict):
 
 class TypingQuestionSeed(TypingQuestionSeedRequired, total=False):
     is_active: bool
+    tags: list[str]
 
 
 EIKEN_LEVELS: list[EikenLevelSeed] = [
@@ -53,17 +54,17 @@ QUESTION_TYPES: list[QuestionTypeSeed] = [
 ]
 
 INITIAL_QUESTIONS: list[TypingQuestionSeed] = [
-    {"eiken_level_code": "5", "question_type": "word", "english": "apple", "japanese": "りんご"},
-    {"eiken_level_code": "5", "question_type": "word", "english": "library", "japanese": "図書館"},
-    {"eiken_level_code": "4", "question_type": "word", "english": "beautiful", "japanese": "美しい"},
-    {"eiken_level_code": "4", "question_type": "word", "english": "schedule", "japanese": "予定"},
-    {"eiken_level_code": "3", "question_type": "word", "english": "environment", "japanese": "環境"},
-    {"eiken_level_code": "2", "question_type": "word", "english": "confidence", "japanese": "自信"},
-    {"eiken_level_code": "5", "question_type": "sentence", "english": "I drink coffee every morning.", "japanese": "私は毎朝コーヒーを飲みます。"},
-    {"eiken_level_code": "4", "question_type": "sentence", "english": "She studies English after dinner.", "japanese": "彼女は夕食後に英語を勉強します。"},
-    {"eiken_level_code": "3", "question_type": "sentence", "english": "We need to finish this report today.", "japanese": "私たちは今日このレポートを終える必要があります。"},
-    {"eiken_level_code": "pre2", "question_type": "sentence", "english": "The train was delayed because of the rain.", "japanese": "雨のため電車が遅れました。"},
-    {"eiken_level_code": "2", "question_type": "sentence", "english": "Learning a language takes patience and repetition.", "japanese": "言語学習には忍耐と反復が必要です。"},
+    {"eiken_level_code": "5", "question_type": "word", "english": "apple", "japanese": "りんご", "tags": ["word"]},
+    {"eiken_level_code": "5", "question_type": "word", "english": "library", "japanese": "図書館", "tags": ["word"]},
+    {"eiken_level_code": "4", "question_type": "word", "english": "beautiful", "japanese": "美しい", "tags": ["word"]},
+    {"eiken_level_code": "4", "question_type": "word", "english": "schedule", "japanese": "予定", "tags": ["word"]},
+    {"eiken_level_code": "3", "question_type": "word", "english": "environment", "japanese": "環境", "tags": ["word"]},
+    {"eiken_level_code": "2", "question_type": "word", "english": "confidence", "japanese": "自信", "tags": ["word"]},
+    {"eiken_level_code": "5", "question_type": "sentence", "english": "I drink coffee every morning.", "japanese": "私は毎朝コーヒーを飲みます。", "tags": ["sentence"]},
+    {"eiken_level_code": "4", "question_type": "sentence", "english": "She studies English after dinner.", "japanese": "彼女は夕食後に英語を勉強します。", "tags": ["sentence"]},
+    {"eiken_level_code": "3", "question_type": "sentence", "english": "We need to finish this report today.", "japanese": "私たちは今日このレポートを終える必要があります。", "tags": ["sentence"]},
+    {"eiken_level_code": "pre2", "question_type": "sentence", "english": "The train was delayed because of the rain.", "japanese": "雨のため電車が遅れました。", "tags": ["sentence"]},
+    {"eiken_level_code": "2", "question_type": "sentence", "english": "Learning a language takes patience and repetition.", "japanese": "言語学習には忍耐と反復が必要です。", "tags": ["sentence"]},
 ]
 
 
@@ -114,6 +115,7 @@ def seed_typing_questions(database_url: str, questions: Iterable[TypingQuestionS
                 english=str(question["english"]),
                 japanese=str(question["japanese"]),
                 is_active=bool(question.get("is_active", True)),
+                tags=tuple(str(tag) for tag in question.get("tags", [])),
             )
         )
 
@@ -164,6 +166,7 @@ def migrate_legacy_words(database_url: str) -> None:
                 english=english,
                 japanese=japanese,
                 is_active=bool(is_active),
+                tags=("word",),
             )
         )
 

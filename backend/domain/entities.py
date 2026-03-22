@@ -20,6 +20,7 @@ class Question:
     english: str
     japanese: str
     is_active: bool = True
+    tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

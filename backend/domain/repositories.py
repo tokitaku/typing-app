@@ -9,6 +9,7 @@ class QuestionRepository(Protocol):
         *,
         eiken_level_codes: list[str] | None = None,
         question_type_codes: list[QuestionType] | None = None,
+        tag_codes: list[str] | None = None,
         include_inactive: bool = True,
     ) -> list[Question]:
         ...
