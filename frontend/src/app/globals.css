@@ -481,7 +481,8 @@ a {
   border-radius: 6px;
   font-size: 16px;
   line-height: 1.6;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .char-correct {
@@ -709,7 +710,8 @@ a {
 .question-table-text {
   min-width: 180px;
   max-width: 360px;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .question-tag-list {

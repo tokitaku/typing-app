@@ -92,7 +92,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     return null;
   }
 
-  const progress = ((currentIndex) / quizSet.length) * 100;
+  const progress = ((currentIndex + 1) / quizSet.length) * 100;
 
   return (
     <div className="page-layout">

@@ -72,13 +72,6 @@ function QuestionTable({
 
   return (
     <>
-      {selectedIds.size > 0 ? (
-        <div className="question-table-actions">
-          <button className="btn btn-destructive" type="button">
-            削除
-          </button>
-        </div>
-      ) : null}
       <div className="question-table-scroll">
         <table className="question-table">
           <thead>
