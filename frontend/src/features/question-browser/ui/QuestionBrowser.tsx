@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useQuestionBrowser } from "@/features/question-browser/hooks/useQuestionBrowser";
 import type {
@@ -37,57 +37,110 @@ function parseTagInput(value: string): string[] {
     .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index);
 }
 
-function renderQuestionTable(
-  questions: Question[],
-  isFormSubmitting: boolean,
-  onOpenEditForm: (question: Question) => void
-) {
+function QuestionTable({
+  questions,
+  isFormSubmitting,
+  onOpenEditForm
+}: {
+  questions: Question[];
+  isFormSubmitting: boolean;
+  onOpenEditForm: (question: Question) => void;
+}) {
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+  const allSelected = questions.length > 0 && selectedIds.size === questions.length;
+
+  function handleToggleAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(questions.map((q) => q.id)));
+    }
+  }
+
+  function handleToggle(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
   return (
-    <div className="question-table-scroll">
-      <table className="question-table">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">英語</th>
-            <th scope="col">日本語</th>
-            <th scope="col">タグ</th>
-            <th scope="col">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {questions.map((question) => (
-            <tr key={question.id}>
-              <td>{question.id}</td>
-              <td className="question-table-text">{question.english}</td>
-              <td className="question-table-text">{question.japanese}</td>
-              <td>
-                {question.tags.length > 0 ? (
-                  <div className="question-tag-list">
-                    {question.tags.map((tag) => (
-                      <span className="question-tag-badge" key={tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  "-"
-                )}
-              </td>
-              <td>
-                <button
-                  className="btn btn-primary"
-                  disabled={isFormSubmitting}
-                  onClick={() => onOpenEditForm(question)}
-                  type="button"
-                >
-                  編集
-                </button>
-              </td>
+    <>
+      {selectedIds.size > 0 ? (
+        <div className="question-table-actions">
+          <button className="btn btn-destructive" type="button">
+            削除
+          </button>
+        </div>
+      ) : null}
+      <div className="question-table-scroll">
+        <table className="question-table">
+          <thead>
+            <tr>
+              <th className="col-checkbox" scope="col">
+                <input
+                  checked={allSelected}
+                  className="question-table-checkbox"
+                  onChange={handleToggleAll}
+                  type="checkbox"
+                />
+              </th>
+              <th className="col-id" scope="col">ID</th>
+              <th scope="col">英語</th>
+              <th scope="col">日本語</th>
+              <th className="col-tags" scope="col">タグ</th>
+              <th className="col-actions" scope="col">操作</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {questions.map((question) => (
+              <tr key={question.id}>
+                <td className="col-checkbox">
+                  <input
+                    checked={selectedIds.has(question.id)}
+                    className="question-table-checkbox"
+                    onChange={() => handleToggle(question.id)}
+                    type="checkbox"
+                  />
+                </td>
+                <td className="col-id">{question.id}</td>
+                <td className="question-table-text">{question.english}</td>
+                <td className="question-table-text">{question.japanese}</td>
+                <td className="col-tags">
+                  {question.tags.length > 0 ? (
+                    <div className="question-tag-list">
+                      {question.tags.map((tag) => (
+                        <span className="question-tag-badge" key={tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td className="col-actions">
+                  <button
+                    className="btn btn-primary"
+                    disabled={isFormSubmitting}
+                    onClick={() => onOpenEditForm(question)}
+                    type="button"
+                  >
+                    編集
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -115,7 +168,7 @@ export function QuestionBrowserView({
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>
           <span className="app-header-title">Type &amp; Learn</span>
         </div>
-        <Link className="btn btn-ghost" href="/">
+        <Link className="btn btn-outline" href="/">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
           ホームへ戻る
         </Link>
@@ -138,6 +191,7 @@ export function QuestionBrowserView({
               onClick={onOpenCreateForm}
               type="button"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
               新規作成
             </button>
           </div>
@@ -218,7 +272,11 @@ export function QuestionBrowserView({
 
         {status === "loaded" ? (
           <div className="table-card card">
-            {renderQuestionTable(questions, isFormSubmitting, onOpenEditForm)}
+            <QuestionTable
+              isFormSubmitting={isFormSubmitting}
+              onOpenEditForm={onOpenEditForm}
+              questions={questions}
+            />
           </div>
         ) : null}
       </div>
