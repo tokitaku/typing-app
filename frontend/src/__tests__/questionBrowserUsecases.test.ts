@@ -10,7 +10,6 @@ const sampleQuestions: Question[] = [
   {
     id: 1,
     type: "word",
-    eikenLevel: "5",
     english: "apple",
     japanese: "りんご",
     isActive: true,
@@ -21,7 +20,7 @@ const sampleQuestions: Question[] = [
 describe("question browser use cases", () => {
   it("creates default filters for initial browsing", () => {
     expect(createDefaultQuestionBrowserFilters()).toEqual({
-      eikenLevels: [],
+      tags: [],
       questionTypes: [],
       includeInactive: false
     });
@@ -30,12 +29,12 @@ describe("question browser use cases", () => {
   it("builds a question query from filters", () => {
     expect(
       createQuestionBrowserQuery({
-        eikenLevels: ["3", "pre2"],
+        tags: ["business", "daily"],
         questionTypes: ["sentence"],
         includeInactive: true
       })
     ).toEqual({
-      eikenLevels: ["3", "pre2"],
+      tags: ["business", "daily"],
       questionTypes: ["sentence"],
       includeInactive: true
     });

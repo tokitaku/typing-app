@@ -33,22 +33,6 @@
         "operationId": "get_questions_questions_get",
         "parameters": [
           {
-            "name": "eiken_levels",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Eiken Levels"
-            }
-          },
-          {
             "name": "question_types",
             "in": "query",
             "required": false,
@@ -345,11 +329,6 @@
       },
       "QuestionCreate": {
         "properties": {
-          "eiken_level_code": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Eiken Level Code"
-          },
           "question_type": {
             "type": "string",
             "enum": [
@@ -378,7 +357,6 @@
         },
         "type": "object",
         "required": [
-          "eiken_level_code",
           "question_type",
           "english",
           "japanese"
@@ -415,10 +393,6 @@
             ],
             "title": "Type"
           },
-          "eikenLevel": {
-            "type": "string",
-            "title": "Eikenlevel"
-          },
           "english": {
             "type": "string",
             "title": "English"
@@ -443,7 +417,6 @@
         "required": [
           "id",
           "type",
-          "eikenLevel",
           "english",
           "japanese",
           "isActive",
@@ -453,18 +426,6 @@
       },
       "QuestionUpdate": {
         "properties": {
-          "eiken_level_code": {
-            "anyOf": [
-              {
-                "type": "string",
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Eiken Level Code"
-          },
           "question_type": {
             "anyOf": [
               {

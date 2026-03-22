@@ -76,7 +76,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
         <section className="empty-card">
           <p className="eyebrow">LEARN READY</p>
           <h1>出題できる問題がありません。</h1>
-          <p>英検級または出題タイプ設定を見直して、もう一度学習を開始してください。</p>
+          <p>タグや出題条件を見直して、もう一度学習を開始してください。</p>
           <Link className="primary-button" href="/">
             ホームへ戻る
           </Link>
@@ -104,7 +104,7 @@ export function StudySession({ mode }: { mode: StudyMode }) {
       <section className="problem-card">
         <div className="problem-meta">
           <span>{currentQuiz.type === "word" ? "単語" : "短文"}</span>
-          <span>英検 {currentQuiz.eikenLevel}</span>
+          <span>{currentQuiz.tags.join(", ") || "tagless"}</span>
         </div>
         <p className="japanese-text">{currentQuiz.japanese}</p>
         <p className="english-target" aria-label="英語の正解文">

@@ -1,8 +1,8 @@
 import type { FetchQuestionListOptions } from "@/shared/api/studyApiClient";
-import type { EikenLevel, Question, QuizType } from "@/shared/types/study";
+import type { Question, QuizType } from "@/shared/types/study";
 
 export type QuestionBrowserFilters = {
-  eikenLevels: EikenLevel[];
+  tags: string[];
   questionTypes: QuizType[];
   includeInactive: boolean;
 };
@@ -17,7 +17,7 @@ type ResolveQuestionBrowserStatusInput = {
 
 export function createDefaultQuestionBrowserFilters(): QuestionBrowserFilters {
   return {
-    eikenLevels: [],
+    tags: [],
     questionTypes: [],
     includeInactive: false
   }; // 一覧閲覧の初期状態では有効問題のみを対象にする
@@ -27,7 +27,7 @@ export function createQuestionBrowserQuery(
   filters: QuestionBrowserFilters
 ): FetchQuestionListOptions {
   return {
-    eikenLevels: filters.eikenLevels,
+    tags: filters.tags,
     questionTypes: filters.questionTypes,
     includeInactive: filters.includeInactive
   }; // filter state を API query 契約へそのまま写像する

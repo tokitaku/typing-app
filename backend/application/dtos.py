@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 
 @dataclass(frozen=True)
 class ListQuestionsQuery:
-    eiken_level_codes: list[str] | None = None
     question_type_codes: list[str] | None = None
     tag_codes: list[str] | None = None
     include_inactive: bool = True
@@ -11,7 +10,6 @@ class ListQuestionsQuery:
 
 @dataclass(frozen=True)
 class CreateQuestionCommand:
-    eiken_level_code: str
     question_type: str
     english: str
     japanese: str
@@ -20,7 +18,6 @@ class CreateQuestionCommand:
 
 @dataclass(frozen=True)
 class UpdateQuestionCommand:
-    eiken_level_code: str | None = None
     question_type: str | None = None
     english: str | None = None
     japanese: str | None = None
@@ -42,7 +39,6 @@ class RecordStudyResultCommand:
 class QuestionDto:
     id: int
     type: str
-    eikenLevel: str
     english: str
     japanese: str
     isActive: bool
