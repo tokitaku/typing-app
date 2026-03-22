@@ -54,6 +54,10 @@ class FakeQuestionRepository:
     def deactivate(self, question_id: int) -> bool:
         return self.update(question_id, {"is_active": False}) is not None  # is_active フラグによる論理削除をエミュレートする
 
+    def list_tags(self) -> list[str]:
+        unique_tags = {tag for question in self.questions for tag in question.tags}
+        return sorted(unique_tags)  # API と同じ契約でアルファベット順・重複なしのタグ一覧を返す
+
 
 class FakeStudyResultRepository:
     def __init__(self) -> None:

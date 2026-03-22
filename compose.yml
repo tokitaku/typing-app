@@ -27,9 +27,12 @@ services:
     command: >-
       /bin/sh -c 'export BACKEND_CORS_ORIGINS="$${BACKEND_CORS_ORIGINS:-http://localhost:$${FRONTEND_PORT:-3000}}";
       uv run --project backend uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --app-dir /app'
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-}
-      DATABASE_URL: sqlite:////data/app.db
+      DATABASE_URL: postgresql://typing_app:typing_app_password@postgres:5432/typing_app
       FRONTEND_PORT: ${FRONTEND_PORT:-3000}
       WATCHFILES_FORCE_POLLING: "true"
     healthcheck:
@@ -46,7 +49,24 @@ services:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ./backend:/app/backend
-      - sqlite_data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: typing_app
+      POSTGRES_PASSWORD: typing_app_password
+      POSTGRES_DB: typing_app
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U typing_app"]
+      timeout: 5s
+      interval: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  sqlite_data:
+  postgres_data:

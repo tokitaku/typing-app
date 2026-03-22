@@ -14,3 +14,4 @@ COPY --from=uv /uv /uvx /bin/
 COPY backend/pyproject.toml backend/uv.lock ./backend/
 
 RUN cd backend && uv sync --frozen
+
