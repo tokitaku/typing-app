@@ -7,12 +7,7 @@ import type {
   QuestionBrowserFilters,
   QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
-import type { Question, QuizType } from "@/shared/types/study";
-
-const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
-  { value: "word", label: "英単語" },
-  { value: "sentence", label: "英文章" }
-];
+import type { Question } from "@/shared/types/study";
 
 export type QuestionBrowserViewProps = {
   filters: QuestionBrowserFilters;
@@ -20,34 +15,15 @@ export type QuestionBrowserViewProps = {
   status: QuestionBrowserStatus;
   errorMessage: string | null;
   onSetTags: (tags: string[]) => void;
-  onSetQuestionTypes: (questionTypes: QuizType[]) => void;
   onSetIncludeInactive: (includeInactive: boolean) => void;
   onReload: () => void;
 };
-
-function toggleSelection<T extends string>(values: T[], value: T): T[] {
-  return values.includes(value)
-    ? values.filter((current) => current !== value)
-    : [...values, value]; // filter UI から複数選択状態を切り替える
-}
 
 function parseTagInput(value: string): string[] {
   return value
     .split(",")
     .map((tag) => tag.trim().toLowerCase())
     .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index); // 入力値を tags query 向けの配列へ正規化する
-}
-
-function formatQuestionTypeLabel(type: Question["type"]): string {
-  if (type === "word") {
-    return "英単語"; // 既存一覧の種別ラベルを維持する
-  }
-
-  if (type === "sentence") {
-    return "英文章"; // 既存一覧の種別ラベルを維持する
-  }
-
-  return "未分類"; // 推定できない問題でも表を崩さずに表示する
 }
 
 function renderQuestionTable(questions: Question[]) {
@@ -57,7 +33,6 @@ function renderQuestionTable(questions: Question[]) {
         <thead>
           <tr>
             <th scope="col">ID</th>
-            <th scope="col">種別</th>
             <th scope="col">英語</th>
             <th scope="col">日本語</th>
             <th scope="col">タグ</th>
@@ -68,7 +43,6 @@ function renderQuestionTable(questions: Question[]) {
           {questions.map((question) => (
             <tr key={question.id}>
               <td>{question.id}</td>
-              <td>{formatQuestionTypeLabel(question.type)}</td>
               <td className="question-table-text">{question.english}</td>
               <td className="question-table-text">{question.japanese}</td>
               <td className="question-table-text">{question.tags.join(", ") || "-"}</td>
@@ -97,7 +71,6 @@ export function QuestionBrowserView({
   status,
   errorMessage,
   onSetTags,
-  onSetQuestionTypes,
   onSetIncludeInactive,
   onReload
 }: QuestionBrowserViewProps) {
@@ -107,7 +80,7 @@ export function QuestionBrowserView({
         <p className="eyebrow">QUESTION BROWSER</p>
         <h1>typing_questions 一覧</h1>
         <p className="hero-copy">
-          登録済みの問題をタグ、問題種別、有効状態で絞り込みながら確認できます。
+          登録済みの問題をタグと有効状態で絞り込みながら確認できます。
         </p>
         <div className="hero-actions">
           <Link className="secondary-button" href="/">
@@ -131,22 +104,6 @@ export function QuestionBrowserView({
           type="text"
           value={filters.tags.join(", ")}
         />
-
-        <p className="settings-label settings-subtitle">問題種別</p>
-        <div className="settings-chip-group">
-          {QUESTION_TYPE_OPTIONS.map((option) => (
-            <label className="settings-chip" key={option.value}>
-              <input
-                checked={filters.questionTypes.includes(option.value)}
-                onChange={() =>
-                  onSetQuestionTypes(toggleSelection(filters.questionTypes, option.value))
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
 
         <label className="question-toggle-row" htmlFor="include-inactive">
           <span className="settings-label">無効問題を含む</span>
@@ -205,7 +162,6 @@ export function QuestionBrowser() {
     status,
     errorMessage,
     setTags,
-    setQuestionTypes,
     setIncludeInactive,
     reload
   } = useQuestionBrowser();
@@ -217,7 +173,6 @@ export function QuestionBrowser() {
       onReload={reload}
       onSetTags={setTags}
       onSetIncludeInactive={setIncludeInactive}
-      onSetQuestionTypes={setQuestionTypes}
       questions={questions}
       status={status}
     />

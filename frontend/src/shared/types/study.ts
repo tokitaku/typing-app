@@ -1,9 +1,7 @@
-export type QuizType = "word" | "sentence";
 export type StudyMode = "learn" | "review";
 
 export type Question = {
   id: number;
-  type?: QuizType;
   english: string;
   japanese: string;
   isActive: boolean;

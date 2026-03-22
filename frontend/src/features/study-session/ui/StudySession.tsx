@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useStudySession } from "@/features/study-session/hooks/useStudySession";
-import type { Question, StudyMode } from "@/shared/types/study";
+import type { StudyMode } from "@/shared/types/study";
 
 function formatMs(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -11,18 +11,6 @@ function formatMs(ms: number) {
     .padStart(2, "0");
   const seconds = (totalSeconds % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
-}
-
-function formatQuestionTypeLabel(type: Question["type"]): string {
-  if (type === "word") {
-    return "単語"; // 旧 API 契約から引き継いだ表示を維持する
-  }
-
-  if (type === "sentence") {
-    return "短文"; // 旧 API 契約から引き継いだ表示を維持する
-  }
-
-  return "未分類"; // type 推定できない問題でも表示を壊さない
 }
 
 export function StudySession({ mode }: { mode: StudyMode }) {
@@ -115,7 +103,6 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
       <section className="problem-card">
         <div className="problem-meta">
-          <span>{formatQuestionTypeLabel(currentQuiz.type)}</span>
           <span>{currentQuiz.tags.join(", ") || "tagless"}</span>
         </div>
         <p className="japanese-text">{currentQuiz.japanese}</p>

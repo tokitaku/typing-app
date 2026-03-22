@@ -9,14 +9,12 @@ import {
 const baseProps: QuestionBrowserViewProps = {
   filters: {
     tags: [],
-    questionTypes: [],
     includeInactive: false
   },
   questions: [],
   status: "loading",
   errorMessage: null,
   onSetTags: vi.fn(),
-  onSetQuestionTypes: vi.fn(),
   onSetIncludeInactive: vi.fn(),
   onReload: vi.fn()
 };
@@ -57,7 +55,6 @@ describe("question browser ui", () => {
         questions={[
           {
             id: 1,
-            type: "word",
             english: "apple",
             japanese: "りんご",
             isActive: true,
@@ -65,7 +62,6 @@ describe("question browser ui", () => {
           },
           {
             id: 2,
-            type: "sentence",
             english: "We must protect the environment.",
             japanese: "私たちは環境を守らなければならない。",
             isActive: false,
@@ -78,6 +74,7 @@ describe("question browser ui", () => {
 
     expect(html).toContain("typing_questions 一覧");
     expect(html).toContain("<th scope=\"col\">英語</th>");
+    expect(html).not.toContain("<th scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
     expect(html).toContain("sentence, environment");
