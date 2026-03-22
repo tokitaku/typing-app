@@ -3,7 +3,6 @@ import type {
   StudySummaryResponseDto
 } from "@/shared/api/studyApiTypes";
 import type {
-  EikenLevel,
   QuizType,
   StudyResult
 } from "@/shared/types/study";
@@ -15,7 +14,6 @@ function getApiBaseUrl(): string {
 }
 
 export type FetchQuestionListOptions = {
-  eikenLevels?: EikenLevel[];
   questionTypes?: QuizType[];
   tags?: string[];
   includeInactive?: boolean;
@@ -34,10 +32,6 @@ export async function fetchQuestionListResponse(
   signal?: AbortSignal
 ): Promise<QuestionListResponseDto> {
   const searchParams = new URLSearchParams();
-
-  if (options.eikenLevels && options.eikenLevels.length > 0) {
-    searchParams.set("eiken_levels", options.eikenLevels.join(",")); // 英検級フィルタを API 契約へ変換する
-  }
 
   if (options.questionTypes && options.questionTypes.length > 0) {
     searchParams.set("question_types", options.questionTypes.join(",")); // 問題種別フィルタを API 契約へ変換する

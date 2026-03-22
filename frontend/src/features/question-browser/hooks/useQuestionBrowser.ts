@@ -9,14 +9,14 @@ import {
   type QuestionBrowserFilters,
   type QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
-import type { EikenLevel, Question, QuizType } from "@/shared/types/study";
+import type { Question, QuizType } from "@/shared/types/study";
 
 type UseQuestionBrowserResult = {
   filters: QuestionBrowserFilters;
   questions: Question[];
   status: QuestionBrowserStatus;
   errorMessage: string | null;
-  setEikenLevels: (eikenLevels: EikenLevel[]) => void;
+  setTags: (tags: string[]) => void;
   setQuestionTypes: (questionTypes: QuizType[]) => void;
   setIncludeInactive: (includeInactive: boolean) => void;
   reload: () => void;
@@ -82,8 +82,8 @@ export function useQuestionBrowser(
     questions,
     status,
     errorMessage,
-    setEikenLevels: (eikenLevels) => {
-      setFilters((current) => ({ ...current, eikenLevels }));
+    setTags: (tags) => {
+      setFilters((current) => ({ ...current, tags }));
     },
     setQuestionTypes: (questionTypes) => {
       setFilters((current) => ({ ...current, questionTypes }));

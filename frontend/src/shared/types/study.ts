@@ -1,11 +1,9 @@
 export type QuizType = "word" | "sentence";
 export type StudyMode = "learn" | "review";
-export type EikenLevel = "5" | "4" | "3" | "pre2" | "2" | "pre1" | "1";
 
 export type Question = {
   id: number;
   type: QuizType;
-  eikenLevel: EikenLevel;
   english: string;
   japanese: string;
   isActive: boolean;

@@ -10,8 +10,8 @@ from backend.application.tests.fakes import FakeQuestionRepository
 def test_list_questions_use_case_includes_inactive_by_default() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, eiken_level_code="5", question_type=QuestionType.WORD, english="cat", japanese="猫", is_active=True),
-            Question(id=2, eiken_level_code="5", question_type=QuestionType.WORD, english="dog", japanese="犬", is_active=False),
+            Question(id=1, question_type=QuestionType.WORD, english="cat", japanese="猫", is_active=True),
+            Question(id=2, question_type=QuestionType.WORD, english="dog", japanese="犬", is_active=False),
         ]
     )
 
@@ -20,23 +20,23 @@ def test_list_questions_use_case_includes_inactive_by_default() -> None:
     assert len(result) == 2  # include_inactive=True の仕様通り、無効問題も含めて返却されることを検証
 
 
-def test_list_questions_use_case_with_eiken_and_type_filter() -> None:
+def test_list_questions_use_case_with_type_filter() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, eiken_level_code="3", question_type=QuestionType.WORD, english="forest", japanese="森", is_active=True),
-            Question(id=2, eiken_level_code="3", question_type=QuestionType.SENTENCE, english="The forest is quiet.", japanese="森は静かだ。", is_active=True),
-            Question(id=3, eiken_level_code="2", question_type=QuestionType.WORD, english="acquire", japanese="習得する", is_active=True),
+            Question(id=1, question_type=QuestionType.WORD, english="forest", japanese="森", is_active=True),
+            Question(id=2, question_type=QuestionType.SENTENCE, english="The forest is quiet.", japanese="森は静かだ。", is_active=True),
+            Question(id=3, question_type=QuestionType.WORD, english="acquire", japanese="習得する", is_active=True),
         ]
     )
 
     result = list_questions(
         repository,
-        ListQuestionsQuery(eiken_level_codes=["3"], question_type_codes=["word"]),
+        ListQuestionsQuery(question_type_codes=["word"]),
     )
 
-    assert len(result) == 1
-    assert result[0].eikenLevel == "3"
-    assert result[0].type == "word"  # 複合フィルタの仕様通り、両条件を満たす問題のみが抽出されることを検証
+    assert len(result) == 2
+    assert all(question.type == "word" for question in result)  # 種別フィルタだけで公開 DTO を絞り込めることを検証
+    assert all(not hasattr(question, "eikenLevel") for question in result)  # 公開 DTO に英検級が露出しないことを検証
 
 
 def test_list_questions_use_case_with_tag_filter() -> None:
@@ -44,7 +44,6 @@ def test_list_questions_use_case_with_tag_filter() -> None:
         [
             Question(
                 id=1,
-                eiken_level_code="pre2",
                 question_type=QuestionType.WORD,
                 english="debate",
                 japanese="討論",
@@ -53,7 +52,6 @@ def test_list_questions_use_case_with_tag_filter() -> None:
             ),
             Question(
                 id=2,
-                eiken_level_code="pre2",
                 question_type=QuestionType.SENTENCE,
                 english="We discussed climate policy.",
                 japanese="私たちは気候政策を議論した。",
@@ -79,17 +77,16 @@ def test_create_question_use_case() -> None:
     result = create_question(
         repository,
         CreateQuestionCommand(
-            eiken_level_code="pre2",
             question_type="sentence",
             english="I have been studying English for three years.",
             japanese="私は3年間英語を勉強し続けている。",
         ),
     )
 
-    assert result.eikenLevel == "pre2"
     assert result.type == "sentence"
     assert result.english == "I have been studying English for three years."
     assert result.isActive is True  # ビジネスルールとして新規作成時は必ず有効状態で保存されることを検証
+    assert not hasattr(result, "eikenLevel")  # 公開 DTO から英検級が除去されることを検証
 
 
 def test_create_question_use_case_normalizes_tags() -> None:
@@ -98,7 +95,6 @@ def test_create_question_use_case_normalizes_tags() -> None:
     result = create_question(
         repository,
         CreateQuestionCommand(
-            eiken_level_code="pre1",
             question_type="word",
             english="Perspective",
             japanese="視点",
@@ -112,7 +108,7 @@ def test_create_question_use_case_normalizes_tags() -> None:
 def test_update_question_use_case_updates_fields() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=10, eiken_level_code="4", question_type=QuestionType.WORD, english="river", japanese="川", is_active=True),
+            Question(id=10, question_type=QuestionType.WORD, english="river", japanese="川", is_active=True),
         ]
     )
 
@@ -125,7 +121,7 @@ def test_update_question_use_case_updates_fields() -> None:
     assert result is not None
     assert result.english == "sea"
     assert result.japanese == "海"
-    assert result.eikenLevel == "4"  # 部分更新の仕様通り、指定されていないフィールドは既存値を保持することを検証
+    assert not hasattr(result, "eikenLevel")  # 公開 DTO から英検級が除去されることを検証
 
 
 def test_update_question_use_case_replaces_tags() -> None:
@@ -133,7 +129,6 @@ def test_update_question_use_case_replaces_tags() -> None:
         [
             Question(
                 id=10,
-                eiken_level_code="4",
                 question_type=QuestionType.WORD,
                 english="river",
                 japanese="川",

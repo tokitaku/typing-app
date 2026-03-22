@@ -7,17 +7,7 @@ import type {
   QuestionBrowserFilters,
   QuestionBrowserStatus
 } from "@/features/question-browser/application/questionBrowser";
-import type { EikenLevel, Question, QuizType } from "@/shared/types/study";
-
-const EIKEN_LEVEL_OPTIONS: { value: EikenLevel; label: string }[] = [
-  { value: "5", label: "英検5級" },
-  { value: "4", label: "英検4級" },
-  { value: "3", label: "英検3級" },
-  { value: "pre2", label: "英検準2級" },
-  { value: "2", label: "英検2級" },
-  { value: "pre1", label: "英検準1級" },
-  { value: "1", label: "英検1級" }
-];
+import type { Question, QuizType } from "@/shared/types/study";
 
 const QUESTION_TYPE_OPTIONS: { value: QuizType; label: string }[] = [
   { value: "word", label: "英単語" },
@@ -29,7 +19,7 @@ export type QuestionBrowserViewProps = {
   questions: Question[];
   status: QuestionBrowserStatus;
   errorMessage: string | null;
-  onSetEikenLevels: (eikenLevels: EikenLevel[]) => void;
+  onSetTags: (tags: string[]) => void;
   onSetQuestionTypes: (questionTypes: QuizType[]) => void;
   onSetIncludeInactive: (includeInactive: boolean) => void;
   onReload: () => void;
@@ -41,6 +31,13 @@ function toggleSelection<T extends string>(values: T[], value: T): T[] {
     : [...values, value]; // filter UI から複数選択状態を切り替える
 }
 
+function parseTagInput(value: string): string[] {
+  return value
+    .split(",")
+    .map((tag) => tag.trim().toLowerCase())
+    .filter((tag, index, tags) => tag !== "" && tags.indexOf(tag) === index); // 入力値を tags query 向けの配列へ正規化する
+}
+
 function renderQuestionTable(questions: Question[]) {
   return (
     <div className="question-table-scroll">
@@ -48,10 +45,10 @@ function renderQuestionTable(questions: Question[]) {
         <thead>
           <tr>
             <th scope="col">ID</th>
-            <th scope="col">英検級</th>
             <th scope="col">種別</th>
             <th scope="col">英語</th>
             <th scope="col">日本語</th>
+            <th scope="col">タグ</th>
             <th scope="col">状態</th>
           </tr>
         </thead>
@@ -59,10 +56,10 @@ function renderQuestionTable(questions: Question[]) {
           {questions.map((question) => (
             <tr key={question.id}>
               <td>{question.id}</td>
-              <td>{question.eikenLevel}</td>
               <td>{question.type === "word" ? "英単語" : "英文章"}</td>
               <td className="question-table-text">{question.english}</td>
               <td className="question-table-text">{question.japanese}</td>
+              <td className="question-table-text">{question.tags.join(", ") || "-"}</td>
               <td>
                 <span
                   className={
@@ -87,7 +84,7 @@ export function QuestionBrowserView({
   questions,
   status,
   errorMessage,
-  onSetEikenLevels,
+  onSetTags,
   onSetQuestionTypes,
   onSetIncludeInactive,
   onReload
@@ -98,7 +95,7 @@ export function QuestionBrowserView({
         <p className="eyebrow">QUESTION BROWSER</p>
         <h1>typing_questions 一覧</h1>
         <p className="hero-copy">
-          登録済みの問題を英検級、問題種別、有効状態で絞り込みながら確認できます。
+          登録済みの問題をタグ、問題種別、有効状態で絞り込みながら確認できます。
         </p>
         <div className="hero-actions">
           <Link className="secondary-button" href="/">
@@ -111,21 +108,17 @@ export function QuestionBrowserView({
       </section>
 
       <section className="settings-section question-filter-section">
-        <p className="settings-label">英検級</p>
-        <div className="settings-chip-group">
-          {EIKEN_LEVEL_OPTIONS.map((option) => (
-            <label className="settings-chip" key={option.value}>
-              <input
-                checked={filters.eikenLevels.includes(option.value)}
-                onChange={() =>
-                  onSetEikenLevels(toggleSelection(filters.eikenLevels, option.value))
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
+        <label className="settings-label" htmlFor="question-tags">
+          タグ
+        </label>
+        <input
+          className="typing-input"
+          id="question-tags"
+          onChange={(event) => onSetTags(parseTagInput(event.target.value))}
+          placeholder="daily, business"
+          type="text"
+          value={filters.tags.join(", ")}
+        />
 
         <p className="settings-label settings-subtitle">問題種別</p>
         <div className="settings-chip-group">
@@ -199,7 +192,7 @@ export function QuestionBrowser() {
     questions,
     status,
     errorMessage,
-    setEikenLevels,
+    setTags,
     setQuestionTypes,
     setIncludeInactive,
     reload
@@ -210,7 +203,7 @@ export function QuestionBrowser() {
       errorMessage={errorMessage}
       filters={filters}
       onReload={reload}
-      onSetEikenLevels={setEikenLevels}
+      onSetTags={setTags}
       onSetIncludeInactive={setIncludeInactive}
       onSetQuestionTypes={setQuestionTypes}
       questions={questions}

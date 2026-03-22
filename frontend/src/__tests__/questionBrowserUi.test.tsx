@@ -8,14 +8,14 @@ import {
 
 const baseProps: QuestionBrowserViewProps = {
   filters: {
-    eikenLevels: [],
+    tags: [],
     questionTypes: [],
     includeInactive: false
   },
   questions: [],
   status: "loading",
   errorMessage: null,
-  onSetEikenLevels: vi.fn(),
+  onSetTags: vi.fn(),
   onSetQuestionTypes: vi.fn(),
   onSetIncludeInactive: vi.fn(),
   onReload: vi.fn()
@@ -58,7 +58,6 @@ describe("question browser ui", () => {
           {
             id: 1,
             type: "word",
-            eikenLevel: "5",
             english: "apple",
             japanese: "りんご",
             isActive: true,
@@ -67,7 +66,6 @@ describe("question browser ui", () => {
           {
             id: 2,
             type: "sentence",
-            eikenLevel: "pre2",
             english: "We must protect the environment.",
             japanese: "私たちは環境を守らなければならない。",
             isActive: false,
@@ -82,6 +80,7 @@ describe("question browser ui", () => {
     expect(html).toContain("<th scope=\"col\">英語</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
+    expect(html).toContain("sentence, environment");
     expect(html).toContain("有効");
     expect(html).toContain("無効");
   });

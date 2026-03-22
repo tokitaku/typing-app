@@ -7,13 +7,12 @@ from backend.domain.tag_rules import normalize_tags
 
 
 class QuestionBase(BaseModel):
-    eiken_level_code: str = Field(min_length=1)
     question_type: Literal["word", "sentence"]
     english: str = Field(min_length=1)
     japanese: str = Field(min_length=1)
     tags: list[str] = Field(default_factory=list)
 
-    @field_validator("eiken_level_code", "english", "japanese")
+    @field_validator("english", "japanese")
     @classmethod
     def validate_non_empty_text(cls, value: str) -> str:
         normalized_value = value.strip()
@@ -34,14 +33,13 @@ class QuestionCreate(QuestionBase):
 
 
 class QuestionUpdate(BaseModel):
-    eiken_level_code: str | None = Field(default=None, min_length=1)
     question_type: Literal["word", "sentence"] | None = None
     english: str | None = Field(default=None, min_length=1)
     japanese: str | None = Field(default=None, min_length=1)
     is_active: bool | None = None
     tags: list[str] | None = None
 
-    @field_validator("eiken_level_code", "english", "japanese")
+    @field_validator("english", "japanese")
     @classmethod
     def validate_optional_non_empty_text(cls, value: str | None) -> str | None:
         if value is None:
@@ -66,7 +64,6 @@ class QuestionUpdate(BaseModel):
 class QuestionResponse(BaseModel):
     id: int
     type: Literal["word", "sentence"]
-    eikenLevel: str
     english: str
     japanese: str
     isActive: bool

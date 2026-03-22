@@ -1,6 +1,5 @@
 def test_post_question_creates_new_sentence_question(client) -> None:
     payload = {
-        "eiken_level_code": "pre2",
         "question_type": "sentence",
         "english": "I will call you after I get home.",
         "japanese": "家に着いたら電話します。",
@@ -12,18 +11,17 @@ def test_post_question_creates_new_sentence_question(client) -> None:
     assert response.status_code == 201
     body = response.json()
     assert body["type"] == "sentence"
-    assert body["eikenLevel"] == "pre2"
     assert body["english"] == payload["english"]
     assert body["japanese"] == payload["japanese"]
     assert body["isActive"] is True
     assert body["tags"] == ["speaking", "daily"]
+    assert "eikenLevel" not in body
 
 
 def test_get_questions_returns_registered_questions(client) -> None:
     created_response = client.post(
         "/questions",
         json={
-            "eiken_level_code": "2",
             "question_type": "word",
             "english": "notebook",
             "japanese": "ノート",
@@ -40,7 +38,6 @@ def test_get_questions_returns_registered_questions(client) -> None:
     assert body["questions"][-1] == {
         "id": created_id,
         "type": "word",
-        "eikenLevel": "2",
         "english": "notebook",
         "japanese": "ノート",
         "isActive": True,
@@ -52,7 +49,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     created_response = client.post(
         "/questions",
         json={
-            "eiken_level_code": "4",
             "question_type": "word",
             "english": "notebook",
             "japanese": "ノート",
@@ -63,7 +59,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     response = client.patch(
         f"/questions/{question_id}",
         json={
-            "eiken_level_code": "3",
             "question_type": "sentence",
             "english": "I bought a new notebook yesterday.",
             "japanese": "昨日新しいノートを買いました。",
@@ -76,7 +71,6 @@ def test_patch_question_updates_existing_question(client) -> None:
     assert response.json() == {
         "id": question_id,
         "type": "sentence",
-        "eikenLevel": "3",
         "english": "I bought a new notebook yesterday.",
         "japanese": "昨日新しいノートを買いました。",
         "isActive": False,
@@ -88,20 +82,6 @@ def test_patch_question_returns_not_found_for_unknown_id(client) -> None:
     response = client.patch("/questions/999", json={"english": "ghost"})
 
     assert response.status_code == 404
-
-
-def test_post_question_rejects_invalid_master_code(client) -> None:
-    response = client.post(
-        "/questions",
-        json={
-            "eiken_level_code": "unknown",  # 未定義の英検級コードを送る
-            "question_type": "word",  # 種別は有効値にして原因を絞る
-            "english": "ghost",  # 正常な本文でマスターコード検証だけを見る
-            "japanese": "ゴースト",  # 正常な本文でマスターコード検証だけを見る
-        },
-    )
-
-    assert response.status_code == 422
 
 
 def test_patch_question_rejects_invalid_master_code(client) -> None:
@@ -119,7 +99,6 @@ def test_post_question_rejects_whitespace_only_fields(client) -> None:
     response = client.post(
         "/questions",
         json={
-            "eiken_level_code": "3",
             "question_type": "word",
             "english": "   ",
             "japanese": "\t",
@@ -133,7 +112,6 @@ def test_post_question_rejects_whitespace_only_tags(client) -> None:
     response = client.post(
         "/questions",
         json={
-            "eiken_level_code": "3",
             "question_type": "word",
             "english": "topic",
             "japanese": "話題",
@@ -166,38 +144,10 @@ def test_delete_question_deactivates_existing_question(client) -> None:
     assert questions_response.json()["questions"][0]["isActive"] is False
 
 
-def test_get_questions_filters_by_eiken_level(client) -> None:
-    client.post(
-        "/questions",
-        json={
-            "eiken_level_code": "5",
-            "question_type": "word",
-            "english": "dog",
-            "japanese": "犬",
-        },
-    )
-    client.post(
-        "/questions",
-        json={
-            "eiken_level_code": "2",
-            "question_type": "word",
-            "english": "enterprise",
-            "japanese": "企業",
-        },
-    )
-
-    response = client.get("/questions?eiken_levels=5")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert all(q["eikenLevel"] == "5" for q in body["questions"])  # eiken_levels フィルタの仕様通り指定された級の問題のみが返却されることを検証
-
-
 def test_get_questions_filters_by_question_type(client) -> None:
     client.post(
         "/questions",
         json={
-            "eiken_level_code": "3",
             "question_type": "sentence",
             "english": "She reads books every night.",
             "japanese": "彼女は毎晩本を読む。",
@@ -216,7 +166,6 @@ def test_get_questions_filters_by_tags(client) -> None:
     client.post(
         "/questions",
         json={
-            "eiken_level_code": "pre1",
             "question_type": "sentence",
             "english": "The proposal needs stronger evidence.",
             "japanese": "その提案にはより強い根拠が必要だ。",
@@ -226,7 +175,6 @@ def test_get_questions_filters_by_tags(client) -> None:
     client.post(
         "/questions",
         json={
-            "eiken_level_code": "pre1",
             "question_type": "sentence",
             "english": "The city expanded the subway network.",
             "japanese": "その都市は地下鉄網を拡張した。",
@@ -246,7 +194,6 @@ def test_get_questions_excludes_inactive_when_flag_is_false(client) -> None:
     created = client.post(
         "/questions",
         json={
-            "eiken_level_code": "4",
             "question_type": "word",
             "english": "umbrella",
             "japanese": "傘",
@@ -263,33 +210,33 @@ def test_get_questions_excludes_inactive_when_flag_is_false(client) -> None:
     assert all(q["id"] != question_id for q in body["questions"])
 
 
-def test_get_questions_combined_eiken_and_type_filter(client) -> None:
+def test_get_questions_combined_tag_and_type_filter(client) -> None:
     client.post(
         "/questions",
         json={
-            "eiken_level_code": "pre2",
             "question_type": "word",
             "english": "environment",
             "japanese": "環境",
+            "tags": ["business"],
         },
     )
     client.post(
         "/questions",
         json={
-            "eiken_level_code": "pre2",
             "question_type": "sentence",
             "english": "We must protect the environment.",
             "japanese": "私たちは環境を守らなければならない。",
+            "tags": ["business"],
         },
     )
 
-    response = client.get("/questions?eiken_levels=pre2&question_types=word")
+    response = client.get("/questions?tags=business&question_types=word")
 
     assert response.status_code == 200
     body = response.json()
     assert len(body["questions"]) > 0
-    assert all(q["eikenLevel"] == "pre2" for q in body["questions"])  # 複合フィルタの仕様通り eiken_levels 条件を満たす問題のみが返却されることを検証
-    assert all(q["type"] == "word" for q in body["questions"])  # 複合フィルタの仕様通り question_types 条件も同時に満たす問題のみが返却されることを検証
+    assert all("business" in question["tags"] for question in body["questions"])  # 複合フィルタでもタグ条件で絞り込めることを検証
+    assert all(question["type"] == "word" for question in body["questions"])  # 複合フィルタでも種別条件を同時に満たすことを検証
 
 
 def test_get_questions_returns_422_for_invalid_question_type(client) -> None:

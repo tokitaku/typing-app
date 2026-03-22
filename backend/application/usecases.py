@@ -31,7 +31,6 @@ def _to_question_dto(question: Question) -> QuestionDto:
     return QuestionDto(
         id=int(question.id),
         type=question.question_type.value,
-        eikenLevel=question.eiken_level_code,
         english=question.english,
         japanese=question.japanese,
         isActive=question.is_active,
@@ -60,7 +59,6 @@ def _to_summary_dto(summary: DailyStudySummary) -> DailyStudySummaryDto:
 
 def list_questions(repository: QuestionRepository, query: ListQuestionsQuery) -> list[QuestionDto]:
     questions = repository.list_questions(
-        eiken_level_codes=query.eiken_level_codes,
         question_type_codes=_parse_question_types(query.question_type_codes),
         tag_codes=_parse_tag_codes(query.tag_codes),
         include_inactive=query.include_inactive,
@@ -72,7 +70,6 @@ def create_question(repository: QuestionRepository, command: CreateQuestionComma
     saved_question = repository.create(
         Question(
             id=None,
-            eiken_level_code=command.eiken_level_code,
             question_type=QuestionType(command.question_type),
             english=command.english,
             japanese=command.japanese,
@@ -89,9 +86,6 @@ def update_question(
     command: UpdateQuestionCommand,
 ) -> QuestionDto | None:
     updates: dict[str, object] = {}
-
-    if command.eiken_level_code is not None:
-        updates["eiken_level_code"] = command.eiken_level_code  # 英検級更新内容を詰める
 
     if command.question_type is not None:
         updates["question_type"] = QuestionType(command.question_type)  # 種別を enum へ正規化する

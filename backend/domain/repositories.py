@@ -7,7 +7,6 @@ class QuestionRepository(Protocol):
     def list_questions(
         self,
         *,
-        eiken_level_codes: list[str] | None = None,
         question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,

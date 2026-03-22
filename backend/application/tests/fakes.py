@@ -10,7 +10,6 @@ class FakeQuestionRepository:
     def list_questions(
         self,
         *,
-        eiken_level_codes: list[str] | None = None,
         question_type_codes: list[QuestionType] | None = None,
         tag_codes: list[str] | None = None,
         include_inactive: bool = True,
@@ -19,11 +18,6 @@ class FakeQuestionRepository:
 
         if not include_inactive:
             filtered = [question for question in filtered if question.is_active]  # 有効問題だけに絞る
-
-        if eiken_level_codes:
-            filtered = [
-                question for question in filtered if question.eiken_level_code in eiken_level_codes
-            ]  # 英検級で絞る
 
         if question_type_codes:
             filtered = [
@@ -41,7 +35,6 @@ class FakeQuestionRepository:
     def create(self, question: Question) -> Question:
         saved = Question(
             id=self._next_id,
-            eiken_level_code=question.eiken_level_code,
             question_type=question.question_type,
             english=question.english,
             japanese=question.japanese,
@@ -57,7 +50,6 @@ class FakeQuestionRepository:
             if q.id == question_id:
                 updated = Question(
                     id=q.id,
-                    eiken_level_code=updates.get("eiken_level_code", q.eiken_level_code),
                     question_type=updates.get("question_type", q.question_type),
                     english=updates.get("english", q.english),
                     japanese=updates.get("japanese", q.japanese),
