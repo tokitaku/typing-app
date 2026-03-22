@@ -19,6 +19,7 @@ services:
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules
+      - /app/frontend/.next
 
   backend:
     build:

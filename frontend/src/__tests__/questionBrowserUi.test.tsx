@@ -80,7 +80,7 @@ describe("question browser ui", () => {
       />
     );
 
-    expect(html).toContain("typing_questions 一覧");
+    expect(html).toContain("typing questions 一覧");
     expect(html).toContain("<th scope=\"col\">英語</th>");
     expect(html).not.toContain("<th scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
@@ -88,8 +88,6 @@ describe("question browser ui", () => {
     expect(html).toContain("question-tag-badge");  // タグバッジが表示されることを検証
     expect(html).toContain("sentence");
     expect(html).toContain("environment");
-    expect(html).toContain("有効");
-    expect(html).toContain("無効");
     expect(html).toContain("編集");  // 編集ボタンが各行にあることを検証
   });
 
@@ -176,8 +174,9 @@ describe("question browser ui", () => {
       />
     );
 
-    expect(html).toContain("question-edit-button\" disabled=\"\"");
-    expect(html).toContain("question-browser-button\" disabled=\"\" type=\"button\">新規作成");
+    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">編集");
+    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">");
+    expect(html).toContain("新規作成");
     expect(html).toContain(">処理中...<");
   });
 });

@@ -9673,6 +9673,7 @@
                   "name": "selectBox",
                   "x": 17,
                   "y": 53,
+                  "height": "fit_content",
                   "descendants": {
                     "vYZyZ": {
                       "width": "fill_container(240)",
@@ -9683,11 +9684,14 @@
                       "enabled": false
                     },
                     "PQ24r": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content"
                     },
                     "ltyf8": {
                       "width": "fill_container",
-                      "content": "2件選択中"
+                      "content": "2件選択中",
+                      "x": 12,
+                      "y": 10
                     }
                   }
                 }
@@ -9706,12 +9710,16 @@
                   "name": "startBtn",
                   "x": 0,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "qssnt": {
                       "enabled": false
                     },
                     "yV4VT": {
-                      "content": "学習開始"
+                      "content": "学習開始",
+                      "x": 16,
+                      "y": 8
                     }
                   }
                 },
@@ -9722,12 +9730,16 @@
                   "name": "reviewBtn",
                   "x": 100,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "IU1A6": {
                       "enabled": false
                     },
                     "aWMhD": {
-                      "content": "復習する"
+                      "content": "復習する",
+                      "x": 16,
+                      "y": 8
                     }
                   }
                 }
@@ -9754,26 +9766,40 @@
               "name": "card1",
               "x": 32,
               "y": 0,
+              "height": "fit_content",
               "descendants": {
                 "vY7gV": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content"
                 },
                 "gwn7N": {
                   "width": "fill_container",
                   "content": "今日の学習回数",
-                  "fontSize": 14
+                  "fontSize": 14,
+                  "x": 24,
+                  "y": 24
                 },
                 "wLWHS": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content",
+                  "y": 69
                 },
                 "jEUXG": {
                   "width": "fill_container",
                   "content": "1",
                   "fontSize": 36,
-                  "fontWeight": "700"
+                  "fontWeight": "700",
+                  "x": 24,
+                  "y": 24
                 },
                 "oyHa9": {
-                  "enabled": false
+                  "enabled": false,
+                  "width": "fit_content",
+                  "height": "fit_content"
+                },
+                "Efulc": {
+                  "x": 8,
+                  "y": 2
                 }
               }
             },
@@ -9785,26 +9811,40 @@
               "name": "card2",
               "x": 442.6666666666667,
               "y": 0,
+              "height": "fit_content",
               "descendants": {
                 "vY7gV": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content"
                 },
                 "gwn7N": {
                   "width": "fill_container",
                   "content": "今日の出題数",
-                  "fontSize": 14
+                  "fontSize": 14,
+                  "x": 24,
+                  "y": 24
                 },
                 "wLWHS": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content",
+                  "y": 69
                 },
                 "jEUXG": {
                   "width": "fill_container",
                   "content": "2",
                   "fontSize": 36,
-                  "fontWeight": "700"
+                  "fontWeight": "700",
+                  "x": 24,
+                  "y": 24
                 },
                 "oyHa9": {
-                  "enabled": false
+                  "enabled": false,
+                  "width": "fit_content",
+                  "height": "fit_content"
+                },
+                "Efulc": {
+                  "x": 8,
+                  "y": 2
                 }
               }
             },
@@ -9816,26 +9856,40 @@
               "name": "card3",
               "x": 853.3333333333334,
               "y": 0,
+              "height": "fit_content",
               "descendants": {
                 "vY7gV": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content"
                 },
                 "gwn7N": {
                   "width": "fill_container",
                   "content": "復習待ち",
-                  "fontSize": 14
+                  "fontSize": 14,
+                  "x": 24,
+                  "y": 24
                 },
                 "wLWHS": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content",
+                  "y": 69
                 },
                 "jEUXG": {
                   "width": "fill_container",
                   "content": "0",
                   "fontSize": 36,
-                  "fontWeight": "700"
+                  "fontWeight": "700",
+                  "x": 24,
+                  "y": 24
                 },
                 "oyHa9": {
-                  "enabled": false
+                  "enabled": false,
+                  "width": "fit_content",
+                  "height": "fit_content"
+                },
+                "Efulc": {
+                  "x": 8,
+                  "y": 2
                 }
               }
             }
@@ -9889,9 +9943,13 @@
                   "name": "learnBadge",
                   "x": 0,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "OgFQ8": {
-                      "content": "LEARN MODE"
+                      "content": "LEARN MODE",
+                      "x": 8,
+                      "y": 2
                     }
                   }
                 },
@@ -9936,9 +9994,13 @@
               "name": "timerBadge",
               "x": 1196,
               "y": 18,
+              "width": "fit_content",
+              "height": "fit_content",
               "descendants": {
                 "npWsI": {
-                  "content": "00:02"
+                  "content": "00:02",
+                  "x": 8,
+                  "y": 2
                 }
               }
             }
@@ -9985,9 +10047,13 @@
                       "name": "tagBadge",
                       "x": 24,
                       "y": 24,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
                         "VBuxq": {
-                          "content": "sentence"
+                          "content": "sentence",
+                          "x": 8,
+                          "y": 2
                         }
                       }
                     },
@@ -10052,19 +10118,25 @@
               "name": "inputGroup",
               "x": 320,
               "y": 479.5,
+              "height": "fit_content",
               "descendants": {
                 "reBfl": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content"
                 },
                 "mjoFC": {
                   "width": "fill_container",
                   "content": "英語を入力"
                 },
                 "6t91O": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "height": "fit_content",
+                  "y": 26
                 },
                 "H6b8U": {
-                  "content": "ここに入力してください"
+                  "content": "ここに入力してください",
+                  "x": 12,
+                  "y": 10
                 }
               }
             }
@@ -10191,12 +10263,20 @@
               "name": "headerRight",
               "x": 1106,
               "y": 10,
+              "width": "fit_content",
+              "height": "fit_content",
               "descendants": {
+                "O1UAB": {
+                  "x": 16,
+                  "y": 8
+                },
                 "BCmZn": {
                   "iconFontName": "home"
                 },
                 "p80Yn": {
-                  "content": "ホームへ戻る"
+                  "content": "ホームへ戻る",
+                  "x": 42,
+                  "y": 8
                 }
               }
             }
@@ -10546,12 +10626,20 @@
                       "name": "backBtn",
                       "x": 165,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
+                        "IU1A6": {
+                          "x": 16,
+                          "y": 8
+                        },
                         "4ff6Q": {
                           "iconFontName": "arrow-left"
                         },
                         "aWMhD": {
-                          "content": "ホームへ戻る"
+                          "content": "ホームへ戻る",
+                          "x": 42,
+                          "y": 8
                         }
                       }
                     },
@@ -10562,12 +10650,20 @@
                       "name": "nextBtn",
                       "x": 319,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
+                        "qssnt": {
+                          "x": 16,
+                          "y": 8
+                        },
                         "Uf0jP": {
                           "iconFontName": "play"
                         },
                         "yV4VT": {
-                          "content": "次の学習へ進む"
+                          "content": "次の学習へ進む",
+                          "x": 42,
+                          "y": 8
                         }
                       }
                     }
@@ -10645,12 +10741,20 @@
               "name": "qHeaderRight",
               "x": 1106,
               "y": 10,
+              "width": "fit_content",
+              "height": "fit_content",
               "descendants": {
+                "O1UAB": {
+                  "x": 16,
+                  "y": 8
+                },
                 "BCmZn": {
                   "iconFontName": "arrow-left"
                 },
                 "p80Yn": {
-                  "content": "ホームへ戻る"
+                  "content": "ホームへ戻る",
+                  "x": 42,
+                  "y": 8
                 }
               }
             }
@@ -10715,12 +10819,20 @@
                       "name": "reloadBtn",
                       "x": 0,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
+                        "IU1A6": {
+                          "x": 16,
+                          "y": 8
+                        },
                         "4ff6Q": {
                           "iconFontName": "refresh-cw"
                         },
                         "aWMhD": {
-                          "content": "再読み込み"
+                          "content": "再読み込み",
+                          "x": 42,
+                          "y": 8
                         }
                       }
                     },
@@ -10731,12 +10843,20 @@
                       "name": "createBtn",
                       "x": 136,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
+                        "qssnt": {
+                          "x": 16,
+                          "y": 8
+                        },
                         "Uf0jP": {
                           "iconFontName": "plus"
                         },
                         "yV4VT": {
-                          "content": "新規作成"
+                          "content": "新規作成",
+                          "x": 42,
+                          "y": 8
                         }
                       }
                     }
@@ -10806,19 +10926,25 @@
                       "name": "tagInput",
                       "x": 20,
                       "y": 16,
+                      "height": "fit_content",
                       "descendants": {
                         "reBfl": {
-                          "width": "fill_container"
+                          "width": "fill_container",
+                          "height": "fit_content"
                         },
                         "mjoFC": {
                           "width": "fill_container",
                           "content": "タグ"
                         },
                         "6t91O": {
-                          "width": "fill_container"
+                          "width": "fill_container",
+                          "height": "fit_content",
+                          "y": 26
                         },
                         "H6b8U": {
-                          "content": "daily, business"
+                          "content": "daily, business",
+                          "x": 12,
+                          "y": 10
                         }
                       }
                     }
@@ -10863,13 +10989,15 @@
                       "y": 16,
                       "justifyContent": "center",
                       "alignItems": "center",
+                      "height": "fit_content",
                       "descendants": {
                         "tmguD": {
                           "enabled": false
                         },
                         "CcvDe": {
                           "content": "削除",
-                          "x": 16
+                          "x": 16,
+                          "y": 8
                         }
                       }
                     }
@@ -10915,7 +11043,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -10933,7 +11063,9 @@
                           "descendants": {
                             "pgI2j": {
                               "width": "fill_container",
-                              "content": "ID"
+                              "content": "ID",
+                              "x": 12,
+                              "y": 12
                             }
                           }
                         },
@@ -10945,10 +11077,13 @@
                           "name": "hc2",
                           "x": 100,
                           "y": 0,
+                          "height": "fit_content",
                           "descendants": {
                             "pgI2j": {
                               "width": "fill_container",
-                              "content": "英語"
+                              "content": "英語",
+                              "x": 12,
+                              "y": 12
                             }
                           }
                         },
@@ -10960,10 +11095,13 @@
                           "name": "hc3",
                           "x": 528,
                           "y": 0,
+                          "height": "fit_content",
                           "descendants": {
                             "pgI2j": {
                               "width": "fill_container",
-                              "content": "日本語"
+                              "content": "日本語",
+                              "x": 12,
+                              "y": 12
                             }
                           }
                         },
@@ -10975,10 +11113,13 @@
                           "name": "hc4",
                           "x": 956,
                           "y": 0,
+                          "height": "fit_content",
                           "descendants": {
                             "pgI2j": {
                               "width": "fill_container",
-                              "content": "タグ"
+                              "content": "タグ",
+                              "x": 12,
+                              "y": 12
                             }
                           }
                         },
@@ -10993,10 +11134,13 @@
                           "justifyContent": "start",
                           "alignItems": "center",
                           "layout": "horizontal",
+                          "height": "fit_content",
                           "descendants": {
                             "pgI2j": {
                               "width": "fill_container",
-                              "content": "操作"
+                              "content": "操作",
+                              "x": 12,
+                              "y": 12
                             }
                           }
                         }
@@ -11035,7 +11179,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11093,6 +11239,7 @@
                           "name": "r1c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11122,9 +11269,13 @@
                               "name": "r1c4b",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             },
@@ -11136,9 +11287,12 @@
                               "width": "fit_content",
                               "x": 66,
                               "y": 12,
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "basic"
+                                  "content": "basic",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11159,12 +11313,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11205,7 +11365,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11263,6 +11425,7 @@
                           "name": "r2c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11292,9 +11455,13 @@
                               "name": "r2b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11315,12 +11482,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn1",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11361,7 +11534,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11419,6 +11594,7 @@
                           "name": "r3c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11448,9 +11624,13 @@
                               "name": "r3b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             },
@@ -11462,9 +11642,12 @@
                               "width": "fit_content",
                               "x": 66,
                               "y": 12,
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "daily"
+                                  "content": "daily",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11485,12 +11668,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn2",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11531,7 +11720,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11589,6 +11780,7 @@
                           "name": "r4c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11618,9 +11810,13 @@
                               "name": "r4b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11641,12 +11837,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn3",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11687,7 +11889,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11745,6 +11949,7 @@
                           "name": "r5c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11774,9 +11979,13 @@
                               "name": "r5b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11797,12 +12006,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn4",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11843,7 +12058,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -11901,6 +12118,7 @@
                           "name": "r6c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -11930,9 +12148,13 @@
                               "name": "r6b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "word"
+                                  "content": "word",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -11953,12 +12175,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn6",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -11998,8 +12226,14 @@
                                 "Lhxn4": {
                                   "y": 0
                                 },
+                                "hjH1g": {
+                                  "x": 2,
+                                  "y": 2
+                                },
                                 "3amh2": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -12057,6 +12291,7 @@
                           "name": "r7c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -12086,9 +12321,13 @@
                               "name": "r7b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "sentence"
+                                  "content": "sentence",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             },
@@ -12100,9 +12339,12 @@
                               "width": "fit_content",
                               "x": 90,
                               "y": 12,
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "daily"
+                                  "content": "daily",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -12123,12 +12365,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn7",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -12169,7 +12417,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -12227,6 +12477,7 @@
                           "name": "r8c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -12256,9 +12507,13 @@
                               "name": "r8b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "sentence"
+                                  "content": "sentence",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -12279,12 +12534,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn8",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -12325,7 +12586,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -12383,6 +12646,7 @@
                           "name": "r9c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -12412,9 +12676,13 @@
                               "name": "r9b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "sentence"
+                                  "content": "sentence",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -12435,12 +12703,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn9",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -12481,7 +12755,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -12539,6 +12815,7 @@
                           "name": "r10c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -12568,9 +12845,13 @@
                               "name": "r10b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "sentence"
+                                  "content": "sentence",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             },
@@ -12582,9 +12863,12 @@
                               "width": "fit_content",
                               "x": 90,
                               "y": 12,
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "daily"
+                                  "content": "daily",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -12605,12 +12889,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn10",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -12651,7 +12941,9 @@
                                   "y": 0
                                 },
                                 "9G6ek": {
-                                  "enabled": false
+                                  "enabled": false,
+                                  "width": "fit_content",
+                                  "height": "fit_content"
                                 }
                               }
                             }
@@ -12709,6 +13001,7 @@
                           "name": "r11c3",
                           "x": 528,
                           "y": 8,
+                          "height": "fit_content",
                           "children": [
                             {
                               "type": "text",
@@ -12738,9 +13031,13 @@
                               "name": "r11b4",
                               "x": 12,
                               "y": 12,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "npWsI": {
-                                  "content": "sentence"
+                                  "content": "sentence",
+                                  "x": 8,
+                                  "y": 2
                                 }
                               }
                             }
@@ -12761,12 +13058,18 @@
                               "type": "ref",
                               "ref": "8LlLT",
                               "name": "btn11",
+                              "width": "fit_content",
+                              "height": "fit_content",
+                              "x": 12,
+                              "y": 12,
                               "descendants": {
                                 "qssnt": {
                                   "enabled": false
                                 },
                                 "yV4VT": {
-                                  "content": "編集"
+                                  "content": "編集",
+                                  "x": 16,
+                                  "y": 8
                                 }
                               }
                             }
@@ -12895,19 +13198,25 @@
                   "name": "engInput",
                   "x": 24,
                   "y": 24,
+                  "height": "fit_content",
                   "descendants": {
                     "DlqTf": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content"
                     },
                     "y9Pvq": {
                       "width": "fill_container",
                       "content": "英語"
                     },
                     "dJ0YW": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content",
+                      "y": 26
                     },
                     "RW1kD": {
-                      "content": "apple"
+                      "content": "apple",
+                      "x": 12,
+                      "y": 10
                     }
                   }
                 },
@@ -12919,20 +13228,25 @@
                   "name": "jpTextarea",
                   "x": 24,
                   "y": 110,
+                  "height": "fit_content",
                   "descendants": {
                     "5a82H": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content"
                     },
                     "n04ol": {
                       "width": "fill_container",
                       "content": "日本語"
                     },
                     "IoqZn": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "y": 26
                     },
                     "jxR8X": {
                       "content": "りんご",
-                      "fill": "$--foreground"
+                      "fill": "$--foreground",
+                      "x": 12,
+                      "y": 8
                     }
                   }
                 },
@@ -13034,12 +13348,16 @@
                   "name": "cancelBtn",
                   "x": 24,
                   "y": 24,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "IU1A6": {
                       "enabled": false
                     },
                     "aWMhD": {
-                      "content": "キャンセル"
+                      "content": "キャンセル",
+                      "x": 16,
+                      "y": 8
                     }
                   }
                 },
@@ -13050,12 +13368,16 @@
                   "name": "nextBtn",
                   "x": 396,
                   "y": 24,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "qssnt": {
                       "enabled": false
                     },
                     "yV4VT": {
-                      "content": "保存"
+                      "content": "保存",
+                      "x": 16,
+                      "y": 8
                     }
                   }
                 }

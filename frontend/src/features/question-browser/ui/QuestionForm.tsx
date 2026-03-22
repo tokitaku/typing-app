@@ -44,16 +44,16 @@ export function QuestionForm({
   const submitLabel = mode === "create" ? "作成" : "更新";
 
   return (
-    <section className="question-form-card settings-section">
+    <section className="question-form-card">
       <form onSubmit={handleSubmit}>
         <h2 className="question-form-title">{titleText}</h2>
 
         <div className="question-form-field">
-          <label className="settings-label settings-subtitle" htmlFor="question-english">
+          <label className="question-form-field-label" htmlFor="question-english">
             英語
           </label>
           <input
-            className="typing-input question-form-input"
+            className="text-input"
             id="question-english"
             onChange={(e) => setValues((current) => ({ ...current, english: e.target.value }))}
             placeholder="例: I drink coffee every morning."
@@ -64,11 +64,11 @@ export function QuestionForm({
         </div>
 
         <div className="question-form-field">
-          <label className="settings-label settings-subtitle" htmlFor="question-japanese">
+          <label className="question-form-field-label" htmlFor="question-japanese">
             日本語
           </label>
           <input
-            className="typing-input question-form-input"
+            className="text-input"
             id="question-japanese"
             onChange={(e) => setValues((current) => ({ ...current, japanese: e.target.value }))}
             placeholder="例: 私は毎朝コーヒーを飲みます。"
@@ -79,7 +79,7 @@ export function QuestionForm({
         </div>
 
         <div className="question-form-field">
-          <label className="settings-label settings-subtitle" htmlFor="question-tags">
+          <label className="question-form-field-label" htmlFor="question-tags">
             タグ
           </label>
           <TagInput
@@ -96,7 +96,7 @@ export function QuestionForm({
 
         <div className="question-form-actions">
           <button
-            className="secondary-button question-browser-button"
+            className="btn btn-outline"
             disabled={isSubmitting}
             onClick={onCancel}
             type="button"
@@ -104,7 +104,7 @@ export function QuestionForm({
             キャンセル
           </button>
           <button
-            className="primary-button question-browser-button"
+            className="btn btn-primary"
             disabled={isSubmitting}
             type="submit"
           >

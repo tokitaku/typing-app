@@ -32,56 +32,59 @@ export function StudySession({ mode }: { mode: StudyMode }) {
 
   if (!isReady) {
     return (
-      <main className="page-shell">
-        <section className="empty-card">
-          <h1>学習データを読み込み中です。</h1>
-        </section>
-      </main>
+      <div className="page-layout">
+        <div className="page-center">
+          <h1 className="empty-title">学習データを読み込み中です。</h1>
+        </div>
+      </div>
     );
   }
 
   if (loadError) {
     return (
-      <main className="page-shell">
-        <section className="empty-card">
-          <p className="eyebrow">LOAD ERROR</p>
-          <h1>問題データの取得に失敗しました。</h1>
-          <p>FastAPI サーバーが起動しているか確認してから、もう一度お試しください。</p>
-          <Link className="primary-button" href="/">
+      <div className="page-layout">
+        <div className="page-center">
+          <h1 className="empty-title">問題データの取得に失敗しました。</h1>
+          <p className="empty-desc">
+            FastAPI サーバーが起動しているか確認してから、もう一度お試しください。
+          </p>
+          <Link className="btn btn-primary" href="/">
             ホームへ戻る
           </Link>
-        </section>
-      </main>
+        </div>
+      </div>
     );
   }
 
   if (mode === "review" && quizSet.length === 0) {
     return (
-      <main className="page-shell">
-        <section className="empty-card">
-          <p className="eyebrow">REVIEW READY</p>
-          <h1>復習対象はありません。</h1>
-          <p>まずは通常学習で問題を解いて、ミスした内容を復習キューに貯めてください。</p>
-          <Link className="primary-button" href="/">
+      <div className="page-layout">
+        <div className="page-center">
+          <h1 className="empty-title">復習対象はありません。</h1>
+          <p className="empty-desc">
+            まずは通常学習で問題を解いて、ミスした内容を復習キューに貯めてください。
+          </p>
+          <Link className="btn btn-primary" href="/">
             ホームへ戻る
           </Link>
-        </section>
-      </main>
+        </div>
+      </div>
     );
   }
 
   if (mode === "learn" && isEmptyQuizSet) {
     return (
-      <main className="page-shell">
-        <section className="empty-card">
-          <p className="eyebrow">LEARN READY</p>
-          <h1>出題できる問題がありません。</h1>
-          <p>タグや出題条件を見直して、もう一度学習を開始してください。</p>
-          <Link className="primary-button" href="/">
+      <div className="page-layout">
+        <div className="page-center">
+          <h1 className="empty-title">出題できる問題がありません。</h1>
+          <p className="empty-desc">
+            タグや出題条件を見直して、もう一度学習を開始してください。
+          </p>
+          <Link className="btn btn-primary" href="/">
             ホームへ戻る
           </Link>
-        </section>
-      </main>
+        </div>
+      </div>
     );
   }
 
@@ -89,56 +92,73 @@ export function StudySession({ mode }: { mode: StudyMode }) {
     return null;
   }
 
-  return (
-    <main className="page-shell">
-      <section className="session-header">
-        <div>
-          <p className="eyebrow">{mode === "learn" ? "LEARN MODE" : "REVIEW MODE"}</p>
-          <h1>
-            {currentIndex + 1} / {quizSet.length}
-          </h1>
-        </div>
-        <div className="timer-badge">{formatMs(elapsedMs)}</div>
-      </section>
+  const progress = ((currentIndex + 1) / quizSet.length) * 100;
 
-      <section className="problem-card">
-        <div className="problem-meta">
-          <span>{currentQuiz.tags.join(", ") || "tagless"}</span>
+  return (
+    <div className="page-layout">
+      <header className="session-header">
+        <div className="session-header-left">
+          <span className="badge badge-default">
+            {mode === "learn" ? "LEARN MODE" : "REVIEW MODE"}
+          </span>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+          <span className="session-counter">
+            {currentIndex + 1} / {quizSet.length}
+          </span>
         </div>
-        <p className="japanese-text">{currentQuiz.japanese}</p>
-        <p className="english-target" aria-label="英語の正解文">
-          {Array.from(currentQuiz.english).map((character, index) => (
-            <span
-              className={`char-${characterStates[index]}`}
-              key={`${currentQuiz.id}-${index}`}
-            >
-              {character}
+        <span className="badge badge-outline">{formatMs(elapsedMs)}</span>
+      </header>
+
+      <main className="page-center">
+        <div className="session-card card">
+          <div className="session-card-header">
+            <span className="badge badge-secondary">
+              {currentQuiz.tags.join(", ") || "tagless"}
             </span>
-          ))}
-        </p>
-        <label className="input-label" htmlFor="typing-input">
-          英語を入力
-        </label>
-        <input
-          autoComplete="off"
-          autoFocus
-          className={`typing-input ${wasMistaken ? "is-mistaken" : ""}`}
-          disabled={isSavingResult}
-          id="typing-input"
-          onChange={(event) => handleChange(event.target.value)}
-          placeholder={isSavingResult ? "結果を保存中です..." : "ここに入力してください"}
-          spellCheck={false}
-          type="text"
-          value={inputValue}
-        />
-        <div className="session-footer">
-          <span>ミス回数: {mistakeCount}</span>
-          <span>スペースと大文字小文字も判定対象です。</span>
-          <Link className="text-link" href="/">
-            中断してホームへ戻る
-          </Link>
+            <p className="japanese-text">{currentQuiz.japanese}</p>
+          </div>
+          <div className="session-card-body">
+            <div className="english-target" aria-label="英語の正解文">
+              {Array.from(currentQuiz.english).map((character, index) => (
+                <span
+                  className={`char-${characterStates[index]}`}
+                  key={`${currentQuiz.id}-${index}`}
+                >
+                  {character}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
-      </section>
-    </main>
+
+        <div className="session-input-group">
+          <label className="input-label" htmlFor="typing-input">
+            英語を入力
+          </label>
+          <input
+            autoComplete="off"
+            autoFocus
+            className={`text-input ${wasMistaken ? "is-mistaken" : ""}`}
+            disabled={isSavingResult}
+            id="typing-input"
+            onChange={(event) => handleChange(event.target.value)}
+            placeholder={isSavingResult ? "結果を保存中です..." : "ここに入力してください"}
+            spellCheck={false}
+            type="text"
+            value={inputValue}
+          />
+        </div>
+      </main>
+
+      <footer className="session-footer">
+        <span className="session-footer-miss">ミス回数: {mistakeCount}</span>
+        <span className="text-muted">スペースと大文字小文字も判定対象です。</span>
+        <Link className="text-muted" href="/">
+          中断してホームへ戻る
+        </Link>
+      </footer>
+    </div>
   );
 }

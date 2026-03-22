@@ -22,17 +22,15 @@ describe("home dashboard ui", () => {
   it("renders a visible link to the questions browser", () => {
     const html = renderToStaticMarkup(<HomeDashboardView {...baseProps} />);
 
-    expect(html).toContain("登録問題を確認する");
+    expect(html).toContain("問題一覧へ");
     expect(html).toContain("href=\"/questions\"");
-    expect(html).toContain("typing_questions の一覧を閲覧できます。");
   });
 
   it("renders tag selection ui and explains empty selection behavior", () => {
     const html = renderToStaticMarkup(<HomeDashboardView {...baseProps} />);
 
-    expect(html).toContain("出題タグ");
-    expect(html).toContain("business");
-    expect(html).toContain("daily");
+    expect(html).toContain("出題対象タグ");
     expect(html).toContain("タグ未選択時はすべてのタグを対象に出題します。");
+    expect(html).toContain("2件選択中");
   });
 });
