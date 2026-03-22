@@ -1,32 +1,27 @@
 import {
-  fetchQuizList,
+  fetchQuestionListResponse,
   postStudyResult
 } from "@/shared/api/studyApiClient";
-import type { EikenLevel, Quiz, QuizType, StudyResult } from "@/shared/types/study";
+import type { EikenLevel, Question, QuizType, StudyResult } from "@/shared/types/study";
 
-export type FetchQuizzesOptions = {
+export type FetchStudyQuestionsOptions = {
   eikenLevels?: EikenLevel[];
   questionTypes?: QuizType[];
 };
 
-export async function fetchQuizzes(
-  options: FetchQuizzesOptions = {},
+export async function fetchStudyQuestions(
+  options: FetchStudyQuestionsOptions = {},
   signal?: AbortSignal
-): Promise<Quiz[]> {
-  const searchParams = new URLSearchParams();
+): Promise<Question[]> {
+  const response = await fetchQuestionListResponse(
+    {
+      ...options,
+      includeInactive: false // 出題導線では inactive 問題を返さない契約に統一する
+    },
+    signal
+  );
 
-  if (options.eikenLevels && options.eikenLevels.length > 0) {
-    searchParams.set("eiken_levels", options.eikenLevels.join(",")); // 英検級フィルタを付与する
-  }
-
-  if (options.questionTypes && options.questionTypes.length > 0) {
-    searchParams.set("question_types", options.questionTypes.join(",")); // 種別フィルタを付与する
-  }
-
-  const queryString = searchParams.toString();
-  const response = await fetchQuizList(queryString ? `?${queryString}` : "", signal);
-
-  return response.quizzes;
+  return response.questions;
 }
 
 export async function saveStudyResult(result: StudyResult): Promise<StudyResult> {

@@ -4,7 +4,7 @@ import {
 } from "@/features/study-session/model/session";
 import type {
   MistakeLog,
-  Quiz,
+  Question,
   QuizProgress,
   Settings,
   StudyMode,
@@ -22,7 +22,7 @@ export type CompletedStudySessionDto = {
 };
 
 type StartStudySessionInput = {
-  quizzes: Quiz[];
+  questions: Question[];
   mode: StudyMode;
   reviewQueue: number[];
   settings: Settings;
@@ -30,7 +30,7 @@ type StartStudySessionInput = {
 };
 
 type StartStudySessionResult = {
-  quizSet: Quiz[];
+  quizSet: Question[];
   isEmptyQuizSet: boolean;
 };
 
@@ -41,14 +41,14 @@ type CompleteStudySessionInput = {
 };
 
 export function startStudySession({
-  quizzes,
+  questions,
   mode,
   reviewQueue,
   settings,
   sessionQuestionCount
 }: StartStudySessionInput): StartStudySessionResult {
   const quizSet = buildQuizSet(
-    quizzes,
+    questions,
     mode,
     reviewQueue,
     settings.eikenLevels,

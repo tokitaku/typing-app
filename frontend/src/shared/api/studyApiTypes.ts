@@ -1,8 +1,4 @@
-import type { DailySummary, Question, Quiz } from "@/shared/types/study";
-
-export type QuizListResponseDto = {
-  quizzes: Quiz[];
-};
+import type { DailySummary, Question } from "@/shared/types/study";
 
 export type QuestionListResponseDto = {
   questions: Question[];

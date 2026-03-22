@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.application.dtos import (
     CreateQuestionCommand,
     ListQuestionsQuery,
-    ListQuizzesQuery,
     RecordStudyResultCommand,
     UpdateQuestionCommand,
 )
@@ -19,7 +18,6 @@ from backend.application.usecases import (
     get_latest_study_result,
     get_today_study_summary,
     list_questions,
-    list_quizzes,
     record_study_result,
     update_question,
 )
@@ -35,8 +33,6 @@ from backend.presentation.schemas import (
     QuestionListResponse,
     QuestionResponse,
     QuestionUpdate,
-    QuizListResponse,
-    QuizResponse,
     StudyResultRequest,
 )
 
@@ -84,26 +80,6 @@ def create_app(database_url: str | None = None) -> FastAPI:
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}  # ヘルスチェック結果を返す
-
-    @app.get("/quizzes", response_model=QuizListResponse)
-    def get_quizzes(
-        eiken_levels: str | None = Query(default=None),
-        question_types: str | None = Query(default=None),
-        tags: str | None = Query(default=None),
-    ) -> QuizListResponse:
-        try:
-            quizzes = list_quizzes(
-                question_repository,
-                ListQuizzesQuery(
-                    eiken_level_codes=_parse_csv_query(eiken_levels),
-                    question_type_codes=_parse_csv_query(question_types),
-                    tag_codes=_parse_csv_query(tags),
-                ),
-            )
-        except ValueError as error:
-            _handle_invalid_master_code(error)
-
-        return QuizListResponse(quizzes=[QuizResponse(**quiz.__dict__) for quiz in quizzes])  # DTO をレスポンスへ詰める
 
     @app.get("/questions", response_model=QuestionListResponse)
     def get_questions(

@@ -12,7 +12,7 @@ import {
   getCharacterStates
 } from "@/features/study-session/typing/typing";
 import {
-  fetchQuizzes,
+  fetchStudyQuestions,
   saveStudyResult
 } from "@/features/study-session/api/studySessionApi";
 import {
@@ -24,11 +24,11 @@ import {
   removeRecoveredQuizIds,
   saveLatestResult
 } from "@/features/study-session/storage/studySessionStorage";
-import type { Quiz, QuizProgress, StudyMode } from "@/shared/types/study";
+import type { Question, QuizProgress, StudyMode } from "@/shared/types/study";
 
 type UseStudySessionResult = {
-  quizSet: Quiz[];
-  currentQuiz: Quiz | null;
+  quizSet: Question[];
+  currentQuiz: Question | null;
   currentIndex: number;
   inputValue: string;
   elapsedMs: number;
@@ -59,7 +59,7 @@ function createProgress(
 
 export function useStudySession(mode: StudyMode): UseStudySessionResult {
   const router = useRouter();
-  const [quizSet, setQuizSet] = useState<Quiz[]>([]);
+  const [quizSet, setQuizSet] = useState<Question[]>([]);
   const [isEmptyQuizSet, setIsEmptyQuizSet] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -89,7 +89,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     const loadQuizSet = async () => {
       try {
         const settings = getSettings();
-        const quizzes = await fetchQuizzes(
+        const questions = await fetchStudyQuestions(
           mode === "learn"
             ? {
                 eikenLevels: settings.eikenLevels,
@@ -99,7 +99,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
           abortController.signal
         );
         const session = startStudySession({
-          quizzes,
+          questions,
           mode,
           reviewQueue: getReviewQueue(),
           settings

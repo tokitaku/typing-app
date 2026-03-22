@@ -8,20 +8,20 @@ import {
   countIncrementalMistakes,
   getCharacterStates
 } from "@/features/study-session/typing/typing";
-import type { Quiz } from "@/shared/types/study";
+import type { Question } from "@/shared/types/study";
 
-const quizzes: Quiz[] = [
-  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご" },
-  { id: 2, type: "word", eikenLevel: "5", english: "library", japanese: "図書館" },
-  { id: 3, type: "word", eikenLevel: "4", english: "beautiful", japanese: "美しい" },
-  { id: 4, type: "word", eikenLevel: "4", english: "schedule", japanese: "予定" },
-  { id: 5, type: "word", eikenLevel: "3", english: "environment", japanese: "環境" },
-  { id: 6, type: "sentence", eikenLevel: "5", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。" },
-  { id: 7, type: "sentence", eikenLevel: "4", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。" },
-  { id: 8, type: "sentence", eikenLevel: "3", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。" },
-  { id: 9, type: "word", eikenLevel: "5", english: "practice", japanese: "練習" },
-  { id: 10, type: "word", eikenLevel: "4", english: "through", japanese: "通り抜けて" },
-  { id: 11, type: "word", eikenLevel: "3", english: "confidence", japanese: "自信" }
+const quizzes: Question[] = [
+  { id: 1, type: "word", eikenLevel: "5", english: "apple", japanese: "りんご", isActive: true },
+  { id: 2, type: "word", eikenLevel: "5", english: "library", japanese: "図書館", isActive: true },
+  { id: 3, type: "word", eikenLevel: "4", english: "beautiful", japanese: "美しい", isActive: true },
+  { id: 4, type: "word", eikenLevel: "4", english: "schedule", japanese: "予定", isActive: true },
+  { id: 5, type: "word", eikenLevel: "3", english: "environment", japanese: "環境", isActive: true },
+  { id: 6, type: "sentence", eikenLevel: "5", english: "I drink coffee every morning.", japanese: "私は毎朝コーヒーを飲みます。", isActive: true },
+  { id: 7, type: "sentence", eikenLevel: "4", english: "We need to finish this report today.", japanese: "私たちは今日このレポートを終える必要があります。", isActive: true },
+  { id: 8, type: "sentence", eikenLevel: "3", english: "Small daily habits often create meaningful progress.", japanese: "小さな毎日の習慣が大きな前進を生みます。", isActive: true },
+  { id: 9, type: "word", eikenLevel: "5", english: "practice", japanese: "練習", isActive: true },
+  { id: 10, type: "word", eikenLevel: "4", english: "through", japanese: "通り抜けて", isActive: true },
+  { id: 11, type: "word", eikenLevel: "3", english: "confidence", japanese: "自信", isActive: true }
 ];
 
 describe("study utilities", () => {
