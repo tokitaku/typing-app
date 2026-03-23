@@ -3,14 +3,14 @@ import argparse
 from backend.presentation.openapi import write_openapi_schema
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="FastAPI の OpenAPI spec を JSON として出力します。")
     parser.add_argument(
         "--output",
-        default="backend/openapi.json",
+        default="backend/docs/openapi.json",
         help="出力先の JSON ファイルパス",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def main() -> None:
