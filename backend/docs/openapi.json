@@ -27,6 +27,24 @@
         }
       }
     },
+    "/tags": {
+      "get": {
+        "summary": "Get Tags",
+        "operationId": "get_tags_tags_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/questions": {
       "get": {
         "summary": "Get Questions",
@@ -492,6 +510,22 @@
           "created_at"
         ],
         "title": "StudyResultRequest"
+      },
+      "TagListResponse": {
+        "properties": {
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tags"
+        ],
+        "title": "TagListResponse"
       },
       "ValidationError": {
         "properties": {

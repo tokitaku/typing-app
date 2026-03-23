@@ -31,4 +31,4 @@ build:
 	cd frontend && npm run build
 
 openapi:
-	uv run --project backend python -m backend.commands.export_openapi --output backend/openapi.json
+	uv run --project backend python -m backend.commands.export_openapi --output backend/docs/openapi.json
