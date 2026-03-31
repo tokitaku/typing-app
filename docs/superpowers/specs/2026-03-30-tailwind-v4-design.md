@@ -6,13 +6,13 @@
 
 ## 結論
 
-`#84` は `frontend` のビルド基盤に `Tailwind CSS v4` を最小差分で追加する issue として扱う。  
+`#84` は `frontend` のビルド基盤に `Tailwind CSS v4` を最小差分で追加する issue として扱う。
 この issue で完了させるのは「Tailwind の utility class が解決される状態」までとし、`shadcn/ui` 初期化や既存画面の本格的なスタイル移行は後続 issue に分離する。
 
 ## 背景
 
-現状の `frontend` は `Next.js 14` / `React 18` / `TypeScript` 構成で、スタイルは [globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) に集約された手書き CSS が中心になっている。  
-一方で open issue には [#89](https://github.com/tokitaku/typing-app/issues/89) と [#90](https://github.com/tokitaku/typing-app/issues/90) があり、どちらも `#84` を前提としている。  
+現状の `frontend` は `Next.js 14` / `React 18` / `TypeScript` 構成で、スタイルは [globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) に集約された手書き CSS が中心になっている。
+一方で open issue には [#89](https://github.com/tokitaku/typing-app/issues/89) と [#90](https://github.com/tokitaku/typing-app/issues/90) があり、どちらも `#84` を前提としている。
 そのため、`#84` の目的は UI の刷新ではなく、後続作業を unblock するための基盤追加に限定する。
 
 ## 目的
@@ -52,7 +52,7 @@
 - [session/page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/session/page.tsx)
 - [result/page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/result/page.tsx)
 
-これらの App Router 側ファイルは feature UI への委譲のみを担っている。  
+これらの App Router 側ファイルは feature UI への委譲のみを担っている。
 したがって、`#84` の主戦場はページルーティングではなくスタイル基盤である。
 
 ### 既存スタイル構造
@@ -68,19 +68,19 @@
 - `study-session`
 - `result-screen`
 
-これらは UI 表示責務を持つが、`#84` では内部の class 構造を変えない。  
+これらは UI 表示責務を持つが、`#84` では内部の class 構造を変えない。
 影響を最小化するため、Tailwind が有効であることを示す最小 1 箇所の利用に留める。
 
 ## 設計方針
 
 ### 1. Tailwind は基盤追加に限定する
 
-`#84` は CSS ビルドパイプラインへ Tailwind を追加する issue とする。  
+`#84` は CSS ビルドパイプラインへ Tailwind を追加する issue とする。
 既存 UI を Tailwind 化することは目的に含めない。
 
 ### 2. 既存 CSS と共存させる
 
-[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の既存 token と既存 class は維持する。  
+[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の既存 token と既存 class は維持する。
 導入初期段階では「手書き CSS の上に Tailwind を使えるようにする」状態を目指す。
 
 ### 3. 後続 issue の責務を先食いしない
@@ -88,7 +88,7 @@
 - `#89`: `shadcn/ui` 基盤導入
 - `#90`: 既存画面の段階移行
 
-この 2 件に含まれる責務を `#84` に持ち込まない。  
+この 2 件に含まれる責務を `#84` に持ち込まない。
 特に `components.json`、`src/components/ui`、`cn()` 導入は `#89` の責務とする。
 
 ## 実装設計
@@ -105,18 +105,18 @@
 
 ### PostCSS 設定
 
-`frontend/postcss.config.mjs` を追加し、`@tailwindcss/postcss` を有効化する。  
+`frontend/postcss.config.mjs` を追加し、`@tailwindcss/postcss` を有効化する。
 このファイルは Tailwind を Next.js の CSS pipeline に接続する単一責務ファイルとする。
 
 ### globals.css への組み込み
 
-[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の先頭へ `@import "tailwindcss";` を追加する。  
-既存の CSS ルールは削除しない。  
+[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の先頭へ `@import "tailwindcss";` を追加する。
+既存の CSS ルールは削除しない。
 この issue では preflight の影響を見極めるためにも、既存ルールの再編は行わない。
 
 ### 最小動作確認用の utility class
 
-Tailwind が本当に有効かを確認するため、既存 UI の単一要素にだけ utility class を追加する。  
+Tailwind が本当に有効かを確認するため、既存 UI の単一要素にだけ utility class を追加する。
 候補は次のどちらかに限定する。
 
 1. [layout.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/layout.tsx) の `body`
@@ -168,7 +168,7 @@ Tailwind が本当に有効かを確認するため、既存 UI の単一要素�
 
 ### 新規テスト追加方針
 
-新規 unit test は原則追加しない。  
+新規 unit test は原則追加しない。
 理由は、この issue の成否がロジック変更ではなく build pipeline の成立にあるためである。
 
 ## リスクと対策
@@ -196,7 +196,7 @@ Tailwind が本当に有効かを確認するため、既存 UI の単一要素�
 
 ## サブ issue 要否
 
-現時点ではサブ issue は追加しない。  
+現時点ではサブ issue は追加しない。
 理由は、`#84` 自体がすでに「基盤導入」という最小有効スライスであり、後続の分割先も [#89](https://github.com/tokitaku/typing-app/issues/89) と [#90](https://github.com/tokitaku/typing-app/issues/90) として存在しているためである。
 
 ## 実装順
