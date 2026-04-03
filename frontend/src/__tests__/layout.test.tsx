@@ -10,6 +10,7 @@ vi.mock("next/font/google", () => ({
 
 describe("root layout", () => {
   it("adds the Tailwind verification utility class to body", async () => {
+    // Dynamic import 先の JSX 評価で React グローバルが必要になる。
     globalThis.React = React;
     const { default: RootLayout } = await import("@/app/layout");
     const html = renderToStaticMarkup(
@@ -18,6 +19,6 @@ describe("root layout", () => {
       </RootLayout>
     );
 
-    expect(html).toContain("antialiased");
+    expect(html).toMatch(/<body[^>]*class="[^"]*antialiased[^"]*"/);
   });
 });

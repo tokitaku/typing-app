@@ -11,7 +11,7 @@
 
 ## 背景
 
-現状の `frontend` は `Next.js 14` / `React 18` / `TypeScript` 構成で、スタイルは [globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) に集約された手書き CSS が中心になっている。
+現状の `frontend` は `Next.js 14` / `React 18` / `TypeScript` 構成で、スタイルは [globals.css](../../../frontend/src/app/globals.css) に集約された手書き CSS が中心になっている。
 一方で open issue には [#89](https://github.com/tokitaku/typing-app/issues/89) と [#90](https://github.com/tokitaku/typing-app/issues/90) があり、どちらも `#84` を前提としている。
 そのため、`#84` の目的は UI の刷新ではなく、後続作業を unblock するための基盤追加に限定する。
 
@@ -37,27 +37,27 @@
 
 `#84` の変更対象は次に限定する。
 
-- [frontend/package.json](/Users/tokimasatakuya/Dev/typing-app/frontend/package.json)
+- [frontend/package.json](../../../frontend/package.json)
 - `frontend/package-lock.json`
 - `frontend/postcss.config.mjs` を新規追加
-- [frontend/src/app/globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css)
-- 必要に応じて [frontend/src/app/layout.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/layout.tsx) または既存 view の 1 箇所だけ
+- [frontend/src/app/globals.css](../../../frontend/src/app/globals.css)
+- 必要に応じて [frontend/src/app/layout.tsx](../../../frontend/src/app/layout.tsx) または既存 view の 1 箇所だけ
 
 ## 現状整理
 
 ### UI 入口
 
-- [page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/page.tsx)
-- [questions/page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/questions/page.tsx)
-- [session/page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/session/page.tsx)
-- [result/page.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/result/page.tsx)
+- [page.tsx](../../../frontend/src/app/page.tsx)
+- [questions/page.tsx](../../../frontend/src/app/questions/page.tsx)
+- [session/page.tsx](../../../frontend/src/app/session/page.tsx)
+- [result/page.tsx](../../../frontend/src/app/result/page.tsx)
 
 これらの App Router 側ファイルは feature UI への委譲のみを担っている。
 したがって、`#84` の主戦場はページルーティングではなくスタイル基盤である。
 
 ### 既存スタイル構造
 
-- [globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) に共通 token と共通 class が集中している
+- [globals.css](../../../frontend/src/app/globals.css) に共通 token と共通 class が集中している
 - 各 feature UI は `.btn` / `.card` / `.badge` / `.text-input` などの既存 class に依存している
 - Tailwind 未導入のため utility class を利用できない
 
@@ -80,7 +80,7 @@
 
 ### 2. 既存 CSS と共存させる
 
-[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の既存 token と既存 class は維持する。
+[globals.css](../../../frontend/src/app/globals.css) の既存 token と既存 class は維持する。
 導入初期段階では「手書き CSS の上に Tailwind を使えるようにする」状態を目指す。
 
 ### 3. 後続 issue の責務を先食いしない
@@ -95,7 +95,7 @@
 
 ### 依存追加
 
-[package.json](/Users/tokimasatakuya/Dev/typing-app/frontend/package.json) に以下を追加する。
+[package.json](../../../frontend/package.json) に以下を追加する。
 
 - `tailwindcss`
 - `@tailwindcss/postcss`
@@ -110,7 +110,7 @@
 
 ### globals.css への組み込み
 
-[globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) の先頭へ `@import "tailwindcss";` を追加する。
+[globals.css](../../../frontend/src/app/globals.css) の先頭へ `@import "tailwindcss";` を追加する。
 既存の CSS ルールは削除しない。
 この issue では preflight の影響を見極めるためにも、既存ルールの再編は行わない。
 
@@ -119,7 +119,7 @@
 Tailwind が本当に有効かを確認するため、既存 UI の単一要素にだけ utility class を追加する。
 候補は次のどちらかに限定する。
 
-1. [layout.tsx](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/layout.tsx) の `body`
+1. [layout.tsx](../../../frontend/src/app/layout.tsx) の `body`
 2. 既存 view の装飾影響が小さいテキスト要素
 
 この変更は「Tailwind がビルドされる」ことの確認用であり、見た目の改善を目的に広げない。
@@ -204,7 +204,7 @@ Tailwind が本当に有効かを確認するため、既存 UI の単一要素�
 1. `frontend` の既存テスト成功を確認する
 2. Tailwind v4 と PostCSS 依存を追加する
 3. `postcss.config.mjs` を追加する
-4. [globals.css](/Users/tokimasatakuya/Dev/typing-app/frontend/src/app/globals.css) に Tailwind import を追加する
+4. [globals.css](../../../frontend/src/app/globals.css) に Tailwind import を追加する
 5. utility class を 1 箇所だけ適用して動作確認用の足場を作る
 6. `npm run test` を再実行する
 7. `npm run lint` を実行する
