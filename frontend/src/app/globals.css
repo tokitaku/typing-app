@@ -45,7 +45,7 @@
   --ring: #171717;
   --primary: #171717;
   --primary-foreground: #fafafa;
-  --destructive: #ef4444;
+  --destructive: #e7000b;
   --destructive-foreground: #fafafa;
   --correct: #16a34a;
   --wrong: #ef4444;
@@ -69,9 +69,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 /* ===== Page Layout ===== */
@@ -236,42 +238,6 @@ a {
   padding: 24px;
 }
 
-/* ===== Stats ===== */
-
-.stats-row {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-}
-
-.stat-card {
-  flex: 1;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--muted-foreground);
-}
-
-.stat-value {
-  display: block;
-  margin-top: 8px;
-  font-size: 36px;
-  font-weight: 700;
-}
-
-/* ===== Metrics Row (Home bottom) ===== */
-
-.metrics-row {
-  display: flex;
-  gap: 16px;
-  padding: 0 32px 32px;
-  flex-shrink: 0;
-}
-
 /* ===== Text Utilities ===== */
 
 .text-muted {
@@ -329,201 +295,6 @@ a {
   margin: 0 0 24px;
 }
 
-/* ===== Home Page ===== */
-
-.hero-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  max-width: 640px;
-  width: 100%;
-}
-
-.hero-title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.hero-desc {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--muted-foreground);
-  text-align: center;
-}
-
-.tag-selector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.tag-selector-label {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.tag-selector-desc {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted-foreground);
-}
-
-.tag-dropdown {
-  position: relative;
-  width: 240px;
-}
-
-.tag-dropdown-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
-  background: #fafafa;
-  font-size: 14px;
-  color: #737373;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-
-.tag-dropdown-trigger:hover {
-  border-color: #d4d4d4;
-}
-
-.tag-dropdown-text {
-  line-height: 1.43;
-}
-
-.tag-dropdown-chevron {
-  flex-shrink: 0;
-  color: #737373;
-  transition: transform 0.15s;
-}
-
-.tag-dropdown-chevron.open {
-  transform: rotate(180deg);
-}
-
-.tag-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-  background: var(--background);
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 10;
-}
-
-.tag-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.1s;
-}
-
-.tag-dropdown-item:hover {
-  background: var(--muted);
-}
-
-.tag-dropdown-item input {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 12px;
-}
-
-/* ===== Session Page ===== */
-
-.session-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 56px;
-  padding: 0 32px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.session-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  margin-right: 16px;
-}
-
-.session-counter {
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--muted);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.session-card {
-  width: 640px;
-  max-width: 100%;
-}
-
-.session-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-}
-
-.session-card-body {
-  padding: 24px;
-}
-
-.japanese-text {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.english-target {
-  padding: 16px;
-  background: var(--muted);
-  border-radius: 6px;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
 .char-correct {
   color: var(--correct);
 }
@@ -535,69 +306,6 @@ a {
 
 .char-pending {
   color: var(--pending);
-}
-
-.session-input-group {
-  width: 640px;
-  max-width: 100%;
-}
-
-.session-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  padding: 0 32px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.session-footer-miss {
-  font-weight: 500;
-}
-
-/* ===== Result Page ===== */
-
-.result-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: 640px;
-  max-width: 100%;
-}
-
-.result-title-section {
-  text-align: center;
-}
-
-.result-title {
-  margin: 0 0 4px;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.result-notes {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 4px;
-  font-size: 14px;
-  color: var(--muted-foreground);
-}
-
-.divider {
-  width: 100%;
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
-}
-
-.result-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
 }
 
 /* ===== Questions Page ===== */
@@ -937,10 +645,7 @@ a {
 /* ===== Responsive ===== */
 
 @media (max-width: 640px) {
-  .app-header,
-  .session-header,
-  .session-footer,
-  .metrics-row {
+  .app-header {
     padding-left: 16px;
     padding-right: 16px;
   }
@@ -950,35 +655,8 @@ a {
     padding: 24px 16px;
   }
 
-  .stats-row,
-  .metrics-row {
-    flex-direction: column;
-  }
-
-  .session-card,
-  .session-input-group,
-  .result-content {
-    width: 100%;
-  }
-
   .questions-title-row {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .session-header {
-    height: auto;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .session-header-left {
-    flex-wrap: wrap;
-  }
-
-  .hero-title {
-    font-size: 24px;
   }
 }
