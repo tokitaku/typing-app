@@ -65,29 +65,29 @@ export function ResultScreenView({ result, todaySummary }: ResultScreenViewProps
           </div>
 
           {/* Stats Grid */}
-          <div className="flex gap-4">
-            <Card className="flex-1">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Card className="min-w-0">
               <CardContent className="flex flex-col gap-1 px-5 py-5">
                 <p className="text-sm font-medium text-muted-foreground">出題数</p>
-                <p className="text-4xl font-bold">{result.total_questions}</p>
+                <p className="text-2xl font-bold md:text-4xl">{result.total_questions}</p>
               </CardContent>
             </Card>
-            <Card className="flex-1">
+            <Card className="min-w-0">
               <CardContent className="flex flex-col gap-1 px-5 py-5">
                 <p className="text-sm font-medium text-muted-foreground">正答率</p>
-                <p className="text-4xl font-bold">{result.correct_rate}%</p>
+                <p className="text-2xl font-bold md:text-4xl">{result.correct_rate}%</p>
               </CardContent>
             </Card>
-            <Card className="flex-1">
+            <Card className="min-w-0">
               <CardContent className="flex flex-col gap-1 px-5 py-5">
                 <p className="text-sm font-medium text-muted-foreground">ミス数</p>
-                <p className="text-4xl font-bold">{result.mistakes}</p>
+                <p className="text-2xl font-bold md:text-4xl">{result.mistakes}</p>
               </CardContent>
             </Card>
-            <Card className="flex-1">
+            <Card className="min-w-0">
               <CardContent className="flex flex-col gap-1 px-5 py-5">
                 <p className="text-sm font-medium text-muted-foreground">平均入力時間</p>
-                <p className="text-4xl font-bold">
+                <p className="text-2xl font-bold md:text-4xl">
                   {formatAverageTime(result.average_time)}
                 </p>
               </CardContent>

@@ -190,6 +190,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     setProgressList(nextProgressList);
 
     if (currentIndex === quizSet.length - 1) {
+      setQuizElapsedMs(0);
       const completedSession = completeStudySession({
         mode,
         progressList: nextProgressList
