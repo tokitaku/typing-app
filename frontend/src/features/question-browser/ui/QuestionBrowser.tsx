@@ -11,6 +11,16 @@ import type {
 import type { QuestionFormValues } from "@/features/question-browser/application/questionForm";
 import { QuestionForm } from "@/features/question-browser/ui/QuestionForm";
 import type { Question } from "@/shared/types/study";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 export type QuestionBrowserViewProps = {
   filters: QuestionBrowserFilters;
@@ -71,69 +81,64 @@ function QuestionTable({
   }
 
   return (
-    <>
-      <div className="question-table-scroll">
-        <table className="question-table">
-          <thead>
-            <tr>
-              <th className="col-checkbox" scope="col">
-                <input
-                  checked={allSelected}
-                  className="question-table-checkbox"
-                  onChange={handleToggleAll}
-                  type="checkbox"
-                />
-              </th>
-              <th className="col-id" scope="col">ID</th>
-              <th scope="col">英語</th>
-              <th scope="col">日本語</th>
-              <th className="col-tags" scope="col">タグ</th>
-              <th className="col-actions" scope="col">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {questions.map((question) => (
-              <tr key={question.id}>
-                <td className="col-checkbox">
-                  <input
-                    checked={selectedIds.has(question.id)}
-                    className="question-table-checkbox"
-                    onChange={() => handleToggle(question.id)}
-                    type="checkbox"
-                  />
-                </td>
-                <td className="col-id">{question.id}</td>
-                <td className="question-table-text">{question.english}</td>
-                <td className="question-table-text">{question.japanese}</td>
-                <td className="col-tags">
-                  {question.tags.length > 0 ? (
-                    <div className="question-tag-list">
-                      {question.tags.map((tag) => (
-                        <span className="question-tag-badge" key={tag}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td className="col-actions">
-                  <button
-                    className="btn btn-primary"
-                    disabled={isFormSubmitting}
-                    onClick={() => onOpenEditForm(question)}
-                    type="button"
-                  >
-                    編集
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-10 border-r border-border text-center" scope="col">
+            <input
+              checked={allSelected}
+              className="size-4 cursor-pointer"
+              onChange={handleToggleAll}
+              type="checkbox"
+            />
+          </TableHead>
+          <TableHead className="w-15" scope="col">ID</TableHead>
+          <TableHead scope="col">英語</TableHead>
+          <TableHead scope="col">日本語</TableHead>
+          <TableHead className="w-40" scope="col">タグ</TableHead>
+          <TableHead className="w-25" scope="col">操作</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {questions.map((question) => (
+          <TableRow key={question.id}>
+            <TableCell className="w-10 border-r border-border text-center">
+              <input
+                checked={selectedIds.has(question.id)}
+                className="size-4 cursor-pointer"
+                onChange={() => handleToggle(question.id)}
+                type="checkbox"
+              />
+            </TableCell>
+            <TableCell className="w-15">{question.id}</TableCell>
+            <TableCell className="min-w-45 max-w-90 break-normal wrap-anywhere">{question.english}</TableCell>
+            <TableCell className="min-w-45 max-w-90 break-normal wrap-anywhere">{question.japanese}</TableCell>
+            <TableCell className="w-40">
+              {question.tags.length > 0 ? (
+                <div className="question-tag-list">
+                  {question.tags.map((tag) => (
+                    <span className="question-tag-badge" key={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                "-"
+              )}
+            </TableCell>
+            <TableCell className="w-25">
+              <Button
+                disabled={isFormSubmitting}
+                onClick={() => onOpenEditForm(question)}
+                type="button"
+              >
+                編集
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 
@@ -161,10 +166,12 @@ export function QuestionBrowserView({
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>
           <span className="app-header-title">Type &amp; Learn</span>
         </div>
-        <Link className="btn btn-outline" href="/">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-          ホームへ戻る
-        </Link>
+        <Button variant="outline" asChild>
+          <Link href="/">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            ホームへ戻る
+          </Link>
+        </Button>
       </header>
 
       <div className="page-padded">
@@ -174,19 +181,18 @@ export function QuestionBrowserView({
             <p>登録済みの問題をタグで絞り込みながら確認できます。</p>
           </div>
           <div className="questions-actions">
-            <button className="btn btn-outline" onClick={onReload} type="button">
+            <Button variant="outline" onClick={onReload} type="button">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
               再読み込み
-            </button>
-            <button
-              className="btn btn-primary"
+            </Button>
+            <Button
               disabled={isFormSubmitting}
               onClick={onOpenCreateForm}
               type="button"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
               新規作成
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -211,8 +217,7 @@ export function QuestionBrowserView({
             <label className="input-label" htmlFor="question-tags">
               タグ
             </label>
-            <input
-              className="text-input"
+            <Input
               id="question-tags"
               onChange={(event) => onSetTags(parseTagInput(event.target.value))}
               placeholder="daily, business"
@@ -247,9 +252,9 @@ export function QuestionBrowserView({
             <div className="card-body">
               <h2 className="empty-title">問題一覧の取得に失敗しました。</h2>
               <p className="empty-desc">{errorMessage ?? "時間を置いて再読み込みしてください。"}</p>
-              <button className="btn btn-primary" onClick={onReload} type="button">
+              <Button onClick={onReload} type="button">
                 再読み込み
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}

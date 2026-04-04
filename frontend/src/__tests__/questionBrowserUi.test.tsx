@@ -81,8 +81,8 @@ describe("question browser ui", () => {
     );
 
     expect(html).toContain("typing questions 一覧");
-    expect(html).toContain("<th scope=\"col\">英語</th>");
-    expect(html).not.toContain("<th scope=\"col\">種別</th>");
+    expect(html).toContain("scope=\"col\">英語</th>");
+    expect(html).not.toContain("scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
     expect(html).toContain("question-tag-badge");  // タグバッジが表示されることを検証
@@ -198,8 +198,7 @@ describe("question browser ui", () => {
       />
     );
 
-    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">編集");
-    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">");
+    expect(html).toContain("disabled=\"\" type=\"button\">編集</button>");
     expect(html).toContain("新規作成");
     expect(html).toContain(">処理中...<");
   });
