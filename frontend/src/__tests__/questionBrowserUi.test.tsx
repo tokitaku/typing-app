@@ -91,6 +91,30 @@ describe("question browser ui", () => {
     expect(html).toContain("編集");  // 編集ボタンが各行にあることを検証
   });
 
+  it("guards QuestionBrowser migration away from legacy globals", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+      />
+    );
+
+    expect(html).toContain("apple");
+    expect(html).not.toContain("btn btn-primary");
+    expect(html).not.toContain("question-table");
+    expect(html).not.toContain("text-input");
+    expect(html).toContain("<table");
+  });
+
   it("renders create button in hero section", () => {
     const html = renderToStaticMarkup(<QuestionBrowserView {...baseProps} />);
 
