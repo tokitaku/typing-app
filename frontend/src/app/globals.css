@@ -320,79 +320,6 @@ a {
   margin: 0 0 24px;
 }
 
-/* ===== Session Page ===== */
-
-.session-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 56px;
-  padding: 0 32px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.session-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  margin-right: 16px;
-}
-
-.session-counter {
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--muted);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.session-card {
-  width: 640px;
-  max-width: 100%;
-}
-
-.session-card-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-}
-
-.session-card-body {
-  padding: 24px;
-}
-
-.japanese-text {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.english-target {
-  padding: 16px;
-  background: var(--muted);
-  border-radius: 6px;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
 .char-correct {
   color: var(--correct);
 }
@@ -404,26 +331,6 @@ a {
 
 .char-pending {
   color: var(--pending);
-}
-
-.session-input-group {
-  width: 640px;
-  max-width: 100%;
-}
-
-.session-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  padding: 0 32px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.session-footer-miss {
-  font-weight: 500;
 }
 
 /* ===== Result Page ===== */
@@ -806,9 +713,7 @@ a {
 /* ===== Responsive ===== */
 
 @media (max-width: 640px) {
-  .app-header,
-  .session-header,
-  .session-footer {
+  .app-header {
     padding-left: 16px;
     padding-right: 16px;
   }
@@ -822,8 +727,6 @@ a {
     flex-direction: column;
   }
 
-  .session-card,
-  .session-input-group,
   .result-content {
     width: 100%;
   }
@@ -831,17 +734,5 @@ a {
   .questions-title-row {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .session-header {
-    height: auto;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .session-header-left {
-    flex-wrap: wrap;
   }
 }
