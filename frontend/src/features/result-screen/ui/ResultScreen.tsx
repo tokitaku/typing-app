@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Home, Keyboard, Play } from "lucide-react";
 import { useResultScreen } from "@/features/result-screen/hooks/useResultScreen";
@@ -47,7 +46,7 @@ export function ResultScreenView({ result, todaySummary }: ResultScreenViewProps
           <Keyboard className="h-5 w-5" />
           <span className="text-base font-semibold">Type &amp; Learn</span>
         </div>
-        <Button variant="outline" asChild aria-label="ナビゲーション：ホームへ戻る">
+        <Button variant="ghost" asChild aria-label="ナビゲーション：ホームへ戻る">
           <Link href="/">
             <Home />
             ホームへ戻る
