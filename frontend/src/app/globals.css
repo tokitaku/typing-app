@@ -107,19 +107,6 @@
   padding: 32px;
 }
 
-.char-correct {
-  color: var(--correct);
-}
-
-.char-wrong {
-  color: var(--wrong);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.char-pending {
-  color: var(--pending);
-}
-
 /* ===== Questions Page ===== */
 
 .questions-title-row {
