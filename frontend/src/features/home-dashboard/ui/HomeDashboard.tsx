@@ -3,6 +3,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import type { DailySummary, Settings } from "@/shared/types/study";
 export type HomeDashboardViewProps = {
   settings: Settings;
@@ -39,8 +47,9 @@ function TagSelectDropdown({
 
   return (
     <div className="tag-dropdown" ref={ref}>
-      <button
+      <Button
         className="tag-dropdown-trigger"
+        variant="outline"
         onClick={() => setOpen(!open)}
         type="button"
       >
@@ -60,7 +69,7 @@ function TagSelectDropdown({
         >
           <path d="m6 9 6 6 6-6" />
         </svg>
-      </button>
+      </Button>
       {open && (
         <div className="tag-dropdown-menu">
           {availableTags.map((tag) => (
@@ -86,25 +95,93 @@ export function HomeDashboardView({
   onToggleTag
 }: HomeDashboardViewProps) {
   return (
-    <div className="page-layout">
-      <header className="app-header">
-        <span className="app-header-title-lg">Type &amp; Learn</span>
-        <Link className="nav-link" href="/questions">
+    <div className="home-shell">
+      <header className="flex h-14 items-center justify-between border-b border-border/70 bg-background/80 px-8 backdrop-blur">
+        <span className="text-lg font-semibold tracking-tight">Type &amp; Learn</span>
+        <Link className="text-sm text-muted-foreground transition-colors hover:text-foreground" href="/questions">
           問題一覧へ
         </Link>
       </header>
 
-      <main className="page-center">
-        <div className="hero-content">
-          <h1 className="hero-title">英語を打って、スペルと短文に慣れる。</h1>
-          <p className="hero-desc">
-            単語と短文をテンポよく入力しながら、スペル定着とタイピング精度を同時に伸ばす学習アプリです。
-          </p>
-          <div className="tag-selector">
-            <p className="tag-selector-label">出題対象タグ</p>
-            <p className="tag-selector-desc">
+      <main className="flex flex-1 flex-col gap-6 px-8 py-10 lg:px-20 lg:py-12">
+        <Card className="border-border/70 bg-[#FFFCF6E0] shadow-[0_24px_60px_rgba(25,35,31,0.12)]">
+          <CardContent className="flex flex-col gap-8 p-10">
+            <div className="flex flex-col gap-4">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#D66D42]">
+                TYPE &amp; LEARN
+              </p>
+              <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+                英語を打って、スペルと短文に慣れる。
+              </h1>
+              <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
+                単語と短文をテンポよく入力しながら、スペル定着とタイピング精度を同時に伸ばす学習アプリです。
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Button asChild className="rounded-full px-6 text-base font-semibold">
+                <Link href="/session?mode=learn">学習開始</Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full px-6 text-base font-semibold">
+                <Link href="/session?mode=review">復習する</Link>
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/70 p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-base font-semibold text-foreground">登録問題を確認する</p>
+                <p className="text-sm text-muted-foreground">
+                  typing_questions の一覧を閲覧できます。
+                </p>
+              </div>
+              <Link className="text-sm font-semibold text-foreground transition-colors hover:text-muted-foreground" href="/questions">
+                問題一覧へ
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-border/70 bg-background/80 shadow-sm">
+            <CardHeader className="p-5 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                今日の学習回数
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 pt-0 text-4xl font-bold tracking-tight text-foreground">
+              {summary.sessions}
+            </CardContent>
+          </Card>
+          <Card className="border-border/70 bg-background/80 shadow-sm">
+            <CardHeader className="p-5 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                今日の出題数
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 pt-0 text-4xl font-bold tracking-tight text-foreground">
+              {summary.solvedProblems}
+            </CardContent>
+          </Card>
+          <Card className="border-border/70 bg-background/80 shadow-sm">
+            <CardHeader className="p-5 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                復習待ち
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 pt-0 text-4xl font-bold tracking-tight text-foreground">
+              {summary.reviewBacklog}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="border-border/70 bg-background/80 shadow-sm">
+          <CardHeader className="gap-2 p-6">
+            <CardTitle className="text-lg">出題対象タグ</CardTitle>
+            <CardDescription>
               タグ未選択時はすべてのタグを対象に出題します。
-            </p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6 pt-0">
             {availableTags.length > 0 ? (
               <TagSelectDropdown
                 availableTags={availableTags}
@@ -112,34 +189,11 @@ export function HomeDashboardView({
                 onToggleTag={onToggleTag}
               />
             ) : (
-              <p className="tag-selector-desc">利用可能なタグはまだありません。</p>
+              <p className="text-sm text-muted-foreground">利用可能なタグはまだありません。</p>
             )}
-          </div>
-          <div className="hero-actions">
-            <Link className="btn btn-primary" href="/session?mode=learn">
-              学習開始
-            </Link>
-            <Link className="btn btn-outline" href="/session?mode=review">
-              復習する
-            </Link>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </main>
-
-      <footer className="metrics-row">
-        <article className="stat-card">
-          <span className="stat-label">今日の学習回数</span>
-          <strong className="stat-value">{summary.sessions}</strong>
-        </article>
-        <article className="stat-card">
-          <span className="stat-label">今日の出題数</span>
-          <strong className="stat-value">{summary.solvedProblems}</strong>
-        </article>
-        <article className="stat-card">
-          <span className="stat-label">復習待ち</span>
-          <strong className="stat-value">{summary.reviewBacklog}</strong>
-        </article>
-      </footer>
     </div>
   );
 }

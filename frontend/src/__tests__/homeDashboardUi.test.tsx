@@ -26,6 +26,17 @@ describe("home dashboard ui", () => {
     expect(html).toContain("href=\"/questions\"");
   });
 
+  it("renders the shadcn home layout without legacy button classes", () => {
+    const html = renderToStaticMarkup(<HomeDashboardView {...baseProps} />);
+
+    expect(html).toContain("Type &amp; Learn");
+    expect(html).toContain("学習開始");
+    expect(html).toContain("復習する");
+    expect(html).toContain("今日の学習回数");
+    expect(html).not.toContain("btn btn-primary");
+    expect(html).not.toContain("hero-actions");
+  });
+
   it("renders tag selection ui and explains empty selection behavior", () => {
     const html = renderToStaticMarkup(<HomeDashboardView {...baseProps} />);
 
