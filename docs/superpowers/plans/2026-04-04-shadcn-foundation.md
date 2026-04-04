@@ -95,7 +95,7 @@ npm install @radix-ui/react-checkbox @radix-ui/react-dialog @radix-ui/react-slot
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "style": "new-york",
-  "rsc": false,
+  "rsc": true,
   "tsx": true,
   "tailwind": {
     "config": "",
