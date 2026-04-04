@@ -46,6 +46,8 @@ function TagSelectDropdown({
   return (
     <div className="relative w-[240px]" ref={ref}>
       <Button
+        aria-controls="tag-select-menu"
+        aria-expanded={open}
         className="w-full justify-between"
         variant="outline"
         onClick={() => setOpen(!open)}
@@ -60,7 +62,7 @@ function TagSelectDropdown({
         />
       </Button>
       {open && (
-        <div className="absolute left-0 top-[calc(100%+4px)] z-10 max-h-[200px] w-full overflow-y-auto rounded-md border bg-background shadow-md">
+        <div className="absolute left-0 top-[calc(100%+4px)] z-10 max-h-[200px] w-full overflow-y-auto rounded-md border bg-background shadow-md" id="tag-select-menu">
           {availableTags.map((tag) => (
             <label
               className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm hover:bg-muted"

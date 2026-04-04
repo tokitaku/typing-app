@@ -32,6 +32,7 @@ type UseStudySessionResult = {
   currentIndex: number;
   inputValue: string;
   elapsedMs: number;
+  quizElapsedMs: number;
   mistakeCount: number;
   wasMistaken: boolean;
   isReady: boolean;
@@ -66,6 +67,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [elapsedMs, setElapsedMs] = useState(0);
+  const [quizElapsedMs, setQuizElapsedMs] = useState(0);
   const [progressList, setProgressList] = useState<QuizProgress[]>([]);
   const [quizStartedAt, setQuizStartedAt] = useState<number | null>(null);
   const [wasMistaken, setWasMistaken] = useState(false);
@@ -80,6 +82,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     setCurrentIndex(0);
     setInputValue("");
     setElapsedMs(0);
+    setQuizElapsedMs(0);
     setProgressList([]);
     setQuizStartedAt(null);
     setWasMistaken(false);
@@ -143,6 +146,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
 
     const timerId = window.setInterval(() => {
       setElapsedMs((value) => value + 100);
+      setQuizElapsedMs((value) => value + 100);
     }, 100);
 
     return () => window.clearInterval(timerId);
@@ -199,6 +203,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     setCurrentIndex((value) => value + 1);
     setInputValue("");
     setQuizStartedAt(null);
+    setQuizElapsedMs(0);
     setWasMistaken(false);
     setMistakeCount(0);
   };
@@ -236,6 +241,7 @@ export function useStudySession(mode: StudyMode): UseStudySessionResult {
     currentIndex,
     inputValue,
     elapsedMs,
+    quizElapsedMs,
     mistakeCount,
     wasMistaken,
     isReady,

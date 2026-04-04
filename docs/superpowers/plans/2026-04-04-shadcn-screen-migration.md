@@ -1,44 +1,53 @@
-# shadcn Screen Migration Implementation Plan
+# shadcn 画面移行 実装計画
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **エージェント向け:** 必須サブスキル: superpowers:subagent-driven-development（推奨）または superpowers:executing-plans を使ってタスク単位で実装してください。ステップはチェックボックス（`- [ ]`）形式で追跡します。
 
-**Goal:** `Home` / `StudySession` / `ResultScreen` を `typing_app.pen` の shadcn デザインに寄せて、旧グローバル CSS 依存を減らしつつ frontend の挙動を保つ
+## 結論
 
-**Architecture:** `frontend/src/features/*/ui` に presentational view を閉じ込め、hook 連携コンポーネントと描画専用コンポーネントを分離して TDD しやすくする。`Home` は既存 `HomeDashboardView` を更新し、`StudySession` と `ResultScreen` は view を新設して static markup テストを追加する。共通表現が必要な箇所だけ `src/components/ui` に `Progress` / `Separator` を最小追加し、`globals.css` は token と未移行画面の互換維持に必要な範囲へ絞る。
+`Home` / `StudySession` / `ResultScreen` を `typing_app.pen` の shadcn デザインに寄せて移行する。  
+`frontend/src/features/*/ui` に presentational view を閉じ込め、hook 連携コンポーネントと描画専用コンポーネントを分離する。  
+`Home` は既存 `HomeDashboardView` を更新し、`StudySession` と `ResultScreen` は view を新設してstatic markup テストを追加する。  
+共通表現が必要な箇所だけ `src/components/ui` に `Progress` / `Separator` を最小追加し、`globals.css` はトークンと未移行画面の互換維持に必要な範囲へ絞る。
 
-**Tech Stack:** Next.js 14, React 18, TypeScript, Vitest, Tailwind CSS v4, shadcn/ui, lucide-react
+**技術スタック:** `Next.js 14`, `React 18`, `TypeScript`, `Vitest`, `Tailwind CSS v4`, `shadcn/ui`, `lucide-react`
 
----
+## 理由
 
-## File Structure
+- 旧グローバル CSS クラス（`btn`, `badge`, `card`, `text-input` など）への依存を削減し、`shadcn/ui` ベースの共通 UI へ段階移行する
+- 業務ロジックを変えずに、表示責務だけを `ui` 層で再構成することで保守性を高める
+- TDD 方針に従い、failing test → 実装 → pass の順で画面単位に進める
 
-- Modify: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
+## 次の手順
+
+### ファイル構成
+
+- 変更: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
   - `.pen` に沿った header / hero / metrics の再構成を行う
-- Modify: `frontend/src/features/study-session/ui/StudySession.tsx`
+- 変更: `frontend/src/features/study-session/ui/StudySession.tsx`
   - hook 利用部と `StudySessionView` を分け、2 枚 card + stats bar 構成へ移行する
-- Modify: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
+- 変更: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
   - hook 利用部と `ResultScreenView` を分け、centered result layout へ移行する
-- Create: `frontend/src/components/ui/progress.tsx`
+- 新規: `frontend/src/components/ui/progress.tsx`
   - session header の progress bar を shadcn 互換の primitive に寄せる
-- Create: `frontend/src/components/ui/separator.tsx`
+- 新規: `frontend/src/components/ui/separator.tsx`
   - result の divider を primitive 化する
-- Modify: `frontend/src/app/globals.css`
+- 変更: `frontend/src/app/globals.css`
   - 対象 3 画面で不要になる旧 class を削減し、最低限の base / token のみ残す
-- Modify: `frontend/src/__tests__/homeDashboardUi.test.tsx`
+- 変更: `frontend/src/__tests__/homeDashboardUi.test.tsx`
   - `Home` の shadcn レイアウト期待を追加する
-- Create: `frontend/src/__tests__/studySessionUi.test.tsx`
+- 新規: `frontend/src/__tests__/studySessionUi.test.tsx`
   - `StudySessionView` の static markup を固定する
-- Create: `frontend/src/__tests__/resultScreenUi.test.tsx`
+- 新規: `frontend/src/__tests__/resultScreenUi.test.tsx`
   - `ResultScreenView` の static markup を固定する
 
-### Task 1: Home を `.pen` 準拠レイアウトへ移行する
+### タスク 1: Home を `.pen` 準拠レイアウトへ移行する
 
-**Files:**
-- Modify: `frontend/src/__tests__/homeDashboardUi.test.tsx`
-- Modify: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
-- Modify: `frontend/src/app/globals.css`
+**対象ファイル:**
+- 変更: `frontend/src/__tests__/homeDashboardUi.test.tsx`
+- 変更: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
+- 変更: `frontend/src/app/globals.css`
 
-- [ ] **Step 1: Home の failing UI test を追加する**
+- [ ] **ステップ 1: Home の failing UI test を追加する**
 
 ```tsx
 it("renders the shadcn home layout without legacy button classes", () => {
@@ -53,12 +62,12 @@ it("renders the shadcn home layout without legacy button classes", () => {
 });
 ```
 
-- [ ] **Step 2: 追加した test を単体実行して fail を確認する**
+- [ ] **ステップ 2: 追加した test を単体実行して fail を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/homeDashboardUi.test.tsx`
-Expected: FAIL。旧 `btn` / `hero-actions` 依存が残っているため assertion が落ちる
+実行: `cd frontend && npx vitest run src/__tests__/homeDashboardUi.test.tsx`  
+期待: FAIL。旧 `btn` / `hero-actions` 依存が残っているため assertion が落ちる
 
-- [ ] **Step 3: `.pen` に沿って HomeDashboardView を最小実装で更新する**
+- [ ] **ステップ 3: `.pen` に沿って HomeDashboardView を最小実装で更新する**
 
 ```tsx
 <header className="flex h-14 items-center justify-between border-b px-8">
@@ -80,27 +89,27 @@ Expected: FAIL。旧 `btn` / `hero-actions` 依存が残っているため asser
 </div>
 ```
 
-- [ ] **Step 4: Home の単体 test を再実行して pass を確認する**
+- [ ] **ステップ 4: Home の単体 test を再実行して pass を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/homeDashboardUi.test.tsx`
-Expected: PASS
+実行: `cd frontend && npx vitest run src/__tests__/homeDashboardUi.test.tsx`  
+期待: PASS
 
-- [ ] **Step 5: Home 変更を commit する**
+- [ ] **ステップ 5: Home 変更を commit する**
 
 ```bash
 git add frontend/src/__tests__/homeDashboardUi.test.tsx frontend/src/features/home-dashboard/ui/HomeDashboard.tsx frontend/src/app/globals.css
 git commit -m "feat: migrate home dashboard to shadcn layout"
 ```
 
-### Task 2: Session / Result 用の最小 primitive を追加する
+### タスク 2: Session / Result 用の最小 primitive を追加する
 
-**Files:**
-- Create: `frontend/src/components/ui/progress.tsx`
-- Create: `frontend/src/components/ui/separator.tsx`
-- Modify: `frontend/src/features/study-session/ui/StudySession.tsx`
-- Modify: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
+**対象ファイル:**
+- 新規: `frontend/src/components/ui/progress.tsx`
+- 新規: `frontend/src/components/ui/separator.tsx`
+- 変更: `frontend/src/features/study-session/ui/StudySession.tsx`
+- 変更: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
 
-- [ ] **Step 1: primitive 追加前提の failing import を用意する**
+- [ ] **ステップ 1: primitive 追加前提の failing import を用意する**
 
 `StudySession.tsx` と `ResultScreen.tsx` で次の import を使う前提にする。
 
@@ -109,12 +118,12 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 ```
 
-- [ ] **Step 2: Home 以外はまだ実装しないまま lint / type レベルで不足を確認する**
+- [ ] **ステップ 2: Home 以外はまだ実装しないまま lint / type レベルで不足を確認する**
 
-Run: `cd frontend && npm run lint`
-Expected: FAIL。`@/components/ui/progress` または `separator` が存在しない
+実行: `cd frontend && npm run lint`  
+期待: FAIL。`@/components/ui/progress` または `separator` が存在しない
 
-- [ ] **Step 3: 最小の primitive を追加する**
+- [ ] **ステップ 3: 最小の primitive を追加する**
 
 `frontend/src/components/ui/progress.tsx`
 
@@ -136,26 +145,26 @@ export function Separator() {
 }
 ```
 
-- [ ] **Step 4: lint を再実行して import 不足が解消したことを確認する**
+- [ ] **ステップ 4: lint を再実行して import 不足が解消したことを確認する**
 
-Run: `cd frontend && npm run lint`
-Expected: PASS もしくは未使用 import 以外の lint error なし
+実行: `cd frontend && npm run lint`  
+期待: PASS もしくは未使用 import 以外の lint error なし
 
-- [ ] **Step 5: primitive 追加を commit する**
+- [ ] **ステップ 5: primitive 追加を commit する**
 
 ```bash
 git add frontend/src/components/ui/progress.tsx frontend/src/components/ui/separator.tsx
 git commit -m "feat: add progress and separator primitives"
 ```
 
-### Task 3: StudySessionView を導入して `.pen` の 2 枚 card 構成へ移行する
+### タスク 3: StudySessionView を導入して `.pen` の 2 枚 card 構成へ移行する
 
-**Files:**
-- Create: `frontend/src/__tests__/studySessionUi.test.tsx`
-- Modify: `frontend/src/features/study-session/ui/StudySession.tsx`
-- Modify: `frontend/src/app/globals.css`
+**対象ファイル:**
+- 新規: `frontend/src/__tests__/studySessionUi.test.tsx`
+- 変更: `frontend/src/features/study-session/ui/StudySession.tsx`
+- 変更: `frontend/src/app/globals.css`
 
-- [ ] **Step 1: StudySessionView の failing UI test を追加する**
+- [ ] **ステップ 1: StudySessionView の failing UI test を追加する**
 
 ```tsx
 it("renders the session screen with source and typing cards", () => {
@@ -188,12 +197,12 @@ it("renders the session screen with source and typing cards", () => {
 });
 ```
 
-- [ ] **Step 2: 新規 test を単体実行して fail を確認する**
+- [ ] **ステップ 2: 新規 test を単体実行して fail を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/studySessionUi.test.tsx`
-Expected: FAIL。`StudySessionView` 未定義、または旧構造のため期待文言が存在しない
+実行: `cd frontend && npx vitest run src/__tests__/studySessionUi.test.tsx`  
+期待: FAIL。`StudySessionView` 未定義、または旧構造のため期待文言が存在しない
 
-- [ ] **Step 3: StudySession.tsx から presentational view を抽出し、最小実装で Green にする**
+- [ ] **ステップ 3: StudySession.tsx から presentational view を抽出し、最小実装で Green にする**
 
 ```tsx
 export function StudySessionView(props: StudySessionViewProps) {
@@ -221,26 +230,26 @@ export function StudySessionView(props: StudySessionViewProps) {
 </Card>
 ```
 
-- [ ] **Step 4: StudySession UI test を再実行して pass を確認する**
+- [ ] **ステップ 4: StudySession UI test を再実行して pass を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/studySessionUi.test.tsx`
-Expected: PASS
+実行: `cd frontend && npx vitest run src/__tests__/studySessionUi.test.tsx`  
+期待: PASS
 
-- [ ] **Step 5: StudySession 変更を commit する**
+- [ ] **ステップ 5: StudySession 変更を commit する**
 
 ```bash
 git add frontend/src/__tests__/studySessionUi.test.tsx frontend/src/features/study-session/ui/StudySession.tsx frontend/src/app/globals.css
 git commit -m "feat: migrate study session to shadcn layout"
 ```
 
-### Task 4: ResultScreenView を導入して centered result layout へ移行する
+### タスク 4: ResultScreenView を導入して centered result layout へ移行する
 
-**Files:**
-- Create: `frontend/src/__tests__/resultScreenUi.test.tsx`
-- Modify: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
-- Modify: `frontend/src/app/globals.css`
+**対象ファイル:**
+- 新規: `frontend/src/__tests__/resultScreenUi.test.tsx`
+- 変更: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
+- 変更: `frontend/src/app/globals.css`
 
-- [ ] **Step 1: ResultScreenView の failing UI test を追加する**
+- [ ] **ステップ 1: ResultScreenView の failing UI test を追加する**
 
 ```tsx
 it("renders the shadcn result layout with four stat cards", () => {
@@ -265,12 +274,12 @@ it("renders the shadcn result layout with four stat cards", () => {
 });
 ```
 
-- [ ] **Step 2: 新規 test を単体実行して fail を確認する**
+- [ ] **ステップ 2: 新規 test を単体実行して fail を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/resultScreenUi.test.tsx`
-Expected: FAIL。`ResultScreenView` 未定義、または旧 button / hr 構成が残っている
+実行: `cd frontend && npx vitest run src/__tests__/resultScreenUi.test.tsx`  
+期待: FAIL。`ResultScreenView` 未定義、または旧 button / hr 構成が残っている
 
-- [ ] **Step 3: ResultScreen.tsx から presentational view を抽出し、lucide-react と primitive へ移行する**
+- [ ] **ステップ 3: ResultScreen.tsx から presentational view を抽出し、`lucide-react` と primitive へ移行する**
 
 ```tsx
 import { ArrowLeft, Home, Keyboard, Play } from "lucide-react";
@@ -291,57 +300,57 @@ export function ResultScreenView({ result, todaySummary }: ResultScreenViewProps
 }
 ```
 
-- [ ] **Step 4: ResultScreen UI test を再実行して pass を確認する**
+- [ ] **ステップ 4: ResultScreen UI test を再実行して pass を確認する**
 
-Run: `cd frontend && npx vitest run src/__tests__/resultScreenUi.test.tsx`
-Expected: PASS
+実行: `cd frontend && npx vitest run src/__tests__/resultScreenUi.test.tsx`  
+期待: PASS
 
-- [ ] **Step 5: ResultScreen 変更を commit する**
+- [ ] **ステップ 5: ResultScreen 変更を commit する**
 
 ```bash
 git add frontend/src/__tests__/resultScreenUi.test.tsx frontend/src/features/result-screen/ui/ResultScreen.tsx frontend/src/app/globals.css
 git commit -m "feat: migrate result screen to shadcn layout"
 ```
 
-### Task 5: 旧 class 依存を削減し、frontend 全体を検証する
+### タスク 5: 旧 class 依存を削減し、frontend 全体を検証する
 
-**Files:**
-- Modify: `frontend/src/app/globals.css`
-- Verify: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
-- Verify: `frontend/src/features/study-session/ui/StudySession.tsx`
-- Verify: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
-- Verify: `frontend/src/__tests__/homeDashboardUi.test.tsx`
-- Verify: `frontend/src/__tests__/studySessionUi.test.tsx`
-- Verify: `frontend/src/__tests__/resultScreenUi.test.tsx`
+**対象ファイル:**
+- 変更: `frontend/src/app/globals.css`
+- 確認: `frontend/src/features/home-dashboard/ui/HomeDashboard.tsx`
+- 確認: `frontend/src/features/study-session/ui/StudySession.tsx`
+- 確認: `frontend/src/features/result-screen/ui/ResultScreen.tsx`
+- 確認: `frontend/src/__tests__/homeDashboardUi.test.tsx`
+- 確認: `frontend/src/__tests__/studySessionUi.test.tsx`
+- 確認: `frontend/src/__tests__/resultScreenUi.test.tsx`
 
-- [ ] **Step 1: 対象 3 画面に残る旧 class 参照を検索する**
+- [ ] **ステップ 1: 対象 3 画面に残る旧 class 参照を検索する**
 
-Run: `cd frontend && rg -n 'btn|badge-|text-input|session-card|result-content|hero-actions' src/features/home-dashboard src/features/study-session src/features/result-screen`
-Expected: 対象 3 画面では旧 class 参照が 0 件、または未移行理由が明確な最小件数
+実行: `cd frontend && rg -n 'btn|badge-|text-input|session-card|result-content|hero-actions' src/features/home-dashboard src/features/study-session src/features/result-screen`  
+期待: 対象 3 画面では旧 class 参照が 0 件、または未移行理由が明確な最小件数
 
-- [ ] **Step 2: globals.css の不要ルールを最小限整理する**
+- [ ] **ステップ 2: globals.css の不要ルールを最小限整理する**
 
 ```css
 /* Home / Session / Result で未使用になった legacy rule を削除し、
    QuestionBrowser が使う class は残す */
 ```
 
-- [ ] **Step 3: frontend の test を全件実行する**
+- [ ] **ステップ 3: frontend の test を全件実行する**
 
-Run: `cd frontend && npm run test`
-Expected: PASS
+実行: `cd frontend && npm run test`  
+期待: PASS
 
-- [ ] **Step 4: frontend の lint を実行する**
+- [ ] **ステップ 4: frontend の lint を実行する**
 
-Run: `cd frontend && npm run lint`
-Expected: PASS
+実行: `cd frontend && npm run lint`  
+期待: PASS
 
-- [ ] **Step 5: frontend の build を実行する**
+- [ ] **ステップ 5: frontend の build を実行する**
 
-Run: `cd frontend && npm run build`
-Expected: PASS
+実行: `cd frontend && npm run build`  
+期待: PASS
 
-- [ ] **Step 6: 最終差分を commit する**
+- [ ] **ステップ 6: 最終差分を commit する**
 
 ```bash
 git add frontend/src/app/globals.css

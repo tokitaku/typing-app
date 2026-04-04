@@ -18,6 +18,7 @@ const baseProps: StudySessionViewProps = {
   currentIndex: 0,
   currentQuiz: mockQuizSet[0],
   elapsedMs: 45000,
+  quizElapsedMs: 0,
   handleChange: vi.fn(),
   inputValue: "",
   isEmptyQuizSet: false,
@@ -56,7 +57,7 @@ describe("study session ui", () => {
 
   it("renders empty review state", () => {
     const html = renderToStaticMarkup(
-      <StudySessionView {...baseProps} mode="review" quizSet={[]} currentQuiz={null} />
+      <StudySessionView {...baseProps} mode="review" quizSet={[]} currentQuiz={null} isEmptyQuizSet={true} />
     );
     expect(html).toContain("復習対象はありません。");
   });
@@ -91,6 +92,7 @@ describe("study session ui", () => {
       ...baseProps,
       inputValue: "Hello",
       elapsedMs: 60000,
+      quizElapsedMs: 60000,
       characterStates: [
         "correct", "correct", "correct", "correct", "correct",
         "pending", "pending", "pending", "pending", "pending", "pending"

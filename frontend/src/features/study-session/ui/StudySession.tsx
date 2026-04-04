@@ -24,6 +24,7 @@ export type StudySessionViewProps = {
   currentIndex: number;
   currentQuiz: Question | null;
   elapsedMs: number;
+  quizElapsedMs: number;
   handleChange: (value: string) => void;
   inputValue: string;
   isEmptyQuizSet: boolean;
@@ -41,6 +42,7 @@ export function StudySessionView({
   currentIndex,
   currentQuiz,
   elapsedMs,
+  quizElapsedMs,
   handleChange,
   inputValue,
   isEmptyQuizSet,
@@ -110,8 +112,7 @@ export function StudySessionView({
   const correctCount = characterStates.filter((s) => s === "correct").length;
   const typedCount = characterStates.filter((s) => s !== "pending").length;
   const accuracy = typedCount > 0 ? ((correctCount / typedCount) * 100).toFixed(1) : "100.0";
-  // WPM is per-current-question approximation (typedChars resets per question, elapsedMs is session-total)
-  const wpm = elapsedMs > 0 ? Math.round((typedChars / 5) / (elapsedMs / 60000)) : 0;
+  const wpm = quizElapsedMs > 0 ? Math.round((typedChars / 5) / (quizElapsedMs / 60000)) : 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

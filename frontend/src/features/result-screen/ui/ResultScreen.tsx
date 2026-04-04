@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Home, Keyboard, Play } from "lucide-react";
 import { useResultScreen } from "@/features/result-screen/hooks/useResultScreen";
