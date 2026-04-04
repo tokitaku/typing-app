@@ -5,7 +5,8 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import type { DailySummary, Settings } from "@/shared/types/study";
 
@@ -65,11 +66,9 @@ function TagSelectDropdown({
               className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
               key={tag}
             >
-              <input
-                className="h-3.5 w-3.5"
-                type="checkbox"
+              <Checkbox
                 checked={selectedTags.includes(tag)}
-                onChange={() => onToggleTag(tag)}
+                onCheckedChange={() => onToggleTag(tag)}
               />
               <span>{tag}</span>
             </label>
@@ -132,22 +131,34 @@ export function HomeDashboardView({
 
       <div className="flex gap-4 px-8 pb-6">
         <Card className="flex-1">
-          <CardHeader className="space-y-1 px-5 py-4">
-            <CardDescription>今日の学習回数</CardDescription>
-            <CardTitle className="text-4xl font-bold">{summary.sessions}</CardTitle>
+          <CardHeader className="px-5 pb-2 pt-5">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              今日の学習回数
+            </CardTitle>
           </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <p className="text-4xl font-bold">{summary.sessions}</p>
+          </CardContent>
         </Card>
         <Card className="flex-1">
-          <CardHeader className="space-y-1 px-5 py-4">
-            <CardDescription>今日の出題数</CardDescription>
-            <CardTitle className="text-4xl font-bold">{summary.solvedProblems}</CardTitle>
+          <CardHeader className="px-5 pb-2 pt-5">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              今日の出題数
+            </CardTitle>
           </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <p className="text-4xl font-bold">{summary.solvedProblems}</p>
+          </CardContent>
         </Card>
         <Card className="flex-1">
-          <CardHeader className="space-y-1 px-5 py-4">
-            <CardDescription>復習待ち</CardDescription>
-            <CardTitle className="text-4xl font-bold">{summary.reviewBacklog}</CardTitle>
+          <CardHeader className="px-5 pb-2 pt-5">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              復習待ち
+            </CardTitle>
           </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <p className="text-4xl font-bold">{summary.reviewBacklog}</p>
+          </CardContent>
         </Card>
       </div>
     </div>
