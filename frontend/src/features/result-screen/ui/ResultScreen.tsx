@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { DailySummary, StudyResult } from "@/shared/types/study";
@@ -49,7 +47,7 @@ export function ResultScreenView({ result, todaySummary }: ResultScreenViewProps
           <Keyboard className="h-5 w-5" />
           <span className="text-base font-semibold">Type &amp; Learn</span>
         </div>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild aria-label="ナビゲーション：ホームへ戻る">
           <Link href="/">
             <Home />
             ホームへ戻る
@@ -69,42 +67,26 @@ export function ResultScreenView({ result, todaySummary }: ResultScreenViewProps
           {/* Stats Grid */}
           <div className="flex gap-4">
             <Card className="flex-1">
-              <CardHeader className="px-5 pb-2 pt-5">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  出題数
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="flex flex-col gap-1 px-5 py-5">
+                <p className="text-sm font-medium text-muted-foreground">出題数</p>
                 <p className="text-4xl font-bold">{result.total_questions}</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
-              <CardHeader className="px-5 pb-2 pt-5">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  正答率
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="flex flex-col gap-1 px-5 py-5">
+                <p className="text-sm font-medium text-muted-foreground">正答率</p>
                 <p className="text-4xl font-bold">{result.correct_rate}%</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
-              <CardHeader className="px-5 pb-2 pt-5">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  ミス数
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="flex flex-col gap-1 px-5 py-5">
+                <p className="text-sm font-medium text-muted-foreground">ミス数</p>
                 <p className="text-4xl font-bold">{result.mistakes}</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
-              <CardHeader className="px-5 pb-2 pt-5">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  平均入力時間
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
+              <CardContent className="flex flex-col gap-1 px-5 py-5">
+                <p className="text-sm font-medium text-muted-foreground">平均入力時間</p>
                 <p className="text-4xl font-bold">
                   {formatAverageTime(result.average_time)}
                 </p>

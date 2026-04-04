@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { useHomeDashboard } from "@/features/home-dashboard/hooks/useHomeDashboard";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import type { DailySummary, Settings } from "@/shared/types/study";
@@ -131,32 +131,20 @@ export function HomeDashboardView({
 
       <div className="flex gap-4 px-8 pb-6">
         <Card className="flex-1">
-          <CardHeader className="px-5 pb-2 pt-5">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              今日の学習回数
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="flex flex-col gap-1 px-5 py-5">
+            <p className="text-sm font-medium text-muted-foreground">今日の学習回数</p>
             <p className="text-4xl font-bold">{summary.sessions}</p>
           </CardContent>
         </Card>
         <Card className="flex-1">
-          <CardHeader className="px-5 pb-2 pt-5">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              今日の出題数
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="flex flex-col gap-1 px-5 py-5">
+            <p className="text-sm font-medium text-muted-foreground">今日の出題数</p>
             <p className="text-4xl font-bold">{summary.solvedProblems}</p>
           </CardContent>
         </Card>
         <Card className="flex-1">
-          <CardHeader className="px-5 pb-2 pt-5">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              復習待ち
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="flex flex-col gap-1 px-5 py-5">
+            <p className="text-sm font-medium text-muted-foreground">復習待ち</p>
             <p className="text-4xl font-bold">{summary.reviewBacklog}</p>
           </CardContent>
         </Card>
