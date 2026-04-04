@@ -46,12 +46,12 @@ export function QuestionForm({
   const submitLabel = mode === "create" ? "作成" : "更新";
 
   return (
-    <section className="question-form-card">
+    <section className="mt-6 border border-border rounded-md p-6">
       <form onSubmit={handleSubmit}>
-        <h2 className="question-form-title">{titleText}</h2>
+        <h2 className="mb-5 text-lg font-semibold">{titleText}</h2>
 
-        <div className="question-form-field">
-          <label className="question-form-field-label" htmlFor="question-english">
+        <div className="mt-4">
+          <label className="mb-1.5 block text-sm font-medium" htmlFor="question-english">
             英語
           </label>
           <Input
@@ -64,8 +64,8 @@ export function QuestionForm({
           />
         </div>
 
-        <div className="question-form-field">
-          <label className="question-form-field-label" htmlFor="question-japanese">
+        <div className="mt-4">
+          <label className="mb-1.5 block text-sm font-medium" htmlFor="question-japanese">
             日本語
           </label>
           <Input
@@ -78,8 +78,8 @@ export function QuestionForm({
           />
         </div>
 
-        <div className="question-form-field">
-          <label className="question-form-field-label" htmlFor="question-tags">
+        <div className="mt-4">
+          <label className="mb-1.5 block text-sm font-medium" htmlFor="question-tags">
             タグ
           </label>
           <TagInput
@@ -91,10 +91,10 @@ export function QuestionForm({
         </div>
 
         {submitError ? (
-          <p className="question-form-error">{submitError}</p>
+          <p className="mt-3 text-sm text-wrong">{submitError}</p>
         ) : null}
 
-        <div className="question-form-actions">
+        <div className="mt-6 flex gap-3">
           <Button
             variant="outline"
             disabled={isSubmitting}
