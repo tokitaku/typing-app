@@ -72,9 +72,12 @@ GitHub Issue [#90](https://github.com/tokitaku/typing-app/issues/90) に対し�
 
 - `.pen` の `header / main / footer` 構成を採用する
 - header は mode badge、progress bar、counter、timer を並べる
-- main は 1 枚の card に集約し、上段にタグ badge と日本語、中央に英語ターゲット、下段に入力欄を置く
-- footer は `ミス回数`、ヒント、`中断してホームへ戻る` の 3 点へ整理する
-- loading / error / empty state も同じ骨格の中で shadcn ベースに揃える
+- main は 960px 幅を基準に、`sourceTextCard`、`typingCard`、`statsBar` の 3 段構成へ寄せる
+- `sourceTextCard` は passage badge と文番号を header に置き、本文側では日本語の文リストを active / completed / upcoming の見た目で並べる
+- `typingCard` は入力中の英文リストと入力欄を持つ card とし、`.pen` の 2 枚 card 構成を再現する
+- `statsBar` は WPM、正確率、入力文字数、ミス回数の補助指標をアイコン付きで並べる
+- footer はショートカット補助、判定ヒント、`中断してホームへ戻る` を並べる
+- loading / error / empty state も同じ visual language の中で shadcn ベースに揃える
 
 ### ResultScreen
 
@@ -150,7 +153,7 @@ GitHub Issue [#90](https://github.com/tokitaku/typing-app/issues/90) に対し�
 TDD で進める。
 
 1. `Home` の UI テストを追加し、hero、CTA、metrics card、旧 class 非依存を固定する
-2. `StudySession` の UI テストを追加し、header、main card、input、footer、旧 class 非依存を固定する
+2. `StudySession` の UI テストを追加し、header、2 枚 card、statsBar、input、footer、旧 class 非依存を固定する
 3. `ResultScreen` の UI テストを追加し、header、4 stat card、action row、icon 差し替えを固定する
 4. 各画面を順に Green にする
 5. `frontend` で `npm run test` を実行する
