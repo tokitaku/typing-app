@@ -81,14 +81,38 @@ describe("question browser ui", () => {
     );
 
     expect(html).toContain("typing questions 一覧");
-    expect(html).toContain("<th scope=\"col\">英語</th>");
-    expect(html).not.toContain("<th scope=\"col\">種別</th>");
+    expect(html).toContain("scope=\"col\">英語</th>");
+    expect(html).not.toContain("scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
     expect(html).toContain("question-tag-badge");  // タグバッジが表示されることを検証
     expect(html).toContain("sentence");
     expect(html).toContain("environment");
     expect(html).toContain("編集");  // 編集ボタンが各行にあることを検証
+  });
+
+  it("guards QuestionBrowser migration away from legacy globals", () => {
+    const html = renderToStaticMarkup(
+      <QuestionBrowserView
+        {...baseProps}
+        questions={[
+          {
+            id: 1,
+            english: "apple",
+            japanese: "りんご",
+            isActive: true,
+            tags: ["word"]
+          }
+        ]}
+        status="loaded"
+      />
+    );
+
+    expect(html).toContain("apple");
+    expect(html).not.toContain("btn btn-primary");
+    expect(html).not.toContain("question-table");
+    expect(html).not.toContain("text-input");
+    expect(html).toContain("<table");
   });
 
   it("renders create button in hero section", () => {
@@ -174,8 +198,7 @@ describe("question browser ui", () => {
       />
     );
 
-    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">編集");
-    expect(html).toContain("btn btn-primary\" disabled=\"\" type=\"button\">");
+    expect(html).toContain("disabled=\"\" type=\"button\">編集</button>");
     expect(html).toContain("新規作成");
     expect(html).toContain(">処理中...<");
   });

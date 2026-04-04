@@ -9,6 +9,8 @@ import {
 } from "@/features/question-browser/application/questionForm";
 import { TagInput } from "@/features/question-browser/ui/TagInput";
 import type { Question } from "@/shared/types/study";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export type QuestionFormProps = {
   mode: QuestionFormMode;
@@ -52,8 +54,7 @@ export function QuestionForm({
           <label className="question-form-field-label" htmlFor="question-english">
             英語
           </label>
-          <input
-            className="text-input"
+          <Input
             id="question-english"
             onChange={(e) => setValues((current) => ({ ...current, english: e.target.value }))}
             placeholder="例: I drink coffee every morning."
@@ -67,8 +68,7 @@ export function QuestionForm({
           <label className="question-form-field-label" htmlFor="question-japanese">
             日本語
           </label>
-          <input
-            className="text-input"
+          <Input
             id="question-japanese"
             onChange={(e) => setValues((current) => ({ ...current, japanese: e.target.value }))}
             placeholder="例: 私は毎朝コーヒーを飲みます。"
@@ -95,21 +95,20 @@ export function QuestionForm({
         ) : null}
 
         <div className="question-form-actions">
-          <button
-            className="btn btn-outline"
+          <Button
+            variant="outline"
             disabled={isSubmitting}
             onClick={onCancel}
             type="button"
           >
             キャンセル
-          </button>
-          <button
-            className="btn btn-primary"
+          </Button>
+          <Button
             disabled={isSubmitting}
             type="submit"
           >
             {isSubmitting ? "処理中..." : submitLabel}
-          </button>
+          </Button>
         </div>
       </form>
     </section>
