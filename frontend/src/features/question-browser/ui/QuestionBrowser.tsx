@@ -11,6 +11,7 @@ import type {
 import type { QuestionFormValues } from "@/features/question-browser/application/questionForm";
 import { QuestionForm } from "@/features/question-browser/ui/QuestionForm";
 import type { Question } from "@/shared/types/study";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -115,11 +116,11 @@ function QuestionTable({
             <TableCell className="min-w-45 max-w-90 break-normal wrap-anywhere">{question.japanese}</TableCell>
             <TableCell className="w-40">
               {question.tags.length > 0 ? (
-                <div className="question-tag-list">
+                <div className="flex flex-wrap gap-1">
                   {question.tags.map((tag) => (
-                    <span className="question-tag-badge" key={tag}>
+                    <Badge key={tag} variant="outline">
                       {tag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               ) : (
@@ -160,11 +161,11 @@ export function QuestionBrowserView({
   onSubmitForm
 }: QuestionBrowserViewProps) {
   return (
-    <div className="page-layout">
-      <header className="app-header">
-        <div className="app-header-left">
+    <div className="flex flex-col min-h-screen">
+      <header className="flex items-center justify-between h-14 px-4 sm:px-8 border-b border-border shrink-0">
+        <div className="flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>
-          <span className="app-header-title">Type &amp; Learn</span>
+          <span className="text-base font-semibold">Type &amp; Learn</span>
         </div>
         <Button variant="outline" asChild>
           <Link href="/">
@@ -174,13 +175,13 @@ export function QuestionBrowserView({
         </Button>
       </header>
 
-      <div className="page-padded">
-        <div className="questions-title-row">
-          <div className="questions-title-left">
-            <h1>typing questions 一覧</h1>
-            <p>登録済みの問題をタグで絞り込みながら確認できます。</p>
+      <div className="flex-1 p-4 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="m-0 text-[28px] font-bold">typing questions 一覧</h1>
+            <p className="mt-1 text-sm text-muted-foreground">登録済みの問題をタグで絞り込みながら確認できます。</p>
           </div>
-          <div className="questions-actions">
+          <div className="flex gap-2">
             <Button variant="outline" onClick={onReload} type="button">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
               再読み込み
@@ -208,13 +209,13 @@ export function QuestionBrowserView({
           />
         ) : null}
 
-        <div className="filter-card card">
-          <div className="filter-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-            <span className="filter-header-label">フィルター</span>
+        <div className="mt-6 overflow-hidden rounded-md border border-border bg-secondary shadow-sm">
+          <div className="flex items-center gap-2 px-5 py-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span className="text-sm font-semibold">フィルター</span>
           </div>
-          <div className="filter-content">
-            <label className="input-label" htmlFor="question-tags">
+          <div className="px-5 py-4">
+            <label className="mb-1.5 block text-sm font-medium" htmlFor="question-tags">
               タグ
             </label>
             <Input
@@ -224,8 +225,8 @@ export function QuestionBrowserView({
               type="text"
               value={filters.tags.join(", ")}
             />
-            <div className="filter-toggle-row">
-              <label className="filter-toggle-label" htmlFor="include-inactive">
+            <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-border">
+              <label className="text-sm font-medium" htmlFor="include-inactive">
                 無効問題を含む
               </label>
               <input
@@ -239,19 +240,19 @@ export function QuestionBrowserView({
         </div>
 
         {status === "loading" ? (
-          <div className="table-card card">
-            <div className="card-body">
-              <h2 className="empty-title">問題一覧を読み込んでいます。</h2>
-              <p className="empty-desc">DB から最新の問題一覧を取得しています。</p>
+          <div className="mt-6 overflow-hidden rounded-md border border-border bg-secondary shadow-sm">
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold mb-2">問題一覧を読み込んでいます。</h2>
+              <p className="text-sm text-muted-foreground mb-6">DB から最新の問題一覧を取得しています。</p>
             </div>
           </div>
         ) : null}
 
         {status === "error" ? (
-          <div className="table-card card">
-            <div className="card-body">
-              <h2 className="empty-title">問題一覧の取得に失敗しました。</h2>
-              <p className="empty-desc">{errorMessage ?? "時間を置いて再読み込みしてください。"}</p>
+          <div className="mt-6 overflow-hidden rounded-md border border-border bg-secondary shadow-sm">
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold mb-2">問題一覧の取得に失敗しました。</h2>
+              <p className="text-sm text-muted-foreground mb-6">{errorMessage ?? "時間を置いて再読み込みしてください。"}</p>
               <Button onClick={onReload} type="button">
                 再読み込み
               </Button>
@@ -260,16 +261,16 @@ export function QuestionBrowserView({
         ) : null}
 
         {status === "empty" ? (
-          <div className="table-card card">
-            <div className="card-body">
-              <h2 className="empty-title">条件に一致する問題がありません。</h2>
-              <p className="empty-desc">フィルタ条件を広げるか、無効問題を含めて再確認してください。</p>
+          <div className="mt-6 overflow-hidden rounded-md border border-border bg-secondary shadow-sm">
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold mb-2">条件に一致する問題がありません。</h2>
+              <p className="text-sm text-muted-foreground mb-6">フィルタ条件を広げるか、無効問題を含めて再確認してください。</p>
             </div>
           </div>
         ) : null}
 
         {status === "loaded" ? (
-          <div className="table-card card">
+          <div className="mt-6 overflow-hidden rounded-md border border-border bg-secondary shadow-sm">
             <QuestionTable
               isFormSubmitting={isFormSubmitting}
               onOpenEditForm={onOpenEditForm}
