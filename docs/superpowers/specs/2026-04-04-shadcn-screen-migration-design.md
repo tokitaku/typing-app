@@ -3,7 +3,7 @@
 ## 概要
 
 GitHub Issue [#90](https://github.com/tokitaku/typing-app/issues/90) に対して、既存フロント画面を shadcn/ui ベースの共通 UI へ段階移行する。
-今回の対象は `Home` / `StudySession` / `ResultScreen` を中心とし、[typing_app.pen](/Users/tokimasatakuya/Dev/typing-app/.worktrees/shadcn-screen-migration/frontend/docs/typing_app.pen) の `shadcn - Home` / `shadcn - Session` / `shadcn - Result` を視覚基準として採用する。
+今回の対象は `Home` / `StudySession` / `ResultScreen` を中心とし、`frontend/docs/typing_app.pen` の `shadcn - Home` / `shadcn - Session` / `shadcn - Result` を視覚基準として採用する。
 
 ## 目的
 
@@ -35,7 +35,7 @@ GitHub Issue [#90](https://github.com/tokitaku/typing-app/issues/90) に対し�
 
 ### 採用理由
 
-- user が `.pen` の shadcn Home を基準にすることを明示的に選択した
+- ユーザーが `.pen` の shadcn Home を基準にすることを明示的に選択した
 - `#90` の目的は単なる class の置換ではなく、shadcn/ui ベースの共通 UI への段階移行にある
 - `Home` / `StudySession` / `ResultScreen` の骨格を揃えることで、今後の画面追加や refinement でも共通パターンを再利用しやすい
 
