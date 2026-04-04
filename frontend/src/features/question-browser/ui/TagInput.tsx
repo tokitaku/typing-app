@@ -74,17 +74,17 @@ export function TagInput({ selectedTags, availableTags, onChange, id }: TagInput
 
   return (
     <div
-      className="tag-input-container"
+      className="relative"
       onBlur={handleBlur}
       ref={containerRef}
     >
-      <div className="tag-input-field">
+      <div className="flex flex-wrap items-center gap-1.5 min-h-10 px-3 py-1.5 border border-border rounded-md bg-background cursor-text focus-within:outline-2 focus-within:outline-primary focus-within:-outline-offset-1 focus-within:border-primary">
         {selectedTags.map((tag) => (
-          <span className="tag-chip" key={tag}>
-            <span className="tag-chip-label">{tag}</span>
+          <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[13px] font-medium" key={tag}>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">{tag}</span>
             <button
               aria-label={`${tag} を削除`}
-              className="tag-chip-remove"
+              className="inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-sm leading-none text-muted-foreground hover:bg-border hover:text-foreground"
               onClick={() => onChange(removeTagFromList(selectedTags, tag))}
               type="button"
             >
@@ -94,7 +94,7 @@ export function TagInput({ selectedTags, availableTags, onChange, id }: TagInput
         ))}
         <input
           autoComplete="off"
-          className="tag-input-text"
+          className="min-w-25 flex-1 border-0 bg-transparent font-[inherit] text-sm text-foreground outline-none placeholder:text-muted-foreground"
           id={id}
           onChange={handleInputChange}
           onFocus={() => setIsSuggestionsOpen(true)}
@@ -106,10 +106,10 @@ export function TagInput({ selectedTags, availableTags, onChange, id }: TagInput
         />
       </div>
       {showSuggestions ? (
-        <ul className="tag-suggestions" role="listbox">
+        <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[200px] list-none overflow-y-auto rounded-md border border-border bg-background py-1 shadow-lg" role="listbox">
           {suggestions.map((tag) => (
             <li
-              className="tag-suggestion-item"
+              className="cursor-pointer px-3 py-2 text-sm hover:bg-muted"
               key={tag}
               onMouseDown={(e) => {
                 e.preventDefault(); // blur の前に click を発火させるために mousedown を抑制する
