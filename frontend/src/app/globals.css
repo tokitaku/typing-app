@@ -236,33 +236,6 @@ a {
   padding: 24px;
 }
 
-/* ===== Stats ===== */
-
-.stats-row {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-}
-
-.stat-card {
-  flex: 1;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--muted-foreground);
-}
-
-.stat-value {
-  display: block;
-  margin-top: 8px;
-  font-size: 36px;
-  font-weight: 700;
-}
-
 /* ===== Text Utilities ===== */
 
 .text-muted {
@@ -331,49 +304,6 @@ a {
 
 .char-pending {
   color: var(--pending);
-}
-
-/* ===== Result Page ===== */
-
-.result-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: 640px;
-  max-width: 100%;
-}
-
-.result-title-section {
-  text-align: center;
-}
-
-.result-title {
-  margin: 0 0 4px;
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.result-notes {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 4px;
-  font-size: 14px;
-  color: var(--muted-foreground);
-}
-
-.divider {
-  width: 100%;
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
-}
-
-.result-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
 }
 
 /* ===== Questions Page ===== */
@@ -721,14 +651,6 @@ a {
   .page-center,
   .page-padded {
     padding: 24px 16px;
-  }
-
-  .stats-row {
-    flex-direction: column;
-  }
-
-  .result-content {
-    width: 100%;
   }
 
   .questions-title-row {
