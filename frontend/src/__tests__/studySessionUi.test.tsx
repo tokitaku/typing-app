@@ -86,12 +86,26 @@ describe("study session ui", () => {
     expect(html).toContain('data-slot="input"');
   });
 
-  it("renders stats bar", () => {
-    const html = renderToStaticMarkup(<StudySessionView {...baseProps} />);
-    expect(html).toContain("WPM");
-    expect(html).toContain("正確率");
-    expect(html).toContain("文字");
-    expect(html).toContain("ミス");
+  it("renders stats bar with computed values", () => {
+    const propsWithInput: StudySessionViewProps = {
+      ...baseProps,
+      inputValue: "Hello",
+      elapsedMs: 60000,
+      characterStates: [
+        "correct", "correct", "correct", "correct", "correct",
+        "pending", "pending", "pending", "pending", "pending", "pending"
+      ] as ("correct" | "wrong" | "pending")[],
+      mistakeCount: 2,
+    };
+    const html = renderToStaticMarkup(<StudySessionView {...propsWithInput} />);
+    // WPM: (5 chars / 5) / (60000ms / 60000) = 1 WPM
+    expect(html).toContain("1 WPM");
+    // Accuracy: 5 correct / 5 typed = 100.0%
+    expect(html).toContain("正確率 100.0%");
+    // Chars: 5 typed / 11 total (Hello world)
+    expect(html).toContain("5 / 11 文字");
+    // Mistakes
+    expect(html).toContain("ミス 2回");
   });
 
   it("renders footer with shortcuts and home link", () => {

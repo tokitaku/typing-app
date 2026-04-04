@@ -110,6 +110,7 @@ export function StudySessionView({
   const correctCount = characterStates.filter((s) => s === "correct").length;
   const typedCount = characterStates.filter((s) => s !== "pending").length;
   const accuracy = typedCount > 0 ? ((correctCount / typedCount) * 100).toFixed(1) : "100.0";
+  // WPM is per-current-question approximation (typedChars resets per question, elapsedMs is session-total)
   const wpm = elapsedMs > 0 ? Math.round((typedChars / 5) / (elapsedMs / 60000)) : 0;
 
   return (
@@ -196,6 +197,7 @@ export function StudySessionView({
               ))}
             </div>
             <Input
+              aria-label="英語を入力"
               autoComplete="off"
               autoFocus
               className={wasMistaken ? "border-destructive focus-visible:ring-destructive" : ""}
