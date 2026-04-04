@@ -49,6 +49,9 @@ describe("home dashboard ui", () => {
     expect(html).toContain("今日の学習回数");
     expect(html).toContain("今日の出題数");
     expect(html).toContain("復習待ち");
+    expect(html).toContain(">2<");
+    expect(html).toContain(">16<");
+    expect(html).toContain(">3<");
   });
 
   it("uses shadcn primitives without legacy CSS classes", () => {
