@@ -12,6 +12,12 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { StudyMode, Question } from "@/shared/types/study";
 
+const charClassMap: Record<"correct" | "wrong" | "pending", string> = {
+  correct: "text-correct",
+  wrong: "text-wrong bg-wrong/10",
+  pending: "text-pending",
+};
+
 function formatMs(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
   const m = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
@@ -182,7 +188,7 @@ export function StudySessionView({
                     <p className="text-[15px] font-semibold leading-[1.6]" aria-label="英語の正解文">
                       {Array.from(quiz.english).map((character, idx) => (
                         <span
-                          className={`char-${characterStates[idx]}`}
+                          className={charClassMap[characterStates[idx]]}
                           key={`${quiz.id}-${idx}`}
                         >
                           {character}

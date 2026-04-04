@@ -85,7 +85,7 @@ describe("question browser ui", () => {
     expect(html).not.toContain("scope=\"col\">種別</th>");
     expect(html).toContain("We must protect the environment.");
     expect(html).toContain("私たちは環境を守らなければならない。");
-    expect(html).toContain("question-tag-badge");  // タグバッジが表示されることを検証
+    expect(html).toContain('data-slot="badge"');  // タグバッジが表示されることを検証
     expect(html).toContain("sentence");
     expect(html).toContain("environment");
     expect(html).toContain("編集");  // 編集ボタンが各行にあることを検証
