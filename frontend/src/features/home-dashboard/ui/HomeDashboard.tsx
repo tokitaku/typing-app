@@ -95,10 +95,10 @@ export function HomeDashboardView({
   onToggleTag
 }: HomeDashboardViewProps) {
   return (
-    <div className="home-shell">
-      <header className="flex h-14 items-center justify-between border-b border-border/70 bg-background/80 px-8 backdrop-blur">
-        <span className="text-lg font-semibold tracking-tight">Type &amp; Learn</span>
-        <Link className="text-sm text-muted-foreground transition-colors hover:text-foreground" href="/questions">
+    <div className="page-layout">
+      <header className="flex h-14 items-center justify-between border-b px-8">
+        <span className="text-lg font-semibold">Type &amp; Learn</span>
+        <Link className="text-sm text-muted-foreground" href="/questions">
           問題一覧へ
         </Link>
       </header>
@@ -126,17 +126,24 @@ export function HomeDashboardView({
                 <Link href="/session?mode=review">復習する</Link>
               </Button>
             </div>
-
-            <div className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/70 p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/70 p-5 shadow-sm">
               <div className="flex flex-col gap-1">
-                <p className="text-base font-semibold text-foreground">登録問題を確認する</p>
-                <p className="text-sm text-muted-foreground">
-                  typing_questions の一覧を閲覧できます。
-                </p>
+                <CardTitle className="text-base font-semibold text-foreground">
+                  出題対象タグ
+                </CardTitle>
+                <CardDescription>
+                  タグ未選択時はすべてのタグを対象に出題します。
+                </CardDescription>
               </div>
-              <Link className="text-sm font-semibold text-foreground transition-colors hover:text-muted-foreground" href="/questions">
-                問題一覧へ
-              </Link>
+              {availableTags.length > 0 ? (
+                <TagSelectDropdown
+                  availableTags={availableTags}
+                  selectedTags={settings.tags}
+                  onToggleTag={onToggleTag}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">利用可能なタグはまだありません。</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -173,26 +180,6 @@ export function HomeDashboardView({
             </CardContent>
           </Card>
         </div>
-
-        <Card className="border-border/70 bg-background/80 shadow-sm">
-          <CardHeader className="gap-2 p-6">
-            <CardTitle className="text-lg">出題対象タグ</CardTitle>
-            <CardDescription>
-              タグ未選択時はすべてのタグを対象に出題します。
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6 pt-0">
-            {availableTags.length > 0 ? (
-              <TagSelectDropdown
-                availableTags={availableTags}
-                selectedTags={settings.tags}
-                onToggleTag={onToggleTag}
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">利用可能なタグはまだありません。</p>
-            )}
-          </CardContent>
-        </Card>
       </main>
     </div>
   );

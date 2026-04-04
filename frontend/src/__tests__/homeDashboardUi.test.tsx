@@ -33,6 +33,8 @@ describe("home dashboard ui", () => {
     expect(html).toContain("学習開始");
     expect(html).toContain("復習する");
     expect(html).toContain("今日の学習回数");
+    expect(html).not.toContain("登録問題を確認する");
+    expect(html.match(/href=\"\/questions\"/g)?.length).toBe(1);
     expect(html).not.toContain("btn btn-primary");
     expect(html).not.toContain("hero-actions");
   });

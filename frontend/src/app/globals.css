@@ -331,15 +331,6 @@ a {
 
 /* ===== Home Page ===== */
 
-.home-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background:
-    radial-gradient(circle at top left, rgba(214, 109, 66, 0.1), transparent 34%),
-    linear-gradient(180deg, #f4efe4 0%, #d8e7dd 100%);
-}
-
 .hero-content {
   display: flex;
   flex-direction: column;
