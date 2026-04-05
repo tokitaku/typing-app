@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from backend.application.tests.fakes import FakeQuestionRepository, FakeStudyResultRepository
 from backend.domain.entities import Question
-from backend.domain.value_objects import QuestionText, TagCollection
+from backend.domain.value_objects import QuestionId, QuestionText, TagCollection
 from backend.infrastructure.sqlmodel.bootstrap import INITIAL_QUESTIONS
 from backend.main import create_app
 
@@ -12,7 +12,7 @@ from backend.main import create_app
 def _build_seed_questions() -> list[Question]:
     return [
         Question(
-            id=index,
+            id=QuestionId(index),
             english=QuestionText(seed["english"]),
             japanese=QuestionText(seed["japanese"]),
             is_active=bool(seed.get("is_active", True)),
