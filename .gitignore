@@ -8,6 +8,7 @@ dist
 npm-debug.log*
 .serena/
 .superpowers/
+docs/superpowers/
 .worktrees/
 
 # Environment
