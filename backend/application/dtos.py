@@ -30,7 +30,6 @@ class RecordStudyResultCommand:
     correct_rate: int
     mistakes: int
     average_time: int
-    created_at: datetime
 
 
 @dataclass(frozen=True)
