@@ -19,11 +19,3 @@
 ## テストと確認
 
 - バックエンド変更時は少なくとも `pytest` を実行し、API 契約や OpenAPI に影響する変更では関連テストを追加で確認する。
-
-## `backend.main` の import 副作用
-
-`backend/main.py` はモジュールトップレベルで `get_database_url()` を呼び出し、`SqlModelQuestionRepository` / `SqlModelStudyResultRepository` を生成します。
-`DATABASE_URL` 未設定時は `DEFAULT_DATABASE_URL`（ローカル PostgreSQL のデフォルト値）にフォールバックするため即時エラーにはなりませんが、`backend.main` を import するだけでこれらの評価が走ります。
-
-- テストや CI で `backend.main` を直接 import する場合はこの副作用に注意してください。
-- `presentation/openapi.py` のような補助スクリプトでは `from backend.main import app` を lazy import（関数内 import）にして副作用を呼び出し時点に限定してください。
