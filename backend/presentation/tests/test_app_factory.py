@@ -1,9 +1,16 @@
-from fastapi.testclient import TestClient
 import pytest
-from unittest.mock import patch
+from fastapi.testclient import TestClient
 
-from backend.presentation import api
+from backend.application.tests.fakes import FakeQuestionRepository, FakeStudyResultRepository
 from backend.presentation.api import create_app
+
+
+def _make_app(**kwargs):
+    return create_app(
+        question_repository=FakeQuestionRepository([]),
+        study_result_repository=FakeStudyResultRepository(),
+        **kwargs,
+    )
 
 
 def test_health_returns_ok(client) -> None:
@@ -13,46 +20,39 @@ def test_health_returns_ok(client) -> None:
     assert response.json() == {"status": "ok"}
 
 
-def test_create_app_bootstraps_database_on_startup(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    bootstrapped_urls: list[str] = []
+def test_create_app_calls_on_startup_callback() -> None:
+    calls: list[str] = []
 
-    def fake_bootstrap_database(received_database_url: str) -> None:
-        bootstrapped_urls.append(received_database_url)  # lifespan が解決済み DB URL を受け取ることを記録する
+    def fake_on_startup() -> None:
+        calls.append("called")  # lifespan が on_startup を呼び出すことを記録する
 
-    monkeypatch.setattr(api, "bootstrap_database", fake_bootstrap_database)
+    with TestClient(_make_app(on_startup=fake_on_startup)):
+        pass  # 起動と終了だけ行い、on_startup が呼ばれることを確認する
 
-    # create_app() は環境変数の DATABASE_URL を使うが、bootstrap がモックされているため DB 接続は発生しない
-    with TestClient(create_app()):
-        pass  # 起動と終了だけ行い、lifespan から bootstrap が呼ばれることを確認する
+    assert calls == ["called"]
 
-    # 既定の DATABASE_URL が bootstrap に渡されることを確認
-    assert len(bootstrapped_urls) == 1
-    assert "postgresql://" in bootstrapped_urls[0]
+
+def test_create_app_skips_startup_when_no_callback_given() -> None:
+    # on_startup を渡さない場合は startup 時に何もせず正常に起動することを確認する
+    with TestClient(_make_app()):
+        pass
 
 
 def test_create_app_allows_default_cors_origin_when_env_is_unset(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("BACKEND_CORS_ORIGINS", raising=False)  # 既定値フォールバック動作を見るため環境変数を外す
 
-    # bootstrap_database をモックして DB 接続を回避
-    with patch("backend.presentation.api.bootstrap_database"):
-        app = create_app()
+    app = _make_app()
 
     cors_middleware = next(middleware for middleware in app.user_middleware if middleware.cls.__name__ == "CORSMiddleware")
-
     assert cors_middleware.kwargs["allow_origins"] == ["http://localhost:3000"]
 
 
 def test_create_app_allows_single_cors_origin_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("BACKEND_CORS_ORIGINS", "http://localhost:3001")  # 単一 origin 指定を再現する
 
-    # bootstrap_database をモックして DB 接続を回避
-    with patch("backend.presentation.api.bootstrap_database"):
-        app = create_app()
+    app = _make_app()
 
     cors_middleware = next(middleware for middleware in app.user_middleware if middleware.cls.__name__ == "CORSMiddleware")
-
     assert cors_middleware.kwargs["allow_origins"] == ["http://localhost:3001"]
 
 
@@ -62,22 +62,16 @@ def test_create_app_allows_multiple_cors_origins_from_env(monkeypatch: pytest.Mo
         "http://localhost:3001, http://localhost:3002 ,",  # 空要素や前後空白を含む入力を正規化対象として与える
     )
 
-    # bootstrap_database をモックして DB 接続を回避
-    with patch("backend.presentation.api.bootstrap_database"):
-        app = create_app()
+    app = _make_app()
 
     cors_middleware = next(middleware for middleware in app.user_middleware if middleware.cls.__name__ == "CORSMiddleware")
-
     assert cors_middleware.kwargs["allow_origins"] == ["http://localhost:3001", "http://localhost:3002"]
 
 
 def test_create_app_falls_back_to_default_cors_origin_when_env_is_blank(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("BACKEND_CORS_ORIGINS", "  ,  ")  # 実質空文字の設定でも既定値へ戻す
 
-    # bootstrap_database をモックして DB 接続を回避
-    with patch("backend.presentation.api.bootstrap_database"):
-        app = create_app()
+    app = _make_app()
 
     cors_middleware = next(middleware for middleware in app.user_middleware if middleware.cls.__name__ == "CORSMiddleware")
-
     assert cors_middleware.kwargs["allow_origins"] == ["http://localhost:3000"]
