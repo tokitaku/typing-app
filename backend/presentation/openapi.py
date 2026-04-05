@@ -2,10 +2,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from backend.main import app
-
 
 def build_openapi_schema() -> dict[str, Any]:
+    from backend.main import app  # lazy import で副作用をここに限定
     return app.openapi()  # composition root が組み立てた app から schema を取得する
 
 
