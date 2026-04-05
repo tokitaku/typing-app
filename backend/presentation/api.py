@@ -1,4 +1,5 @@
 import os
+from collections.abc import Callable
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import NoReturn
@@ -22,12 +23,7 @@ from backend.application.usecases import (
     record_study_result,
     update_question,
 )
-from backend.database import get_database_url
-from backend.infrastructure.sqlmodel.bootstrap import bootstrap_database
-from backend.infrastructure.sqlmodel.repositories import (
-    SqlModelQuestionRepository,
-    SqlModelStudyResultRepository,
-)
+from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.presentation.schemas import (
     DailyStudySummaryResponse,
     QuestionCreate,
@@ -60,14 +56,15 @@ def _handle_invalid_master_code(error: ValueError) -> NoReturn:
     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(error)) from error
 
 
-def create_app(database_url: str | None = None) -> FastAPI:
-    resolved_database_url = get_database_url(database_url)
-    question_repository = SqlModelQuestionRepository(resolved_database_url)
-    study_result_repository = SqlModelStudyResultRepository(resolved_database_url)
-
+def create_app(
+    question_repository: QuestionRepository,
+    study_result_repository: StudyResultRepository,
+    on_startup: Callable[[], None] | None = None,
+) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_: FastAPI):
-        bootstrap_database(resolved_database_url)  # アプリ起動時に DB を初期化・投入する
+        if on_startup:
+            on_startup()  # 呼び出し元が渡した起動コールバックを実行する
         yield
 
     app = FastAPI(title="Typing App API", lifespan=lifespan)
