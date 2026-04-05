@@ -137,8 +137,11 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
     @app.delete("/questions/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
     def delete_question(question_id: int) -> Response:
-        if not deactivate_question(question_repository, question_id):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        try:
+            if not deactivate_question(question_repository, question_id):
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        except ValueError as error:
+            _handle_invalid_master_code(error)  # question_id < 1 の場合に 422 を返す
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 

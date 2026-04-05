@@ -40,7 +40,7 @@ class FakeQuestionRepository:
 
     def update(self, question_id: QuestionId, patch: QuestionPatch) -> Question | None:
         for i, q in enumerate(self.questions):
-            if q.id == question_id:  # QuestionId 同士の比較（dataclass equality）
+            if q.id == question_id:  # QuestionId 同士の比較 (dataclass equality)
                 updated = Question(
                     id=q.id,
                     english=patch.english if patch.english is not None else q.english,
