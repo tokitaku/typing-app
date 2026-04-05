@@ -19,7 +19,9 @@ def test_post_study_result_persists_payload(client) -> None:
     assert body["correct_rate"] == 80
     assert body["mistakes"] == 3
     assert body["average_time"] == 1200
-    assert "created_at" in body  # サーバー側で UTC タイムスタンプが付与されることを確認する
+    created_at = datetime.fromisoformat(body["created_at"].replace("Z", "+00:00"))
+    assert created_at.utcoffset() is not None  # サーバー側で UTC タイムスタンプが付与されることを確認する
+    assert created_at.utcoffset().total_seconds() == 0  # UTC であることを確認する
 
     latest_response = client.get("/study-results/latest")
 

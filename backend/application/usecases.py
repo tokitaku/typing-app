@@ -115,6 +115,7 @@ def record_study_result(
     *,
     now_fn: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
 ) -> StudyResultDto:
+    created_at = now_fn().astimezone(timezone.utc)  # now_fn の注入値を UTC に正規化する
     saved_result = repository.save(
         StudyResult(
             mode=StudyMode(command.mode),
@@ -122,7 +123,7 @@ def record_study_result(
             correct_rate=CorrectRate(command.correct_rate),
             mistakes=MistakeCount(command.mistakes),
             average_time=AverageTime(command.average_time),
-            created_at=now_fn(),  # サーバー側で UTC タイムスタンプを生成する
+            created_at=created_at,
         )
     )
     return _to_study_result_dto(saved_result)  # 保存結果を返す
