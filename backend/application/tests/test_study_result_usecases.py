@@ -8,7 +8,7 @@ from backend.application.tests.fakes import FakeStudyResultRepository
 FIXED_UTC = datetime(2026, 3, 21, 8, 0, tzinfo=timezone.utc)
 
 
-def _make_command(**overrides) -> RecordStudyResultCommand:
+def _make_command(**overrides: object) -> RecordStudyResultCommand:
     defaults = dict(mode="learn", total_questions=10, correct_rate=90, mistakes=1, average_time=1200)
     return RecordStudyResultCommand(**{**defaults, **overrides})
 
@@ -33,7 +33,7 @@ def test_study_result_use_cases_record_and_summarize_results() -> None:
 
 def test_record_study_result_excludes_yesterday_from_today_summary() -> None:
     repository = FakeStudyResultRepository()
-    today = datetime(2026, 3, 21, 8, 0, tzinfo=timezone.utc)
+    today = FIXED_UTC
     yesterday = datetime(2026, 3, 20, 8, 0, tzinfo=timezone.utc)
     command = _make_command(total_questions=5, correct_rate=80)
 
