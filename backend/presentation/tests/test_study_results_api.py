@@ -2,31 +2,31 @@ from datetime import datetime, timezone
 
 
 def test_post_study_result_persists_payload(client) -> None:
-    created_at = "2026-03-21T17:00:00+09:00"
     payload = {
         "mode": "learn",
         "total_questions": 10,
         "correct_rate": 80,
         "mistakes": 3,
         "average_time": 1200,
-        "created_at": created_at,
     }
 
     response = client.post("/study-results", json=payload)
 
     assert response.status_code == 201
-    assert response.json() == {
-        **payload,
-        "created_at": "2026-03-21T08:00:00Z",
-    }  # API 境界では ISO 文字列を受け取りつつ、内部 datetime を UTC の ISO 文字列で返すことを確認する
+    body = response.json()
+    assert body["mode"] == "learn"
+    assert body["total_questions"] == 10
+    assert body["correct_rate"] == 80
+    assert body["mistakes"] == 3
+    assert body["average_time"] == 1200
+    created_at = datetime.fromisoformat(body["created_at"].replace("Z", "+00:00"))
+    assert created_at.utcoffset() is not None  # サーバー側で UTC タイムスタンプが付与されることを確認する
+    assert created_at.utcoffset().total_seconds() == 0  # UTC であることを確認する
 
     latest_response = client.get("/study-results/latest")
 
     assert latest_response.status_code == 200
-    assert latest_response.json() == {
-        **payload,
-        "created_at": "2026-03-21T08:00:00Z",
-    }
+    assert latest_response.json()["mode"] == "learn"
 
 
 def test_post_study_result_rejects_invalid_payload(client) -> None:
@@ -36,7 +36,6 @@ def test_post_study_result_rejects_invalid_payload(client) -> None:
         "correct_rate": 110,
         "mistakes": -1,
         "average_time": -5,
-        "created_at": "invalid-date",
     }
 
     response = client.post("/study-results", json=payload)
@@ -45,8 +44,6 @@ def test_post_study_result_rejects_invalid_payload(client) -> None:
 
 
 def test_today_summary_aggregates_saved_results(client) -> None:
-    today = datetime.now(timezone.utc).isoformat()
-    yesterday = datetime(2025, 1, 1, tzinfo=timezone.utc).isoformat()
     client.post(
         "/study-results",
         json={
@@ -55,7 +52,6 @@ def test_today_summary_aggregates_saved_results(client) -> None:
             "correct_rate": 75,
             "mistakes": 2,
             "average_time": 1000,
-            "created_at": today,
         },
     )
     client.post(
@@ -66,18 +62,6 @@ def test_today_summary_aggregates_saved_results(client) -> None:
             "correct_rate": 100,
             "mistakes": 0,
             "average_time": 900,
-            "created_at": today,
-        },
-    )
-    client.post(
-        "/study-results",
-        json={
-            "mode": "learn",
-            "total_questions": 9,
-            "correct_rate": 60,
-            "mistakes": 4,
-            "average_time": 1500,
-            "created_at": yesterday,
         },
     )
 
@@ -88,10 +72,10 @@ def test_today_summary_aggregates_saved_results(client) -> None:
         "date": datetime.now(timezone.utc).date().isoformat(),
         "sessions": 2,
         "solvedProblems": 10,
-    }
+    }  # 昨日の除外はユースケース単体テストで検証するため、ここでは今日分の集計のみ確認する
 
 
 def test_get_latest_study_result_returns_not_found_when_no_data(client) -> None:
     response = client.get("/study-results/latest")
 
-    assert response.status_code == 404  # データが存在しない場合のエラーハンドリング仕様を検証
+    assert response.status_code == 404

@@ -195,12 +195,6 @@ class SqlModelStudyResultRepository:
     def __init__(self, database_url: str) -> None:
         self.database_url = database_url
 
-    def _normalize_created_at(self, value: datetime) -> datetime:
-        if value.tzinfo is None or value.utcoffset() is None:
-            return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
-
-        return value.astimezone(timezone.utc)  # 永続化前に UTC へ正規化する
-
     def _build_study_result(self, record: StudyResultRecord) -> StudyResult:
         return StudyResult(
             mode=StudyMode(record.mode.value),
@@ -208,11 +202,10 @@ class SqlModelStudyResultRepository:
             correct_rate=CorrectRate(record.correct_rate),
             mistakes=MistakeCount(record.mistakes),
             average_time=AverageTime(record.average_time),
-            created_at=self._normalize_created_at(record.created_at),
+            created_at=record.created_at,
         )  # ORM レコードをドメインエンティティへ変換する
 
     def save(self, result: StudyResult) -> StudyResult:
-        normalized_created_at = self._normalize_created_at(result.created_at)
         with get_session(self.database_url) as session:
             record = StudyResultRecord(
                 mode=StudyModeRecord(result.mode.value),
@@ -220,7 +213,7 @@ class SqlModelStudyResultRepository:
                 correct_rate=result.correct_rate.value,
                 mistakes=result.mistakes.value,
                 average_time=result.average_time.value,
-                created_at=normalized_created_at,
+                created_at=result.created_at,
             )
             session.add(record)
             session.commit()

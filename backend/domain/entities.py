@@ -33,7 +33,7 @@ class StudyResult:
     correct_rate: CorrectRate
     mistakes: MistakeCount
     average_time: AverageTime
-    created_at: datetime  # UTC 正規化は #86 で対応
+    created_at: datetime
 
 
 @dataclass(frozen=True)

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 from backend.application.dtos import (
@@ -20,13 +21,6 @@ from backend.domain.value_objects import (
     TagCollection,
     TotalQuestions,
 )
-
-
-def _normalize_created_at(value: datetime) -> datetime:
-    if value.tzinfo is None or value.utcoffset() is None:
-        return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
-
-    return value.astimezone(timezone.utc)  # 内部では UTC に正規化して扱う
 
 
 def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
@@ -118,8 +112,10 @@ def list_tags(repository: QuestionRepository) -> list[str]:
 def record_study_result(
     repository: StudyResultRepository,
     command: RecordStudyResultCommand,
+    *,
+    now_fn: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
 ) -> StudyResultDto:
-    normalized_created_at = _normalize_created_at(command.created_at)
+    created_at = now_fn().astimezone(timezone.utc)  # now_fn の注入値を UTC に正規化する
     saved_result = repository.save(
         StudyResult(
             mode=StudyMode(command.mode),
@@ -127,7 +123,7 @@ def record_study_result(
             correct_rate=CorrectRate(command.correct_rate),
             mistakes=MistakeCount(command.mistakes),
             average_time=AverageTime(command.average_time),
-            created_at=normalized_created_at,
+            created_at=created_at,
         )
     )
     return _to_study_result_dto(saved_result)  # 保存結果を返す
