@@ -33,7 +33,7 @@ erDiagram
         int correct_rate
         int mistakes
         int average_time
-        string created_at
+        datetime created_at
     }
 ```
 
