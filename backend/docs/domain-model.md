@@ -12,6 +12,12 @@ classDiagram
         REVIEW
     }
 
+    class QuestionId {
+        <<value object>>
+        +value: int
+        __post_init__: >= 1 を保証
+    }
+
     class QuestionText {
         <<value object>>
         +value: str
@@ -50,11 +56,19 @@ classDiagram
 
     class Question {
         <<entity>>
-        +id: int | None
+        +id: QuestionId | None
         +english: QuestionText
         +japanese: QuestionText
         +is_active: bool
         +tags: TagCollection
+    }
+
+    class QuestionPatch {
+        <<entity>>
+        +english: QuestionText | None
+        +japanese: QuestionText | None
+        +is_active: bool | None
+        +tags: TagCollection | None
     }
 
     class StudyResult {
@@ -78,8 +92,8 @@ classDiagram
         <<interface>>
         +list_questions(tag_codes, include_inactive) list~Question~
         +create(question) Question
-        +update(question_id, updates) Question | None
-        +deactivate(question_id) bool
+        +update(question_id: QuestionId, patch: QuestionPatch) Question | None
+        +deactivate(question_id: QuestionId) bool
         +list_tags() list~str~
     }
 
@@ -90,20 +104,27 @@ classDiagram
         +get_today_summary(target_date) DailyStudySummary
     }
 
+    Question --> QuestionId : uses
     Question --> QuestionText : uses
     Question --> TagCollection : uses
+    QuestionPatch --> QuestionText : uses
+    QuestionPatch --> TagCollection : uses
     StudyResult --> StudyMode : uses
     StudyResult --> TotalQuestions : uses
     StudyResult --> CorrectRate : uses
     StudyResult --> MistakeCount : uses
     StudyResult --> AverageTime : uses
     QuestionRepository ..> Question : manages
+    QuestionRepository ..> QuestionPatch : uses
+    QuestionRepository ..> QuestionId : uses
     StudyResultRepository ..> StudyResult : persists
     StudyResultRepository ..> DailyStudySummary : builds
 ```
 
 補足:
 - `Question` と `StudyResult` は値オブジェクトによって生成時の不変条件を自己保証する。不正な状態は `__post_init__` が `ValueError` を送出することで防ぐ。
+- `Question.id` は `QuestionId` 値オブジェクトで表現し、永続化前は `None`、永続化後は `>= 1` の整数値を持つ。
+- `QuestionPatch` は部分更新用のエンティティで、`None` フィールドは「変更なし」を意味する。
 - `Question` は自由タグを 0 件以上保持し、学習者が自分の目的に合わせて分類できます。
 - タグは学習者が自由に作成・付与でき、出題条件と教材分類の両方に利用されます。
 - `StudyResult` は `StudyMode` を保持し、学習モードごとの結果を表現します。
