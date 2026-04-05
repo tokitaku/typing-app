@@ -12,6 +12,14 @@ from backend.application.dtos import (
 from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.domain.tag_rules import normalize_tags
+from backend.domain.value_objects import (
+    AverageTime,
+    CorrectRate,
+    MistakeCount,
+    QuestionText,
+    TagCollection,
+    TotalQuestions,
+)
 
 
 def _normalize_created_at(value: datetime) -> datetime:
@@ -32,20 +40,20 @@ def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
 def _to_question_dto(question: Question) -> QuestionDto:
     return QuestionDto(
         id=int(question.id),
-        english=question.english,
-        japanese=question.japanese,
+        english=question.english.value,
+        japanese=question.japanese.value,
         isActive=question.is_active,
-        tags=list(question.tags),
+        tags=list(question.tags.value),
     )  # 管理用 DTO へ詰め替える
 
 
 def _to_study_result_dto(result: StudyResult) -> StudyResultDto:
     return StudyResultDto(
         mode=result.mode.value,
-        total_questions=result.total_questions,
-        correct_rate=result.correct_rate,
-        mistakes=result.mistakes,
-        average_time=result.average_time,
+        total_questions=result.total_questions.value,
+        correct_rate=result.correct_rate.value,
+        mistakes=result.mistakes.value,
+        average_time=result.average_time.value,
         created_at=result.created_at,
     )  # API 返却用 DTO へ詰め替える
 
@@ -70,10 +78,10 @@ def create_question(repository: QuestionRepository, command: CreateQuestionComma
     saved_question = repository.create(
         Question(
             id=None,
-            english=command.english,
-            japanese=command.japanese,
+            english=QuestionText(command.english),
+            japanese=QuestionText(command.japanese),
             is_active=True,
-            tags=normalize_tags(command.tags),
+            tags=TagCollection(command.tags),
         )
     )
     return _to_question_dto(saved_question)  # 保存結果を DTO にして返す
@@ -87,16 +95,13 @@ def update_question(
     updates: dict[str, object] = {}
 
     if command.english is not None:
-        updates["english"] = command.english  # 英文の変更を詰める
-
+        updates["english"] = QuestionText(command.english).value  # 検証・正規化してから格納する
     if command.japanese is not None:
-        updates["japanese"] = command.japanese  # 日本語訳の変更を詰める
-
+        updates["japanese"] = QuestionText(command.japanese).value  # 検証・正規化してから格納する
     if command.is_active is not None:
         updates["is_active"] = command.is_active  # 有効フラグ変更を詰める
-
     if command.tags is not None:
-        updates["tags"] = normalize_tags(command.tags)  # タグ一覧を正規化して全置換する
+        updates["tags"] = TagCollection(command.tags).value  # 正規化済みタプルを格納する
 
     saved_question = repository.update(question_id, updates)
     return _to_question_dto(saved_question) if saved_question is not None else None  # 対象があれば DTO を返す
@@ -118,10 +123,10 @@ def record_study_result(
     saved_result = repository.save(
         StudyResult(
             mode=StudyMode(command.mode),
-            total_questions=command.total_questions,
-            correct_rate=command.correct_rate,
-            mistakes=command.mistakes,
-            average_time=command.average_time,
+            total_questions=TotalQuestions(command.total_questions),
+            correct_rate=CorrectRate(command.correct_rate),
+            mistakes=MistakeCount(command.mistakes),
+            average_time=AverageTime(command.average_time),
             created_at=normalized_created_at,
         )
     )

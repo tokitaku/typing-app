@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from backend.application.tests.fakes import FakeQuestionRepository, FakeStudyResultRepository
 from backend.domain.entities import Question
-from backend.domain.tag_rules import normalize_tags
+from backend.domain.value_objects import QuestionText, TagCollection
 from backend.infrastructure.sqlmodel.bootstrap import INITIAL_QUESTIONS
 from backend.main import create_app
 
@@ -13,10 +13,10 @@ def _build_seed_questions() -> list[Question]:
     return [
         Question(
             id=index,
-            english=seed["english"],
-            japanese=seed["japanese"],
+            english=QuestionText(seed["english"]),
+            japanese=QuestionText(seed["japanese"]),
             is_active=bool(seed.get("is_active", True)),
-            tags=normalize_tags(seed.get("tags", [])),
+            tags=TagCollection(seed.get("tags", [])),
         )
         for index, seed in enumerate(INITIAL_QUESTIONS, start=1)
     ]  # 初期投入データを in-memory repository 用のエンティティ一覧へ変換する
