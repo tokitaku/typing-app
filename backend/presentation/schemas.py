@@ -3,8 +3,6 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from backend.domain.tag_rules import normalize_tags
-
 
 class QuestionBase(BaseModel):
     english: str = Field(min_length=1)
@@ -20,11 +18,6 @@ class QuestionBase(BaseModel):
             raise ValueError("must not be blank")  # 空文字は拒否する
 
         return normalized_value
-
-    @field_validator("tags")
-    @classmethod
-    def validate_tags(cls, value: list[str]) -> list[str]:
-        return list(normalize_tags(value))  # 業務ルールに沿ってタグを正規化しつつ重複を排除する
 
 
 class QuestionCreate(QuestionBase):
@@ -49,14 +42,6 @@ class QuestionUpdate(BaseModel):
             raise ValueError("must not be blank")  # 空白のみは拒否する
 
         return normalized_value
-
-    @field_validator("tags")
-    @classmethod
-    def validate_optional_tags(cls, value: list[str] | None) -> list[str] | None:
-        if value is None:
-            return None  # 未指定時は既存値維持のためそのまま通す
-
-        return list(normalize_tags(value))  # 指定された場合だけタグ一覧を正規化する
 
 
 class QuestionResponse(BaseModel):
