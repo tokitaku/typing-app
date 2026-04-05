@@ -1,6 +1,13 @@
 import pytest
 
-from backend.domain.value_objects import QuestionText, TagCollection
+from backend.domain.value_objects import (
+    AverageTime,
+    CorrectRate,
+    MistakeCount,
+    QuestionText,
+    TagCollection,
+    TotalQuestions,
+)
 
 
 class TestQuestionText:
@@ -38,3 +45,62 @@ class TestTagCollection:
 
     def test_list_input_is_accepted(self) -> None:
         assert TagCollection(["essay", "eiken"]).value == ("essay", "eiken")
+
+
+class TestTotalQuestions:
+    def test_one_is_valid(self) -> None:
+        assert TotalQuestions(1).value == 1
+
+    def test_large_number_is_valid(self) -> None:
+        assert TotalQuestions(100).value == 100
+
+    def test_zero_raises(self) -> None:
+        with pytest.raises(ValueError, match="total_questions"):
+            TotalQuestions(0)
+
+    def test_negative_raises(self) -> None:
+        with pytest.raises(ValueError, match="total_questions"):
+            TotalQuestions(-1)
+
+
+class TestCorrectRate:
+    def test_zero_is_valid(self) -> None:
+        assert CorrectRate(0).value == 0
+
+    def test_hundred_is_valid(self) -> None:
+        assert CorrectRate(100).value == 100
+
+    def test_fifty_is_valid(self) -> None:
+        assert CorrectRate(50).value == 50
+
+    def test_over_100_raises(self) -> None:
+        with pytest.raises(ValueError, match="correct_rate"):
+            CorrectRate(101)
+
+    def test_negative_raises(self) -> None:
+        with pytest.raises(ValueError, match="correct_rate"):
+            CorrectRate(-1)
+
+
+class TestMistakeCount:
+    def test_zero_is_valid(self) -> None:
+        assert MistakeCount(0).value == 0
+
+    def test_positive_is_valid(self) -> None:
+        assert MistakeCount(5).value == 5
+
+    def test_negative_raises(self) -> None:
+        with pytest.raises(ValueError, match="mistakes"):
+            MistakeCount(-1)
+
+
+class TestAverageTime:
+    def test_zero_is_valid(self) -> None:
+        assert AverageTime(0).value == 0
+
+    def test_positive_is_valid(self) -> None:
+        assert AverageTime(300).value == 300
+
+    def test_negative_raises(self) -> None:
+        with pytest.raises(ValueError, match="average_time"):
+            AverageTime(-1)
