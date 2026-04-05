@@ -1,6 +1,6 @@
 # Backend Domain Model
 
-以下は、`backend/domain/entities.py` と `backend/domain/repositories.py` を元にしたドメインモデル図です。
+以下は、`backend/domain/entities.py`、`backend/domain/value_objects.py`、`backend/domain/repositories.py` を元にしたドメインモデル図です。
 
 ```mermaid
 classDiagram
@@ -12,23 +12,59 @@ classDiagram
         REVIEW
     }
 
+    class QuestionText {
+        <<value object>>
+        +value: str
+        __post_init__: strip後に非空白を保証
+    }
+
+    class TagCollection {
+        <<value object>>
+        +value: tuple~str~
+        __post_init__: normalize_tagsで正規化・重複排除
+    }
+
+    class TotalQuestions {
+        <<value object>>
+        +value: int
+        __post_init__: >= 1 を保証
+    }
+
+    class CorrectRate {
+        <<value object>>
+        +value: int
+        __post_init__: 0 <= x <= 100 を保証
+    }
+
+    class MistakeCount {
+        <<value object>>
+        +value: int
+        __post_init__: >= 0 を保証
+    }
+
+    class AverageTime {
+        <<value object>>
+        +value: int
+        __post_init__: >= 0 を保証
+    }
+
     class Question {
         <<entity>>
         +id: int | None
-        +english: str
-        +japanese: str
+        +english: QuestionText
+        +japanese: QuestionText
         +is_active: bool
-        +tags: tuple~str~
+        +tags: TagCollection
     }
 
     class StudyResult {
         <<entity>>
         +mode: StudyMode
-        +total_questions: int
-        +correct_rate: int
-        +mistakes: int
-        +average_time: int
-        +created_at: str
+        +total_questions: TotalQuestions
+        +correct_rate: CorrectRate
+        +mistakes: MistakeCount
+        +average_time: AverageTime
+        +created_at: datetime
     }
 
     class DailyStudySummary {
@@ -54,13 +90,20 @@ classDiagram
         +get_today_summary(target_date) DailyStudySummary
     }
 
+    Question --> QuestionText : uses
+    Question --> TagCollection : uses
     StudyResult --> StudyMode : uses
+    StudyResult --> TotalQuestions : uses
+    StudyResult --> CorrectRate : uses
+    StudyResult --> MistakeCount : uses
+    StudyResult --> AverageTime : uses
     QuestionRepository ..> Question : manages
     StudyResultRepository ..> StudyResult : persists
     StudyResultRepository ..> DailyStudySummary : builds
 ```
 
 補足:
+- `Question` と `StudyResult` は値オブジェクトによって生成時の不変条件を自己保証する。不正な状態は `__post_init__` が `ValueError` を送出することで防ぐ。
 - `Question` は自由タグを 0 件以上保持し、学習者が自分の目的に合わせて分類できます。
 - タグは学習者が自由に作成・付与でき、出題条件と教材分類の両方に利用されます。
 - `StudyResult` は `StudyMode` を保持し、学習モードごとの結果を表現します。

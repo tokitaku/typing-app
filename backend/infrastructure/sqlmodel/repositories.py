@@ -7,6 +7,14 @@ from sqlmodel import select
 from backend.database import get_session
 from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
 from backend.domain.tag_rules import normalize_tags
+from backend.domain.value_objects import (
+    AverageTime,
+    CorrectRate,
+    MistakeCount,
+    QuestionText,
+    TagCollection,
+    TotalQuestions,
+)
 from backend.infrastructure.sqlmodel.models import (
     TagRecord,
     StudyModeRecord,
@@ -78,10 +86,10 @@ class SqlModelQuestionRepository:
     ) -> Question:
         return Question(
             id=int(record.id),
-            english=record.english_text,
-            japanese=record.japanese_text,
+            english=QuestionText(record.english_text),
+            japanese=QuestionText(record.japanese_text),
             is_active=record.is_active,
-            tags=tags,
+            tags=TagCollection(tags),
         )  # ORM レコードをドメインエンティティへ変換する
 
     def list_questions(
@@ -123,13 +131,13 @@ class SqlModelQuestionRepository:
     def create(self, question: Question) -> Question:
         with get_session(self.database_url) as session:
             record = TypingQuestionRecord(
-                english_text=question.english,
-                japanese_text=question.japanese,
+                english_text=question.english.value,
+                japanese_text=question.japanese.value,
                 is_active=question.is_active,
             )
             session.add(record)
             session.flush()  # 中間テーブル作成前に question_id を確定させる
-            self._replace_question_tags(session, int(record.id), question.tags)
+            self._replace_question_tags(session, int(record.id), question.tags.value)
             session.commit()
             session.refresh(record)
 
@@ -196,10 +204,10 @@ class SqlModelStudyResultRepository:
     def _build_study_result(self, record: StudyResultRecord) -> StudyResult:
         return StudyResult(
             mode=StudyMode(record.mode.value),
-            total_questions=record.total_questions,
-            correct_rate=record.correct_rate,
-            mistakes=record.mistakes,
-            average_time=record.average_time,
+            total_questions=TotalQuestions(record.total_questions),
+            correct_rate=CorrectRate(record.correct_rate),
+            mistakes=MistakeCount(record.mistakes),
+            average_time=AverageTime(record.average_time),
             created_at=self._normalize_created_at(record.created_at),
         )  # ORM レコードをドメインエンティティへ変換する
 
@@ -208,10 +216,10 @@ class SqlModelStudyResultRepository:
         with get_session(self.database_url) as session:
             record = StudyResultRecord(
                 mode=StudyModeRecord(result.mode.value),
-                total_questions=result.total_questions,
-                correct_rate=result.correct_rate,
-                mistakes=result.mistakes,
-                average_time=result.average_time,
+                total_questions=result.total_questions.value,
+                correct_rate=result.correct_rate.value,
+                mistakes=result.mistakes.value,
+                average_time=result.average_time.value,
                 created_at=normalized_created_at,
             )
             session.add(record)

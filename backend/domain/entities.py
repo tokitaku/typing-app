@@ -1,6 +1,15 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+
+from backend.domain.value_objects import (
+    AverageTime,
+    CorrectRate,
+    MistakeCount,
+    QuestionText,
+    TagCollection,
+    TotalQuestions,
+)
 
 
 class StudyMode(str, Enum):
@@ -11,20 +20,20 @@ class StudyMode(str, Enum):
 @dataclass(frozen=True)
 class Question:
     id: int | None
-    english: str
-    japanese: str
+    english: QuestionText
+    japanese: QuestionText
     is_active: bool = True
-    tags: tuple[str, ...] = ()
+    tags: TagCollection = field(default_factory=TagCollection)
 
 
 @dataclass(frozen=True)
 class StudyResult:
     mode: StudyMode
-    total_questions: int
-    correct_rate: int
-    mistakes: int
-    average_time: int
-    created_at: datetime
+    total_questions: TotalQuestions
+    correct_rate: CorrectRate
+    mistakes: MistakeCount
+    average_time: AverageTime
+    created_at: datetime  # UTC 正規化は #86 で対応
 
 
 @dataclass(frozen=True)
