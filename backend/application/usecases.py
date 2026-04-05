@@ -10,13 +10,14 @@ from backend.application.dtos import (
     StudyResultDto,
     UpdateQuestionCommand,
 )
-from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, QuestionPatch, StudyMode, StudyResult
 from backend.domain.repositories import QuestionRepository, StudyResultRepository
 from backend.domain.tag_rules import normalize_tags
 from backend.domain.value_objects import (
     AverageTime,
     CorrectRate,
     MistakeCount,
+    QuestionId,
     QuestionText,
     TagCollection,
     TotalQuestions,
@@ -33,7 +34,7 @@ def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
 
 def _to_question_dto(question: Question) -> QuestionDto:
     return QuestionDto(
-        id=int(question.id),
+        id=question.id.value,
         english=question.english.value,
         japanese=question.japanese.value,
         isActive=question.is_active,
@@ -86,23 +87,18 @@ def update_question(
     question_id: int,
     command: UpdateQuestionCommand,
 ) -> QuestionDto | None:
-    updates: dict[str, object] = {}
-
-    if command.english is not None:
-        updates["english"] = QuestionText(command.english).value  # 検証・正規化してから格納する
-    if command.japanese is not None:
-        updates["japanese"] = QuestionText(command.japanese).value  # 検証・正規化してから格納する
-    if command.is_active is not None:
-        updates["is_active"] = command.is_active  # 有効フラグ変更を詰める
-    if command.tags is not None:
-        updates["tags"] = TagCollection(command.tags).value  # 正規化済みタプルを格納する
-
-    saved_question = repository.update(question_id, updates)
+    patch = QuestionPatch(
+        english=QuestionText(command.english) if command.english is not None else None,  # 検証・正規化してから詰める
+        japanese=QuestionText(command.japanese) if command.japanese is not None else None,  # 検証・正規化してから詰める
+        is_active=command.is_active,
+        tags=TagCollection(command.tags) if command.tags is not None else None,  # 正規化済みタプルを格納する
+    )
+    saved_question = repository.update(QuestionId(question_id), patch)  # int を QuestionId に変換して渡す
     return _to_question_dto(saved_question) if saved_question is not None else None  # 対象があれば DTO を返す
 
 
 def deactivate_question(repository: QuestionRepository, question_id: int) -> bool:
-    return repository.deactivate(question_id)  # 論理削除を委譲する
+    return repository.deactivate(QuestionId(question_id))  # int を QuestionId に変換して委譲する
 
 
 def list_tags(repository: QuestionRepository) -> list[str]:

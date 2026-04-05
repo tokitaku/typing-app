@@ -5,12 +5,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from backend.database import get_session
-from backend.domain.entities import DailyStudySummary, Question, StudyMode, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, QuestionPatch, StudyMode, StudyResult
 from backend.domain.tag_rules import normalize_tags
 from backend.domain.value_objects import (
     AverageTime,
     CorrectRate,
     MistakeCount,
+    QuestionId,
     QuestionText,
     TagCollection,
     TotalQuestions,
@@ -85,7 +86,7 @@ class SqlModelQuestionRepository:
         tags: tuple[str, ...],
     ) -> Question:
         return Question(
-            id=int(record.id),
+            id=QuestionId(int(record.id)),  # int から QuestionId に変換する
             english=QuestionText(record.english_text),
             japanese=QuestionText(record.japanese_text),
             is_active=record.is_active,
@@ -148,24 +149,24 @@ class SqlModelQuestionRepository:
             tags_by_question_id.get(int(record.id), ()),
         )  # 保存済みエンティティを返す
 
-    def update(self, question_id: int, updates: dict[str, object]) -> Question | None:
+    def update(self, question_id: QuestionId, patch: QuestionPatch) -> Question | None:
         with get_session(self.database_url) as session:
-            record = session.get(TypingQuestionRecord, question_id)
+            record = session.get(TypingQuestionRecord, question_id.value)  # QuestionId.value で int を取り出す
 
             if record is None:
                 return None  # 対象がなければ何もしない
 
-            if "english" in updates:
-                record.english_text = str(updates["english"])  # 英文変更を反映する
+            if patch.english is not None:
+                record.english_text = patch.english.value  # 英文変更を反映する
 
-            if "japanese" in updates:
-                record.japanese_text = str(updates["japanese"])  # 日本語訳変更を反映する
+            if patch.japanese is not None:
+                record.japanese_text = patch.japanese.value  # 日本語訳変更を反映する
 
-            if "is_active" in updates:
-                record.is_active = bool(updates["is_active"])  # 有効フラグ変更を反映する
+            if patch.is_active is not None:
+                record.is_active = patch.is_active  # 有効フラグ変更を反映する
 
-            if "tags" in updates:
-                self._replace_question_tags(session, question_id, tuple(updates["tags"]))  # タグ変更を反映する
+            if patch.tags is not None:
+                self._replace_question_tags(session, question_id.value, patch.tags.value)  # タグ変更を反映する
 
             record.updated_at = datetime.now(timezone.utc)
             session.add(record)
@@ -179,8 +180,8 @@ class SqlModelQuestionRepository:
             tags_by_question_id.get(int(record.id), ()),
         )  # 更新済みエンティティを返す
 
-    def deactivate(self, question_id: int) -> bool:
-        return self.update(question_id, {"is_active": False}) is not None  # 論理削除として無効化する
+    def deactivate(self, question_id: QuestionId) -> bool:
+        return self.update(question_id, QuestionPatch(is_active=False)) is not None  # 論理削除として無効化する
 
     def list_tags(self) -> list[str]:
         with get_session(self.database_url) as session:

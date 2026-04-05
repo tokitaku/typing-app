@@ -1,6 +1,7 @@
 from typing import Protocol
 
-from backend.domain.entities import DailyStudySummary, Question, StudyResult
+from backend.domain.entities import DailyStudySummary, Question, QuestionPatch, StudyResult
+from backend.domain.value_objects import QuestionId
 
 
 class QuestionRepository(Protocol):
@@ -15,10 +16,10 @@ class QuestionRepository(Protocol):
     def create(self, question: Question) -> Question:
         ...
 
-    def update(self, question_id: int, updates: dict[str, object]) -> Question | None:
+    def update(self, question_id: QuestionId, patch: QuestionPatch) -> Question | None:
         ...
 
-    def deactivate(self, question_id: int) -> bool:
+    def deactivate(self, question_id: QuestionId) -> bool:
         ...
 
     def list_tags(self) -> list[str]:

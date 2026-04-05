@@ -6,6 +6,7 @@ from backend.domain.value_objects import (
     AverageTime,
     CorrectRate,
     MistakeCount,
+    QuestionId,
     QuestionText,
     TagCollection,
     TotalQuestions,
@@ -19,11 +20,19 @@ class StudyMode(str, Enum):
 
 @dataclass(frozen=True)
 class Question:
-    id: int | None
+    id: QuestionId | None
     english: QuestionText
     japanese: QuestionText
     is_active: bool = True
     tags: TagCollection = field(default_factory=TagCollection)
+
+
+@dataclass(frozen=True)
+class QuestionPatch:
+    english: QuestionText | None = None
+    japanese: QuestionText | None = None
+    is_active: bool | None = None
+    tags: TagCollection | None = None  # None は「変更なし」を意味する
 
 
 @dataclass(frozen=True)

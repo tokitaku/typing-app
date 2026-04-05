@@ -1,11 +1,11 @@
-from backend.domain.entities import DailyStudySummary, Question, StudyResult
-from backend.domain.value_objects import QuestionText, TagCollection
+from backend.domain.entities import DailyStudySummary, Question, QuestionPatch, StudyResult
+from backend.domain.value_objects import QuestionId, QuestionText, TagCollection
 
 
 class FakeQuestionRepository:
     def __init__(self, questions: list[Question]) -> None:
         self.questions = list(questions)
-        self._next_id = max((q.id for q in questions if q.id is not None), default=0) + 1
+        self._next_id = max((q.id.value for q in questions if q.id is not None), default=0) + 1
 
     def list_questions(
         self,
@@ -28,7 +28,7 @@ class FakeQuestionRepository:
 
     def create(self, question: Question) -> Question:
         saved = Question(
-            id=self._next_id,
+            id=QuestionId(self._next_id),
             english=question.english,
             japanese=question.japanese,
             is_active=question.is_active,
@@ -38,25 +38,22 @@ class FakeQuestionRepository:
         self.questions.append(saved)
         return saved  # DB の自動採番をエミュレートするため連番 ID を割り当てて返す
 
-    def update(self, question_id: int, updates: dict) -> Question | None:
+    def update(self, question_id: QuestionId, patch: QuestionPatch) -> Question | None:
         for i, q in enumerate(self.questions):
-            if q.id == question_id:
-                english_raw = updates.get("english")
-                japanese_raw = updates.get("japanese")
-                tags_raw = updates.get("tags")
+            if q.id == question_id:  # QuestionId 同士の比較 (dataclass equality)
                 updated = Question(
                     id=q.id,
-                    english=QuestionText(english_raw) if english_raw is not None else q.english,
-                    japanese=QuestionText(japanese_raw) if japanese_raw is not None else q.japanese,
-                    is_active=updates.get("is_active", q.is_active),
-                    tags=TagCollection(tags_raw) if tags_raw is not None else q.tags,
+                    english=patch.english if patch.english is not None else q.english,
+                    japanese=patch.japanese if patch.japanese is not None else q.japanese,
+                    is_active=patch.is_active if patch.is_active is not None else q.is_active,
+                    tags=patch.tags if patch.tags is not None else q.tags,
                 )
                 self.questions[i] = updated
                 return updated  # リポジトリの実装と同じ戻り値の契約を再現するため更新後のエンティティを返す
         return None  # リポジトリの実装と同じ振る舞いを再現するため存在しない ID は None を返す
 
-    def deactivate(self, question_id: int) -> bool:
-        return self.update(question_id, {"is_active": False}) is not None  # is_active フラグによる論理削除をエミュレートする
+    def deactivate(self, question_id: QuestionId) -> bool:
+        return self.update(question_id, QuestionPatch(is_active=False)) is not None  # is_active フラグによる論理削除をエミュレートする
 
     def list_tags(self) -> list[str]:
         unique_tags = {tag for question in self.questions for tag in question.tags.value}

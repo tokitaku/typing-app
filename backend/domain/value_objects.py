@@ -60,3 +60,12 @@ class AverageTime:
     def __post_init__(self) -> None:
         if self.value < 0:
             raise ValueError(f"average_time must be >= 0, got {self.value}")
+
+
+@dataclass(frozen=True)
+class QuestionId:
+    value: int
+
+    def __post_init__(self) -> None:
+        if self.value < 1:
+            raise ValueError(f"QuestionId must be >= 1, got {self.value}")
