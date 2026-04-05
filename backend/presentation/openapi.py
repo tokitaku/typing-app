@@ -2,12 +2,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-from backend.main import create_app
-
 
 def build_openapi_schema() -> dict[str, Any]:
-    app = create_app()  # 既存の FastAPI 定義を再利用して schema を組み立てる
-    return app.openapi()
+    from backend.main import app  # lazy import で副作用をここに限定
+    return app.openapi()  # composition root が組み立てた app から schema を取得する
 
 
 def write_openapi_schema(output_path: str | Path) -> Path:
