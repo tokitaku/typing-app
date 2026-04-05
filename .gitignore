@@ -27,3 +27,4 @@ backend/app.db
 
 # Claude
 .claude/settings.local.json
+docs/superpowers/
