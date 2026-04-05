@@ -1,4 +1,5 @@
 from backend.domain.entities import DailyStudySummary, Question, StudyResult
+from backend.domain.value_objects import QuestionText, TagCollection
 
 
 class FakeQuestionRepository:
@@ -20,7 +21,7 @@ class FakeQuestionRepository:
         if tag_codes:
             normalized_codes = {code.lower() for code in tag_codes}
             filtered = [
-                question for question in filtered if normalized_codes.intersection(question.tags)
+                question for question in filtered if normalized_codes.intersection(question.tags.value)
             ]  # タグ一致が 1 件以上ある問題だけを残す
 
         return filtered
@@ -40,12 +41,15 @@ class FakeQuestionRepository:
     def update(self, question_id: int, updates: dict) -> Question | None:
         for i, q in enumerate(self.questions):
             if q.id == question_id:
+                english_raw = updates.get("english")
+                japanese_raw = updates.get("japanese")
+                tags_raw = updates.get("tags")
                 updated = Question(
                     id=q.id,
-                    english=updates.get("english", q.english),
-                    japanese=updates.get("japanese", q.japanese),
+                    english=QuestionText(english_raw) if english_raw is not None else q.english,
+                    japanese=QuestionText(japanese_raw) if japanese_raw is not None else q.japanese,
                     is_active=updates.get("is_active", q.is_active),
-                    tags=updates.get("tags", q.tags),
+                    tags=TagCollection(tags_raw) if tags_raw is not None else q.tags,
                 )
                 self.questions[i] = updated
                 return updated  # リポジトリの実装と同じ戻り値の契約を再現するため更新後のエンティティを返す
@@ -55,7 +59,7 @@ class FakeQuestionRepository:
         return self.update(question_id, {"is_active": False}) is not None  # is_active フラグによる論理削除をエミュレートする
 
     def list_tags(self) -> list[str]:
-        unique_tags = {tag for question in self.questions for tag in question.tags}
+        unique_tags = {tag for question in self.questions for tag in question.tags.value}
         return sorted(unique_tags)  # API と同じ契約でアルファベット順・重複なしのタグ一覧を返す
 
 
@@ -72,7 +76,7 @@ class FakeStudyResultRepository:
 
     def get_today_summary(self, target_date: str) -> DailyStudySummary:
         solved_problems = sum(
-            result.total_questions
+            result.total_questions.value
             for result in self.saved_results
             if result.created_at.date().isoformat() == target_date
         )
