@@ -52,8 +52,8 @@ class FakeQuestionRepository:
                 return updated  # リポジトリの実装と同じ戻り値の契約を再現するため更新後のエンティティを返す
         return None  # リポジトリの実装と同じ振る舞いを再現するため存在しない ID は None を返す
 
-    def deactivate(self, question_id: int) -> bool:
-        return self.update(question_id, {"is_active": False}) is not None  # is_active フラグによる論理削除をエミュレートする
+    def deactivate(self, question_id: QuestionId) -> bool:
+        return self.update(question_id, QuestionPatch(is_active=False)) is not None  # is_active フラグによる論理削除をエミュレートする
 
     def list_tags(self) -> list[str]:
         unique_tags = {tag for question in self.questions for tag in question.tags.value}

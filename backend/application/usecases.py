@@ -98,7 +98,7 @@ def update_question(
 
 
 def deactivate_question(repository: QuestionRepository, question_id: int) -> bool:
-    return repository.deactivate(question_id)  # 論理削除を委譲する
+    return repository.deactivate(QuestionId(question_id))  # int を QuestionId に変換して委譲する
 
 
 def list_tags(repository: QuestionRepository) -> list[str]:
