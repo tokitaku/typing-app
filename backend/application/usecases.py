@@ -33,7 +33,7 @@ def _parse_tag_codes(codes: list[str] | None) -> list[str] | None:
 
 def _to_question_dto(question: Question) -> QuestionDto:
     return QuestionDto(
-        id=int(question.id),
+        id=question.id.value,
         english=question.english.value,
         japanese=question.japanese.value,
         isActive=question.is_active,

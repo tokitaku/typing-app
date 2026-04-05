@@ -5,15 +5,15 @@ from backend.application.dtos import (
 )
 from backend.application.usecases import create_question, list_questions, update_question
 from backend.domain.entities import Question
-from backend.domain.value_objects import QuestionText, TagCollection
+from backend.domain.value_objects import QuestionId, QuestionText, TagCollection
 from backend.application.tests.fakes import FakeQuestionRepository
 
 
 def test_list_questions_use_case_includes_inactive_by_default() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=1, english=QuestionText("cat"), japanese=QuestionText("猫"), is_active=True),
-            Question(id=2, english=QuestionText("dog"), japanese=QuestionText("犬"), is_active=False),
+            Question(id=QuestionId(1), english=QuestionText("cat"), japanese=QuestionText("猫"), is_active=True),
+            Question(id=QuestionId(2), english=QuestionText("dog"), japanese=QuestionText("犬"), is_active=False),
         ]
     )
 
@@ -26,14 +26,14 @@ def test_list_questions_use_case_with_tag_filter() -> None:
     repository = FakeQuestionRepository(
         [
             Question(
-                id=1,
+                id=QuestionId(1),
                 english=QuestionText("debate"),
                 japanese=QuestionText("討論"),
                 is_active=True,
                 tags=TagCollection(("eiken", "writing")),
             ),
             Question(
-                id=2,
+                id=QuestionId(2),
                 english=QuestionText("We discussed climate policy."),
                 japanese=QuestionText("私たちは気候政策を議論した。"),
                 is_active=True,
@@ -86,7 +86,7 @@ def test_create_question_use_case_normalizes_tags() -> None:
 def test_update_question_use_case_updates_fields() -> None:
     repository = FakeQuestionRepository(
         [
-            Question(id=10, english=QuestionText("river"), japanese=QuestionText("川"), is_active=True),
+            Question(id=QuestionId(10), english=QuestionText("river"), japanese=QuestionText("川"), is_active=True),
         ]
     )
 
@@ -106,7 +106,7 @@ def test_update_question_use_case_replaces_tags() -> None:
     repository = FakeQuestionRepository(
         [
             Question(
-                id=10,
+                id=QuestionId(10),
                 english=QuestionText("river"),
                 japanese=QuestionText("川"),
                 is_active=True,

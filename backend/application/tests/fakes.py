@@ -1,11 +1,11 @@
-from backend.domain.entities import DailyStudySummary, Question, StudyResult
-from backend.domain.value_objects import QuestionText, TagCollection
+from backend.domain.entities import DailyStudySummary, Question, QuestionPatch, StudyResult
+from backend.domain.value_objects import QuestionId, QuestionText, TagCollection
 
 
 class FakeQuestionRepository:
     def __init__(self, questions: list[Question]) -> None:
         self.questions = list(questions)
-        self._next_id = max((q.id for q in questions if q.id is not None), default=0) + 1
+        self._next_id = max((q.id.value for q in questions if q.id is not None), default=0) + 1
 
     def list_questions(
         self,
@@ -28,7 +28,7 @@ class FakeQuestionRepository:
 
     def create(self, question: Question) -> Question:
         saved = Question(
-            id=self._next_id,
+            id=QuestionId(self._next_id),
             english=question.english,
             japanese=question.japanese,
             is_active=question.is_active,
