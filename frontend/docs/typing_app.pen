@@ -8072,14 +8072,33 @@
           "alignItems": "center",
           "children": [
             {
-              "type": "text",
-              "id": "WnkeF",
-              "name": "heroTitle",
-              "fill": "$--foreground",
-              "content": "英語を打って、スペルと短文に慣れる。",
-              "fontFamily": "Inter",
-              "fontSize": 32,
-              "fontWeight": "700"
+              "type": "frame",
+              "id": "vPLQZ",
+              "name": "heroTitleFrame",
+              "gap": 2,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "RUKvR",
+                  "name": "titleText",
+                  "fill": "#0a0a0a",
+                  "content": "Type and Learn",
+                  "fontFamily": "Inter",
+                  "fontSize": 36,
+                  "fontWeight": "700",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1,
+                  "id": "FOrag",
+                  "name": "typingCursor",
+                  "fill": "#0a0a0a",
+                  "width": 3,
+                  "height": 40
+                }
+              ]
             },
             {
               "type": "text",
@@ -8094,6 +8113,70 @@
               "fontFamily": "Inter",
               "fontSize": 16,
               "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "6MJIF",
+              "name": "typingAnimationDemo",
+              "width": 560,
+              "fill": "#f5f5f5",
+              "cornerRadius": 12,
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                16,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "g3AyG",
+                  "name": "label",
+                  "fill": "#a3a3a3",
+                  "content": "typing...",
+                  "fontFamily": "Inter",
+                  "fontSize": 12,
+                  "fontWeight": "normal",
+                  "fontStyle": "italic"
+                },
+                {
+                  "type": "frame",
+                  "id": "UFvxD",
+                  "name": "typingLine",
+                  "width": "fill_container",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "iDbV9",
+                      "name": "typed",
+                      "fill": "#404040",
+                      "content": "The quick brown fox ju",
+                      "fontFamily": "Roboto Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "WLOA7",
+                      "name": "cursor",
+                      "fill": "#0a0a0a",
+                      "width": 2,
+                      "height": 22
+                    },
+                    {
+                      "type": "text",
+                      "id": "VgHGq",
+                      "name": "untyped",
+                      "fill": "#d4d4d4",
+                      "content": "mps",
+                      "fontFamily": "Roboto Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "frame",
