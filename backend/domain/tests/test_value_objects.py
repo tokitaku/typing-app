@@ -4,6 +4,7 @@ from backend.domain.value_objects import (
     AverageTime,
     CorrectRate,
     MistakeCount,
+    QuestionId,
     QuestionText,
     TagCollection,
     TotalQuestions,
@@ -108,21 +109,15 @@ class TestAverageTime:
 
 class TestQuestionId:
     def test_positive_integer_is_stored(self) -> None:
-        from backend.domain.value_objects import QuestionId
         assert QuestionId(1).value == 1
 
     def test_large_integer_is_valid(self) -> None:
-        from backend.domain.value_objects import QuestionId
         assert QuestionId(9999).value == 9999
 
     def test_zero_raises(self) -> None:
-        import pytest
-        from backend.domain.value_objects import QuestionId
         with pytest.raises(ValueError, match="QuestionId"):
             QuestionId(0)
 
     def test_negative_raises(self) -> None:
-        import pytest
-        from backend.domain.value_objects import QuestionId
         with pytest.raises(ValueError, match="QuestionId"):
             QuestionId(-1)
