@@ -34,7 +34,8 @@ from backend.presentation.schemas import (
     QuestionListResponse,
     QuestionResponse,
     QuestionUpdate,
-    StudyResultRequest,
+    StudyResultCreate,
+    StudyResultResponse,
     TagListResponse,
 )
 
@@ -141,22 +142,22 @@ def create_app(database_url: str | None = None) -> FastAPI:
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-    @app.post("/study-results", response_model=StudyResultRequest, status_code=status.HTTP_201_CREATED)
-    def post_study_result(study_result: StudyResultRequest) -> StudyResultRequest:
+    @app.post("/study-results", response_model=StudyResultResponse, status_code=status.HTTP_201_CREATED)
+    def post_study_result(study_result: StudyResultCreate) -> StudyResultResponse:
         saved_result = record_study_result(
             study_result_repository,
             RecordStudyResultCommand(**study_result.model_dump()),
         )
-        return StudyResultRequest(**saved_result.__dict__)
+        return StudyResultResponse(**saved_result.__dict__)
 
-    @app.get("/study-results/latest", response_model=StudyResultRequest)
-    def get_latest_result() -> StudyResultRequest:
+    @app.get("/study-results/latest", response_model=StudyResultResponse)
+    def get_latest_result() -> StudyResultResponse:
         latest_result = get_latest_study_result(study_result_repository)
 
         if latest_result is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-        return StudyResultRequest(**latest_result.__dict__)
+        return StudyResultResponse(**latest_result.__dict__)
 
     @app.get("/study-results/summary/today", response_model=DailyStudySummaryResponse)
     def get_today_summary() -> DailyStudySummaryResponse:

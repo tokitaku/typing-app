@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -60,21 +60,20 @@ class TagListResponse(BaseModel):
     tags: list[str]
 
 
-class StudyResultRequest(BaseModel):
+class StudyResultBase(BaseModel):
     mode: Literal["learn", "review"]
     total_questions: int = Field(ge=1)
     correct_rate: int = Field(ge=0, le=100)
     mistakes: int = Field(ge=0)
     average_time: int = Field(ge=0)
-    created_at: datetime
 
-    @field_validator("created_at")
-    @classmethod
-    def validate_created_at(cls, value: datetime) -> datetime:
-        if value.tzinfo is None or value.utcoffset() is None:
-            return value.replace(tzinfo=timezone.utc)  # タイムゾーン未指定は UTC として扱う
 
-        return value.astimezone(timezone.utc)  # 内部では UTC に正規化して扱う
+class StudyResultCreate(StudyResultBase):
+    pass  # created_at はサーバー側で生成するため入力に含めない
+
+
+class StudyResultResponse(StudyResultBase):
+    created_at: datetime  # サーバー側で付与された UTC タイムスタンプ
 
 
 class DailyStudySummaryResponse(BaseModel):
