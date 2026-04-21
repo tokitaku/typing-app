@@ -26,7 +26,7 @@ def _build_alembic_config(database_url: str) -> Config:
     backend_dir = Path(__file__).resolve().parents[3]
     config = Config(str(backend_dir / "alembic.ini"))
     config.set_main_option("script_location", str(backend_dir / "alembic"))
-    config.set_main_option("sqlalchemy.url", database_url)
+    config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
     return config
 
 
@@ -37,6 +37,17 @@ def _build_schema_scoped_url(database_url: str, schema_name: str) -> str:
     merged_options = f"{existing_options} {search_path_option}" if existing_options else search_path_option
     scoped_url: URL = url.update_query_dict({"options": merged_options})
     return str(scoped_url)
+
+
+def test_build_alembic_config_accepts_percent_encoded_database_url() -> None:
+    database_url = (
+        "postgresql://typing_app:typing_app_password@127.0.0.1:5432/typing_app"
+        "?options=-csearch_path%3Dtest_migrations_schema"
+    )
+
+    config = _build_alembic_config(database_url)
+
+    assert config.get_main_option("sqlalchemy.url") == database_url
 
 
 @pytest.fixture
