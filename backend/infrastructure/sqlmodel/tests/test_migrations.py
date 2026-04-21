@@ -6,28 +6,24 @@ from uuid import uuid4
 
 import pytest
 from alembic import command
-from alembic.config import Config
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import URL, make_url
 from sqlalchemy.pool import NullPool
 
-from backend.database import get_database_url
+from backend.database import _build_alembic_config, get_database_url
 
 
-EXPECTED_TABLES = {
+EXPECTED_UPGRADED_TABLES = {
+    "alembic_version",
     "study_results",
     "tags",
     "typing_question_tags",
     "typing_questions",
 }
 
-
-def _build_alembic_config(database_url: str) -> Config:
-    backend_dir = Path(__file__).resolve().parents[3]
-    config = Config(str(backend_dir / "alembic.ini"))
-    config.set_main_option("script_location", str(backend_dir / "alembic"))
-    config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
-    return config
+EXPECTED_DOWNGRADED_TABLES = {
+    "alembic_version",
+}
 
 
 def _build_isolated_database_url(database_url: str, database_name: str) -> str:
@@ -85,7 +81,7 @@ def test_migrations_can_upgrade_and_downgrade_roundtrip(isolated_database: str) 
 
     upgraded_engine = create_engine(database_url, poolclass=NullPool)
     upgraded_inspector = inspect(upgraded_engine)
-    assert EXPECTED_TABLES.issubset(set(upgraded_inspector.get_table_names()))
+    assert set(upgraded_inspector.get_table_names()) == EXPECTED_UPGRADED_TABLES
     upgraded_engine.dispose()
 
     with migration_engine.connect() as connection:
@@ -94,7 +90,6 @@ def test_migrations_can_upgrade_and_downgrade_roundtrip(isolated_database: str) 
 
     downgraded_engine = create_engine(database_url, poolclass=NullPool)
     downgraded_inspector = inspect(downgraded_engine)
-    remaining_tables = set(downgraded_inspector.get_table_names())
-    assert EXPECTED_TABLES.isdisjoint(remaining_tables)
+    assert set(downgraded_inspector.get_table_names()) == EXPECTED_DOWNGRADED_TABLES
     downgraded_engine.dispose()
     migration_engine.dispose()
