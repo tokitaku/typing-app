@@ -39,6 +39,22 @@ jobs:
 
   backend-ci:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://typing_app:typing_app_password@127.0.0.1:5432/typing_app
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: typing_app
+          POSTGRES_PASSWORD: typing_app_password
+          POSTGRES_DB: typing_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U typing_app"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
 
     steps:
       - uses: actions/checkout@v4
