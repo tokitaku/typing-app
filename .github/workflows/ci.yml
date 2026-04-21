@@ -40,14 +40,14 @@ jobs:
   backend-ci:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: postgresql://typing_app:typing_app_password@127.0.0.1:5432/typing_app
+      DATABASE_URL: postgresql://typing_app@127.0.0.1:5432/typing_app
     services:
       postgres:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: typing_app
-          POSTGRES_PASSWORD: typing_app_password
           POSTGRES_DB: typing_app
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         options: >-
